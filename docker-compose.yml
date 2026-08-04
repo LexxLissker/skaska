@@ -1,4 +1,5 @@
-# Локальная разработка. Прод-конфигурация — в docker-compose.prod.yml.
+# Локальная разработка: postgres + API + воркер + витрина.
+# Продакшен — в docker-compose.prod.yml.
 services:
   db:
     image: postgres:16-alpine
@@ -8,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-vendure}
       POSTGRES_DB: ${DB_NAME:-zamorozka}
     ports:
-      # Пробрасываем наружу, чтобы можно было подключиться psql/DBeaver с хоста.
+      # Наружу — чтобы подключаться psql или DBeaver с хоста.
       - '5432:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -18,7 +19,7 @@ services:
       timeout: 5s
       retries: 10
 
-  api:
+  api: &api
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -28,7 +29,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
+    environment: &api_env
       APP_ENV: dev
       DB_HOST: db
       DB_PORT: 5432
@@ -43,33 +44,37 @@ services:
       STOREFRONT_URL: http://localhost:3001
     ports:
       - '3000:3000'
-      # Admin UI в дев-режиме собирается на отдельном порту
       - '3002:3002'
     volumes:
       - ./apps/api/src:/app/apps/api/src
       - api_static:/app/apps/api/static
 
   worker:
+    <<: *api
+    command: npm run dev:worker --workspace=@zamorozka/api
+    environment:
+      <<: *api_env
+    ports: []
+
+  web:
     build:
       context: .
-      dockerfile: apps/api/Dockerfile
+      dockerfile: apps/web/Dockerfile
       target: dev
     restart: unless-stopped
-    command: npm run dev:worker --workspace=@zamorozka/api
     depends_on:
-      db:
-        condition: service_healthy
+      - api
     environment:
-      APP_ENV: dev
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-zamorozka}
-      DB_USERNAME: ${DB_USERNAME:-vendure}
-      DB_PASSWORD: ${DB_PASSWORD:-vendure}
-      COOKIE_SECRET: ${COOKIE_SECRET:-zamorozka-dev-cookie-secret}
+      # В браузере адрес API внешний, при серверном рендеринге — внутри сети.
+      NEXT_PUBLIC_SHOP_API_URL: http://localhost:3000/shop-api
+      SHOP_API_URL_INTERNAL: http://api:3000/shop-api
+      NEXT_PUBLIC_PHONE_LOGIN_ENABLED: 'false'
+    ports:
+      - '3001:3001'
     volumes:
-      - ./apps/api/src:/app/apps/api/src
-      - api_static:/app/apps/api/static
+      - ./apps/web/app:/app/apps/web/app
+      - ./apps/web/components:/app/apps/web/components
+      - ./apps/web/lib:/app/apps/web/lib
 
 volumes:
   db_data:

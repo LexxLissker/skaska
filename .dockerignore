@@ -1,0 +1,31 @@
+# Зависимости ставятся внутри образа под его платформу —
+# копировать хостовые (Windows) нельзя, нативные модули не подойдут.
+node_modules
+**/node_modules
+
+# Сборки
+**/dist
+**/.next
+**/out
+**/*.tsbuildinfo
+
+# Секреты и локальные настройки
+.env
+.env.*
+!.env.example
+**/.env.local
+
+# Загруженные файлы и рантайм Vendure
+apps/api/static
+.vendure
+
+# Git и документация
+.git
+.gitignore
+.gitattributes
+docs/design/screenshots
+
+# Прочее
+**/*.log
+.vscode
+.idea

@@ -1,0 +1,94 @@
+# Продакшен на VPS. Образы берутся из GitLab Container Registry,
+# TLS-сертификаты Caddy получает и продлевает сам.
+#
+# Запуск на сервере:
+#   docker compose -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.prod.yml up -d
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:?требуется DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?требуется DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:?требуется DB_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME} -d ${DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Наружу порт не публикуем: база доступна только внутри docker-сети.
+    networks: [internal]
+
+  api: &api
+    image: ${REGISTRY_IMAGE_API:?требуется REGISTRY_IMAGE_API}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: &api_env
+      APP_ENV: production
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      PORT: 3000
+      SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME:?требуется SUPERADMIN_USERNAME}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:?требуется SUPERADMIN_PASSWORD}
+      COOKIE_SECRET: ${COOKIE_SECRET:?требуется COOKIE_SECRET}
+      CORS_ORIGIN: https://${DOMAIN:?требуется DOMAIN}
+      STOREFRONT_URL: https://${DOMAIN}
+      ASSET_URL_PREFIX: https://${DOMAIN}/assets/
+    volumes:
+      - api_static:/app/apps/api/static
+    networks: [internal]
+
+  worker:
+    <<: *api
+    command: ['node', 'apps/api/dist/index-worker.js']
+    environment:
+      <<: *api_env
+    volumes:
+      - api_static:/app/apps/api/static
+    healthcheck:
+      disable: true
+
+  web:
+    image: ${REGISTRY_IMAGE_WEB:?требуется REGISTRY_IMAGE_WEB}
+    restart: unless-stopped
+    depends_on: [api]
+    environment:
+      NODE_ENV: production
+      # Серверный рендеринг ходит в API внутри сети, минуя интернет.
+      SHOP_API_URL_INTERNAL: http://api:3000/shop-api
+      NEXT_PUBLIC_SHOP_API_URL: https://${DOMAIN}/shop-api
+    networks: [internal]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [web, api]
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+
+volumes:
+  db_data:
+  api_static:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:

@@ -1,0 +1,48 @@
+# Caddy сам получает и продлевает сертификаты Let's Encrypt,
+# отдельного certbot не требуется.
+
+{$DOMAIN} {
+	encode gzip zstd
+
+	# Shop API — публичный, к нему ходит браузер покупателя.
+	handle /shop-api* {
+		reverse_proxy api:3000
+	}
+
+	# Раздача загруженных изображений товаров.
+	handle /assets* {
+		reverse_proxy api:3000
+	}
+
+	# Админка и Admin API. Ограничить доступ по IP можно так:
+	#   @office remote_ip 203.0.113.0/24
+	#   handle @office { reverse_proxy api:3000 }
+	# Пока полагаемся на аутентификацию Vendure.
+	handle /admin* {
+		reverse_proxy api:3000
+	}
+	handle /admin-api* {
+		reverse_proxy api:3000
+	}
+
+	# Всё остальное — витрина.
+	handle {
+		reverse_proxy web:3001
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		# Сервер не обязан сообщать, чем он работает.
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}
