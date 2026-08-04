@@ -1,0 +1,76 @@
+# Локальная разработка. Прод-конфигурация — в docker-compose.prod.yml.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-vendure}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-vendure}
+      POSTGRES_DB: ${DB_NAME:-zamorozka}
+    ports:
+      # Пробрасываем наружу, чтобы можно было подключиться psql/DBeaver с хоста.
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME:-vendure} -d ${DB_NAME:-zamorozka}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: dev
+    restart: unless-stopped
+    command: npm run dev:server --workspace=@zamorozka/api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: dev
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-zamorozka}
+      DB_USERNAME: ${DB_USERNAME:-vendure}
+      DB_PASSWORD: ${DB_PASSWORD:-vendure}
+      PORT: 3000
+      SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME:-superadmin}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:-superadmin}
+      COOKIE_SECRET: ${COOKIE_SECRET:-zamorozka-dev-cookie-secret}
+      CORS_ORIGIN: http://localhost:3001
+      STOREFRONT_URL: http://localhost:3001
+    ports:
+      - '3000:3000'
+      # Admin UI в дев-режиме собирается на отдельном порту
+      - '3002:3002'
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - api_static:/app/apps/api/static
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: dev
+    restart: unless-stopped
+    command: npm run dev:worker --workspace=@zamorozka/api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: dev
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-zamorozka}
+      DB_USERNAME: ${DB_USERNAME:-vendure}
+      DB_PASSWORD: ${DB_PASSWORD:-vendure}
+      COOKIE_SECRET: ${COOKIE_SECRET:-zamorozka-dev-cookie-secret}
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - api_static:/app/apps/api/static
+
+volumes:
+  db_data:
+  api_static:

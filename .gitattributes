@@ -1,0 +1,13 @@
+# Единый перевод строки в репозитории — в рабочей копии Windows
+# git всё равно развернёт в CRLF там, где это нужно.
+* text=auto eol=lf
+
+# Бинарные файлы не трогаем
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Скрипты PowerShell исполняются под Windows
+*.ps1 text eol=crlf

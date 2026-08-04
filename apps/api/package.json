@@ -1,0 +1,33 @@
+{
+  "name": "@zamorozka/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vendure backend для магазина «Заморозка»",
+  "scripts": {
+    "dev": "concurrently -n server,worker -c cyan,magenta \"npm:dev:server\" \"npm:dev:worker\"",
+    "dev:server": "ts-node ./src/index.ts",
+    "dev:worker": "ts-node ./src/index-worker.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node ./dist/index.js",
+    "start:worker": "node ./dist/index-worker.js",
+    "seed": "ts-node ./src/seed/seed.ts",
+    "migration:generate": "ts-node ./src/migration.ts generate",
+    "migration:run": "ts-node ./src/migration.ts run",
+    "migration:revert": "ts-node ./src/migration.ts revert"
+  },
+  "dependencies": {
+    "@vendure/admin-ui-plugin": "^3.7.1",
+    "@vendure/asset-server-plugin": "^3.7.1",
+    "@vendure/core": "^3.7.1",
+    "@vendure/email-plugin": "^3.7.1",
+    "dotenv": "^17.2.3",
+    "pg": "^8.16.3",
+    "typescript": "5.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "concurrently": "^9.2.1",
+    "ts-node": "^10.9.2"
+  }
+}

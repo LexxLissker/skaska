@@ -1,0 +1,31 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# builds
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# vendure runtime
+static/
+apps/api/static/
+apps/api/vendure.sqlite
+.vendure/
+
+# generated graphql types
+**/gql/generated.ts
+
+# logs
+*.log
+npm-debug.log*
+
+# os / editors
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/

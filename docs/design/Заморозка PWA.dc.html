@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="_ds/nocturne-0ede1542-dfa9-4377-913f-fa16139c24fc/styles.css">
+  <script src="_ds/nocturne-0ede1542-dfa9-4377-913f-fa16139c24fc/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+  <style>
+    body{ margin:0; background:#0e1012; display:flex; justify-content:center; padding:40px 20px; }
+    .chip{ font-family:var(--font-heading); cursor:pointer; white-space:nowrap; border:1px solid transparent; }
+    .chip::-webkit-scrollbar{ display:none; }
+    .noscroll{ scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-behavior:smooth; }
+    .noscroll::-webkit-scrollbar{ display:none; }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+    .spin{ animation:spin 1s linear infinite; transform-origin:center; }
+    @keyframes flyToCart{ 0%{ transform:translate(0,0) scale(1); opacity:1; } 70%{ opacity:1; } 100%{ transform:translate(var(--dx), var(--dy)) scale(0.2); opacity:0; } }
+    @keyframes cartBump{ 0%{ transform:scale(1); } 35%{ transform:scale(1.32); } 60%{ transform:scale(0.94); } 100%{ transform:scale(1); } }
+    a{ color:var(--color-accent-300); text-decoration:none; }
+    a:hover{ color:var(--color-accent); }
+  </style>
+</helmet>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:14px; font-family:var(--font-body);">
+  <div style="width:412px; height:892px; border-radius:34px; overflow:hidden; background:#1c1e20; border:8px solid rgba(116,119,117,0.5); box-shadow:0 30px 80px rgba(0,0,0,0.45); display:flex; flex-direction:column; box-sizing:border-box;">
+
+    <x-import component-from-global-scope="AndroidStatusBar" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,40px"></x-import>
+
+    <div ref="{{ setRootAreaEl }}" style="flex:1; position:relative; min-height:0; background:var(--color-bg); transform:translateZ(0);">
+
+      <!-- ===================== MAIN SCREEN ===================== -->
+      <sc-if value="{{ isMain }}" hint-placeholder-val="{{ true }}">
+      <div class="noscroll" onScroll="{{ onMainScroll }}" style="position:absolute; inset:0; bottom:64px; overflow-y:auto;">
+
+        <div style="position:relative; width:100%; height:580px;">
+          <image-slot id="{{ heroImgId }}" shape="rect" placeholder="Фото/видео блюда"></image-slot>
+          <div style="position:absolute; inset:0; background:linear-gradient(to bottom, transparent 58%, color-mix(in srgb, var(--color-bg) 92%, transparent) 100%); pointer-events:none;"></div>
+          <div style="position:absolute; left:0; right:0; bottom:0; padding:0 20px 22px; pointer-events:none;">
+            <h1 style="margin:0 0 8px; font-size:24px; color:var(--color-neutral-100); text-align:center; text-wrap:pretty;">{{ heroName }}</h1>
+            <p style="margin:0; font-size:13.5px; line-height:1.5; color:var(--color-neutral-100); opacity:0.82; text-align:center; text-wrap:pretty;">{{ heroDesc }}</p>
+          </div>
+        </div>
+
+        <div style="position:relative; z-index:2; margin-top:-16px; padding-top:40px; background:linear-gradient(to bottom, transparent 0, var(--color-bg) 50px, var(--color-bg) 100%);">
+          <div class="noscroll" style="display:flex; gap:8px; padding:0 16px 8px; overflow-x:auto;">
+            <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="4">
+              <div class="chip" onClick="{{ onCategoryClick }}" data-idx="{{ $index }}" style="{{ cat.chipStyle }}">{{ cat.name }}</div>
+            </sc-for>
+          </div>
+          <div class="noscroll" style="display:flex; gap:16px; padding:0 16px 12px; overflow-x:auto;">
+            <sc-for list="{{ subs }}" as="sub" hint-placeholder-count="4">
+              <div class="chip" onClick="{{ onSubClick }}" data-idx="{{ $index }}" style="{{ sub.chipStyle }}">{{ sub.name }}</div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="{{ dockedBarStyle }}">
+          <div class="noscroll" style="display:flex; gap:8px; padding:0 16px 8px; overflow-x:auto;">
+            <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="4">
+              <div class="chip" onClick="{{ onCategoryClick }}" data-idx="{{ $index }}" style="{{ cat.chipStyle }}">{{ cat.name }}</div>
+            </sc-for>
+          </div>
+          <div class="noscroll" style="display:flex; gap:16px; padding:0 16px 12px; overflow-x:auto;">
+            <sc-for list="{{ subs }}" as="sub" hint-placeholder-count="4">
+              <div class="chip" onClick="{{ onSubClick }}" data-idx="{{ $index }}" style="{{ sub.chipStyle }}">{{ sub.name }}</div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div ref="{{ catalogRef }}" onTouchStart="{{ onProductsTouchStart }}" onTouchEnd="{{ onProductsTouchEnd }}">
+        <div style="position:relative; width:100%; height:414px; margin:14px 0 4px; overflow:hidden;">
+          <image-slot id="{{ subImgId }}" shape="rect" placeholder="Фото/видео подкатегории"></image-slot>
+          <div style="position:absolute; inset:0; background:linear-gradient(to bottom, transparent 40%, color-mix(in srgb, var(--color-bg) 92%, transparent) 100%); pointer-events:none;"></div>
+          <div style="position:absolute; left:0; right:0; bottom:0; padding:20px 20px 24px; pointer-events:none;">
+            <h3 style="margin:0 0 8px; font-size:19px; color:var(--color-neutral-100);">{{ subHeading }}</h3>
+            <p style="margin:0; font-size:13.5px; line-height:1.55; color:var(--color-neutral-100); opacity:0.82; max-width:88%;">{{ subDesc }}</p>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 16px;">
+          <sc-for list="{{ visibleProducts }}" as="p" hint-placeholder-count="8">
+            <div onClick="{{ onProductClick }}" data-id="{{ p.id }}" style="background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; overflow:hidden; cursor:pointer; display:flex; flex-direction:column;">
+              <div style="width:100%; aspect-ratio:1/1;">
+                <image-slot id="{{ p.imgId }}" shape="rect" placeholder="Фото товара"></image-slot>
+              </div>
+              <div style="padding:10px 12px 12px; display:flex; flex-direction:column; gap:8px;">
+                <div style="font-size:13.5px; line-height:1.3; min-height:35px; color:var(--color-text);">{{ p.name }}</div>
+                <div data-no-nav="1" style="display:flex; align-items:center; gap:7px;">
+                  <div style="position:relative; flex:1; height:36px; background:var(--color-surface-2); border:1px solid var(--color-divider); border-radius:999px; display:flex;">
+                    <div onClick="{{ onCardWeightClick }}" data-id="{{ p.id }}" data-w="500" style="flex:1; position:relative; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                      <sc-if value="{{ p.halfSelected }}" hint-placeholder-val="{{ true }}">
+                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:var(--color-accent); color:var(--color-bg); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,0.45); border:2px solid var(--color-surface); z-index:2; pointer-events:none;">
+                          <span style="font-size:11px; font-weight:700; line-height:1.15;">0.5</span>
+                          <span style="font-size:7.5px; font-weight:500; opacity:0.7; line-height:1;">кг</span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ p.kgSelected }}" hint-placeholder-val="{{ false }}">
+                        <span style="font-size:11px; color:var(--color-neutral-400); pointer-events:none;">0.5</span>
+                      </sc-if>
+                    </div>
+                    <div onClick="{{ onCardWeightClick }}" data-id="{{ p.id }}" data-w="1000" style="flex:1; position:relative; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                      <sc-if value="{{ p.kgSelected }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:var(--color-accent); color:var(--color-bg); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,0.45); border:2px solid var(--color-surface); z-index:2; pointer-events:none;">
+                          <span style="font-size:11px; font-weight:700; line-height:1.15;">1</span>
+                          <span style="font-size:7.5px; font-weight:500; opacity:0.7; line-height:1;">кг</span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ p.halfSelected }}" hint-placeholder-val="{{ true }}">
+                        <span style="font-size:11px; color:var(--color-neutral-400); pointer-events:none;">1</span>
+                      </sc-if>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary" onClick="{{ onProductQuickAdd }}" data-id="{{ p.id }}" style="height:36px; padding:0 12px; font-size:12.5px; font-weight:600; white-space:nowrap; border-radius:999px; flex-shrink:0;">+ {{ p.price }} ₽</button>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;">
+            <button class="btn btn-secondary btn-block" onClick="{{ onShowMore }}" style="height:44px;">Показать ещё</button>
+          </div>
+        </sc-if>
+        </div>
+
+        <div style="padding:22px 16px 4px;">
+          <h5 style="margin:0 0 12px; font-size:22px; font-weight:500; color:var(--color-text);">Наборы для дома</h5>
+          <div class="noscroll" style="display:flex; gap:12px; overflow-x:auto; padding-bottom:4px;">
+            <sc-for list="{{ bundles }}" as="b" hint-placeholder-count="3">
+              <div style="flex:0 0 240px; background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; overflow:hidden; display:flex; flex-direction:column;">
+                <div style="position:relative; width:100%; height:120px;">
+                  <image-slot id="{{ b.imgId }}" shape="rect" placeholder="Фото набора"></image-slot>
+                  <span class="tag tag-accent" style="position:absolute; left:10px; top:10px;">{{ b.tag }}</span>
+                </div>
+                <div style="padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1;">
+                  <div style="font-size:15.5px; font-weight:500; color:var(--color-text);">{{ b.title }}</div>
+                  <div style="font-size:12.5px; color:color-mix(in srgb, var(--color-text) 65%, transparent);">{{ b.meta }}</div>
+                  <div style="font-size:12px; color:color-mix(in srgb, var(--color-text) 55%, transparent); line-height:1.4;">{{ b.desc }}</div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:auto; padding-top:10px;">
+                    <span style="font-size:11.5px; color:color-mix(in srgb, var(--color-text) 55%, transparent);">Выгода в наборе</span>
+                    <button class="btn btn-primary" onClick="{{ onBundleAdd }}" data-id="{{ b.id }}" style="height:32px; padding:0 12px; font-size:12px; font-weight:600; white-space:nowrap; border-radius:999px; flex-shrink:0;">{{ b.priceLabel }}</button>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="padding:22px 16px 4px;">
+          <h5 style="margin:0 0 12px; font-size:22px; font-weight:500; color:var(--color-text);">Отзывы</h5>
+          <div class="noscroll" style="display:flex; gap:12px; overflow-x:auto; padding-bottom:4px;">
+            <sc-for list="{{ reviews }}" as="rv" hint-placeholder-count="3">
+              <div style="flex:0 0 220px; background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; padding:14px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                  <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg, var(--color-accent) 0%, #C59B27 100%); color:var(--color-bg); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0;">{{ rv.initial }}</div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-size:13px; color:var(--color-text);">{{ rv.name }}</div>
+                    <div style="font-size:11px; color:var(--color-accent-300);">{{ rv.rating }}</div>
+                  </div>
+                </div>
+                <p style="margin:0; font-size:12.5px; line-height:1.45; opacity:0.8; text-wrap:pretty;">{{ rv.text }}</p>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="padding:22px 16px 4px;">
+          <h5 style="margin:0 0 12px; font-size:22px; font-weight:500; color:var(--color-text);">Почему выбирают нас</h5>
+          <div class="noscroll" style="display:flex; gap:14px; overflow-x:auto; padding-bottom:6px;">
+            <sc-for list="{{ offers }}" as="o" hint-placeholder-count="3">
+              <div style="flex:0 0 78%; position:relative; overflow:hidden; border:1px solid var(--color-accent); border-radius:var(--radius-lg); background:linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 16%, var(--color-surface)) 0%, var(--color-surface) 70%); padding:18px;">
+                <div style="position:absolute; top:-22px; right:-22px; width:100px; height:100px; border-radius:50%; background:color-mix(in srgb, var(--color-accent) 20%, transparent); filter:blur(2px);"></div>
+                <span class="tag tag-accent" style="position:relative; display:inline-block; margin-bottom:10px;">{{ o.tag }}</span>
+                <div style="position:relative; font-size:16px; color:var(--color-text); margin-bottom:6px;">{{ o.title }}</div>
+                <p style="position:relative; margin:0 0 14px; font-size:12.5px; line-height:1.5; opacity:0.78; text-wrap:pretty;">{{ o.desc }}</p>
+                <sc-if value="{{ o.hasButton }}" hint-placeholder-val="{{ false }}">
+                  <button class="btn btn-primary" style="position:relative; height:38px; padding:0 16px; font-size:13.5px;">{{ o.buttonText }}</button>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="height:6px; margin-top:4px;"></div>
+        </div>
+
+        <div style="padding:22px 16px 4px;">
+          <h5 style="margin:0 0 12px; font-size:22px; font-weight:500; color:var(--color-text);">Как мы готовим</h5>
+          <div class="noscroll" style="display:flex; gap:14px; overflow-x:auto; padding-bottom:6px;">
+            <sc-for list="{{ steps }}" as="st" hint-placeholder-count="4">
+              <div style="flex:0 0 78%; background:linear-gradient(155deg, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface)) 0%, var(--color-surface) 65%); border:1px solid var(--color-divider); border-radius:var(--radius-lg); padding:20px; position:relative; overflow:hidden;">
+                <div style="position:absolute; top:-18px; right:-18px; width:90px; height:90px; border-radius:50%; background:color-mix(in srgb, var(--color-accent) 20%, transparent); filter:blur(2px);"></div>
+                <div style="position:relative; display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                  <div style="width:44px; height:44px; border-radius:50%; background:color-mix(in srgb, var(--color-accent) 18%, transparent); border:1px solid var(--color-accent); display:flex; align-items:center; justify-content:center; color:var(--color-accent);" dangerouslySetInnerHTML="{{ st.iconHtml }}"></div>
+                  <span style="font-family:var(--font-heading); font-size:34px; font-weight:500; color:color-mix(in srgb, var(--color-text) 20%, transparent);">{{ st.numLabel }}</span>
+                </div>
+                <div style="position:relative; font-size:15px; color:var(--color-text); margin-bottom:6px;">{{ st.title }}</div>
+                <div style="position:relative; font-size:12.5px; line-height:1.5; opacity:0.75;">{{ st.desc }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="height:6px; margin-top:12px;"></div>
+        </div>
+
+        <div style="padding:22px 16px 4px;">
+          <h5 style="margin:0 0 6px; font-size:22px; font-weight:500; color:var(--color-text);">Вопросы и ответы</h5>
+          <div style="display:flex; flex-direction:column;">
+            <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
+              <div style="border-bottom:1px solid var(--color-divider); padding:14px 0;">
+                <div onClick="{{ onFaqClick }}" data-idx="{{ $index }}" style="display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;">
+                  <span style="font-size:13.5px; color:var(--color-text);">{{ f.q }}</span>
+                  <span style="font-size:16px; color:var(--color-accent-300); flex-shrink:0;">{{ f.icon }}</span>
+                </div>
+                <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+                  <p style="margin:10px 0 0; font-size:12.5px; line-height:1.5; opacity:0.75;">{{ f.a }}</p>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="height:24px;"></div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== PRODUCT SCREEN ===================== -->
+      <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+      <div class="noscroll" style="position:absolute; inset:0; bottom:64px; overflow-y:auto;">
+        <div style="position:relative; width:100%; aspect-ratio:4/3;">
+          <image-slot id="{{ selectedImgId }}" shape="rect" placeholder="Фото товара"></image-slot>
+          <div style="position:absolute; inset:0; background:linear-gradient(to bottom, transparent 45%, color-mix(in srgb, var(--color-bg) 88%, transparent) 100%); pointer-events:none;"></div>
+          <button onClick="{{ onBack }}" style="position:absolute; top:14px; left:14px; width:38px; height:38px; border-radius:50%; background:color-mix(in srgb, var(--color-bg) 65%, transparent); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#f3f5fe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 style="position:absolute; left:18px; right:18px; bottom:14px; margin:0; font-size:20px; color:var(--color-neutral-100); text-wrap:pretty;">{{ selectedName }}</h2>
+        </div>
+        <div style="padding:18px 18px 8px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px;">
+            <div style="display:flex; gap:8px;">
+              <sc-for list="{{ weightOptions }}" as="w" hint-placeholder-count="2">
+                <div onClick="{{ onWeightClick }}" data-w="{{ w.value }}" style="{{ w.style }}">{{ w.label }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; border:1px solid var(--color-divider); border-radius:var(--radius-md); padding:5px 8px;">
+              <button onClick="{{ onQtyDec }}" style="width:22px; height:22px; border:none; background:transparent; color:var(--color-text); font-size:16px; cursor:pointer;">−</button>
+              <span style="min-width:14px; text-align:center; font-size:14px;">{{ qty }}</span>
+              <button onClick="{{ onQtyInc }}" style="width:22px; height:22px; border:none; background:transparent; color:var(--color-text); font-size:16px; cursor:pointer;">+</button>
+            </div>
+            <button class="btn btn-primary" onClick="{{ onAddToCart }}" style="height:34px; padding:0 14px; font-size:14px; white-space:nowrap;">+ {{ selectedTotal }} ₽</button>
+          </div>
+          <div style="font-size:12px; color:color-mix(in srgb, var(--color-text) 60%, transparent); margin-bottom:14px;">{{ bjuText }}</div>
+
+          <div style="margin-bottom:14px;">
+            <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:8px;">Тесто</div>
+            <div class="noscroll" style="display:flex; flex-wrap:nowrap; gap:6px; overflow-x:auto; margin-bottom:6px;">
+              <sc-for list="{{ doughOptions }}" as="d" hint-placeholder-count="3">
+                <div onClick="{{ onDoughClick }}" data-id="{{ d.id }}" style="{{ d.style }}">{{ d.label }}</div>
+              </sc-for>
+            </div>
+            <div style="font-size:12px; opacity:0.7; line-height:1.4;">{{ doughHint }}</div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:8px;">Сочность и жир</div>
+            <div class="noscroll" style="display:flex; flex-wrap:nowrap; gap:6px; overflow-x:auto; margin-bottom:6px;">
+              <sc-for list="{{ fatOptions }}" as="fo" hint-placeholder-count="3">
+                <div onClick="{{ onFatClick }}" data-id="{{ fo.id }}" style="{{ fo.style }}">{{ fo.label }}</div>
+              </sc-for>
+            </div>
+            <div style="font-size:12px; opacity:0.7; line-height:1.4;">{{ fatHint }}</div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:8px;">Цвет теста</div>
+            <div class="noscroll" style="display:flex; flex-wrap:nowrap; gap:6px; overflow-x:auto; margin-bottom:6px;">
+              <sc-for list="{{ colorOptions }}" as="co" hint-placeholder-count="4">
+                <div onClick="{{ onColorClick }}" data-id="{{ co.id }}" style="{{ co.style }}">{{ co.label }}</div>
+              </sc-for>
+            </div>
+            <div style="font-size:12px; opacity:0.7; line-height:1.4;">{{ colorHint }}</div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:8px;">Текстура мяса</div>
+            <div class="noscroll" style="display:flex; flex-wrap:nowrap; gap:6px; overflow-x:auto; margin-bottom:6px;">
+              <sc-for list="{{ textureOptions }}" as="to" hint-placeholder-count="2">
+                <div onClick="{{ onTextureClick }}" data-id="{{ to.id }}" style="{{ to.style }}">{{ to.label }}</div>
+              </sc-for>
+            </div>
+            <div style="font-size:12px; opacity:0.7; line-height:1.4;">{{ textureHint }}</div>
+          </div>
+
+          <sc-if value="{{ hasRelevantAddons }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px;">
+            <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:8px;">С чем подать?</div>
+            <div class="noscroll" style="display:flex; gap:8px; overflow-x:auto;">
+              <sc-for list="{{ relevantAddons }}" as="ad" hint-placeholder-count="3">
+                <div style="flex:0 0 120px; height:98px; background:var(--color-surface); border-radius:var(--radius-md); padding:10px; display:flex; flex-direction:column; box-sizing:border-box;">
+                  <div style="font-size:11.5px; line-height:1.3; color:var(--color-text); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">{{ ad.name }}</div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:4px; margin-top:auto;">
+                    <span style="font-size:12px; color:#E5B84B; text-shadow:0 2px 8px rgba(229,184,75,0.2); font-weight:600;">+{{ ad.price }} ₽</span>
+                    <button onClick="{{ onAddonQuickAdd }}" data-id="{{ ad.id }}" style="width:22px; height:22px; border-radius:50%; border:1px solid var(--color-accent); background:transparent; color:var(--color-accent); font-size:14px; line-height:1; cursor:pointer; flex-shrink:0;">+</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+
+          <div class="hr"></div>
+          <h5 style="margin:14px 0 6px; color:color-mix(in srgb, var(--color-text) 70%, transparent);">Описание</h5>
+          <p style="font-size:14px; opacity:0.8; margin:0 0 14px; text-wrap:pretty;">Замороженный полуфабрикат ручной лепки. Хранить при -18°C, готовить из замороженного, не размораживая. Состав и время приготовления уточняются на упаковке.</p>
+          <h5 style="margin:14px 0 6px; color:color-mix(in srgb, var(--color-text) 70%, transparent);">Состав</h5>
+          <p style="font-size:14px; opacity:0.8; margin:0;">{{ compositionText }}</p>
+        </div>
+      </div>
+      <sc-if value="{{ upsellOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; background:color-mix(in srgb, var(--color-bg) 60%, transparent); z-index:40; display:flex; align-items:flex-end;">
+        <div style="width:100%; background:var(--color-surface); border-radius:20px 20px 0 0; padding:20px 18px 22px; box-sizing:border-box;">
+          <div style="width:36px; height:4px; border-radius:2px; background:var(--color-divider); margin:0 auto 16px;"></div>
+          <div style="font-size:13px; color:var(--color-accent-300); margin-bottom:6px;">Шеф рекомендует</div>
+          <div style="font-size:16px; color:var(--color-text); margin-bottom:16px; text-wrap:pretty;">Добавить к заказу {{ upsellAddon.name }}?</div>
+          <div style="display:flex; gap:10px;">
+            <button onClick="{{ onUpsellSkip }}" class="btn btn-secondary" style="flex:1; height:44px;">Пропустить</button>
+            <button onClick="{{ onUpsellAdd }}" class="btn btn-primary" style="flex:1; height:44px;">Да, за {{ upsellAddon.price }} ₽</button>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+      </sc-if>
+
+      <!-- ===================== CART SCREEN ===================== -->
+      <sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; bottom:64px;">
+        <div class="noscroll" style="position:absolute; inset:0; bottom:90px; overflow-y:auto;">
+
+          <div style="display:flex; align-items:center; gap:12px; padding:16px 18px 18px;">
+            <button onClick="{{ onBack }}" style="width:38px; height:38px; border-radius:50%; background:var(--color-surface); border:1px solid var(--color-divider); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; padding:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <h2 style="margin:0; font-size:21px; font-weight:500; color:var(--color-text);">Корзина</h2>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:14px; padding:0 18px 18px;">
+
+            <div style="background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; padding:16px;">
+              <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:14.5px; font-weight:500; color:var(--color-text); margin-bottom:6px;">Корзина пуста</div>
+                <div style="font-size:12.5px; line-height:1.5; color:color-mix(in srgb, var(--color-text) 60%, transparent);">Добавьте блюда из каталога, чтобы оформить заказ</div>
+              </sc-if>
+              <sc-if value="{{ cartNotEmpty }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:14.5px; font-weight:500; color:var(--color-text); margin-bottom:4px;">{{ orderCountLabel }}</div>
+                <div style="display:flex; flex-direction:column;">
+                  <sc-for list="{{ orderItems }}" as="it" hint-placeholder-count="3">
+                    <div style="{{ it.rowStyle }}">
+                      <div style="width:64px; height:64px; border-radius:var(--radius-md); overflow:hidden; flex-shrink:0;">
+                        <image-slot id="{{ it.imgId }}" shape="rect" placeholder="Фото товара"></image-slot>
+                      </div>
+                      <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                        <span style="font-size:13.5px; color:var(--color-text);">{{ it.name }}</span>
+                        <span style="font-size:11.5px; color:color-mix(in srgb, var(--color-text) 55%, transparent);">{{ it.variant }}</span>
+                        <span style="font-size:11.5px; color:color-mix(in srgb, var(--color-text) 55%, transparent);">{{ it.meta }}</span>
+                        <div style="display:flex; align-items:center; gap:6px; padding:4px 0; margin-top:8px; align-self:flex-start;">
+                          <button onClick="{{ onDecrementItem }}" data-id="{{ it.id }}" aria-label="Убрать одну" style="width:20px; height:20px; border:none; background:transparent; color:color-mix(in srgb, var(--color-text) 60%, transparent); font-size:15px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;">−</button>
+                          <span style="min-width:14px; text-align:center; font-size:13px; color:var(--color-text);">{{ it.qty }}</span>
+                          <button onClick="{{ onIncrementItem }}" data-id="{{ it.id }}" aria-label="Добавить ещё одну" style="width:20px; height:20px; border:none; background:transparent; color:var(--color-accent); font-size:15px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;">+</button>
+                        </div>
+                      </div>
+                      <span style="font-size:14px; font-weight:500; color:var(--color-text); flex-shrink:0;">{{ it.priceLabel }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+
+            <sc-if value="{{ cartNotEmpty }}" hint-placeholder-val="{{ true }}">
+            <div style="background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; padding:16px;">
+              <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:12px;">Промокод</div>
+              <sc-if value="{{ promoApplied }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                  <div style="display:flex; align-items:baseline; gap:8px;">
+                    <span style="font-size:14.5px; font-weight:600; color:var(--color-accent); font-family:var(--font-heading);">{{ promoCodeText }}</span>
+                    <span style="font-size:12px; color:color-mix(in srgb, var(--color-text) 60%, transparent);">{{ promoDiscountLabel }}</span>
+                  </div>
+                  <button onClick="{{ onPromoRemove }}" aria-label="Убрать промокод" style="width:24px; height:24px; border-radius:50%; border:1px solid var(--color-divider); background:transparent; color:color-mix(in srgb, var(--color-text) 60%, transparent); font-size:14px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;">×</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ promoNotApplied }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; gap:8px;">
+                  <input class="input" placeholder="Введите промокод" value="{{ promoInput }}" onChange="{{ onPromoInputChange }}" style="flex:1;"/>
+                  <button class="btn btn-secondary" onClick="{{ onPromoApply }}" style="flex-shrink:0; height:44px; padding:0 16px;">Применить</button>
+                </div>
+                <sc-if value="{{ promoError }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px; color:color-mix(in srgb, var(--color-text) 55%, transparent); margin-top:8px;">Промокод не найден</div>
+                </sc-if>
+              </sc-if>
+            </div>
+
+            <div style="background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; padding:16px;">
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:13.5px; color:color-mix(in srgb, var(--color-text) 70%, transparent);">Товары</span>
+                  <span style="font-size:13.5px; color:var(--color-text);">{{ goodsTotalLabel }}</span>
+                </div>
+                <sc-if value="{{ promoApplied }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span style="font-size:13.5px; color:color-mix(in srgb, var(--color-text) 70%, transparent);">Скидка</span>
+                    <span style="font-size:13.5px; color:var(--color-accent);">{{ discountLabel }}</span>
+                  </div>
+                </sc-if>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px; padding-top:10px; border-top:1px solid var(--color-divider);">
+                  <span style="font-size:15px; font-weight:500; color:var(--color-text);">Итого</span>
+                  <span style="font-size:18px; font-weight:600; color:var(--color-accent); font-family:var(--font-heading);">{{ subtotalLabel }}</span>
+                </div>
+              </div>
+            </div>
+            </sc-if>
+
+          </div>
+        </div>
+
+        <div style="position:absolute; left:0; right:0; bottom:0; padding:14px 18px 18px; background:var(--color-bg); border-top:1px solid var(--color-divider); box-sizing:border-box; z-index:5;">
+          <button onClick="{{ onProceedToCheckout }}" disabled="{{ cartEmpty }}" style="{{ cartCtaStyle }}">{{ cartCtaLabel }}</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== CHECKOUT SCREEN ===================== -->
+      <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; bottom:64px;">
+        <div class="noscroll" style="position:absolute; inset:0; bottom:90px; overflow-y:auto;">
+
+          <div style="display:flex; align-items:center; gap:12px; padding:16px 18px 18px;">
+            <button onClick="{{ onBack }}" style="width:38px; height:38px; border-radius:50%; background:var(--color-surface); border:1px solid var(--color-divider); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; padding:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="var(--color-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <h2 style="margin:0; font-size:21px; font-weight:500; color:var(--color-text);">Оформление</h2>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:14px; padding:0 18px 18px;">
+
+            <div style="background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; padding:16px;">
+              <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:12px;">Доставка</div>
+              <div class="field" style="position:relative; margin-bottom:12px;">
+                <label>Улица и дом</label>
+                <input class="input" placeholder="Например, ул. Тверская, 12" value="{{ checkoutAddress }}" onChange="{{ onAddressChange }}" onFocus="{{ onAddressFocus }}" onBlur="{{ onAddressBlur }}" autoComplete="off"/>
+                <sc-if value="{{ showSuggestions }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; left:0; right:0; top:100%; margin-top:6px; background:var(--color-surface-2); border:1px solid var(--color-divider); border-radius:var(--radius-md); box-shadow:var(--shadow-md); z-index:30; overflow:hidden;">
+                    <sc-for list="{{ addressSuggestions }}" as="s" hint-placeholder-count="3">
+                      <div onMouseDown="{{ onSuggestionPick }}" data-value="{{ s }}" style="padding:11px 12px; font-size:13.5px; color:var(--color-text); cursor:pointer; border-bottom:1px solid var(--color-divider);">{{ s }}</div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+
+              <sc-if value="{{ addressSelected }}" hint-placeholder-val="{{ false }}">
+                <div style="background:var(--color-surface-2); border-radius:var(--radius-md); padding:12px 14px; display:flex; flex-direction:column; gap:7px; margin-bottom:12px;">
+                  <div style="font-size:12px; color:color-mix(in srgb, var(--color-text) 60%, transparent);">Зона «{{ zoneName }}» · ближайший рейс</div>
+                  <div style="font-size:13.5px; font-weight:500; color:var(--color-text);">{{ nextRunText }}</div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; font-size:13px; color:color-mix(in srgb, var(--color-text) 70%, transparent);">
+                    <span>Доставка</span><span style="{{ deliveryValueStyle }}">{{ deliveryValueLabel }}</span>
+                  </div>
+                  <div style="font-size:12px; color:var(--color-accent-300);">{{ freeDeliveryText }}</div>
+                  <div style="font-size:11.5px; color:color-mix(in srgb, var(--color-text) 50%, transparent);">{{ deadlineText }}</div>
+                </div>
+
+                <div class="seg">
+                  <label class="seg-opt">
+                    <input type="radio" name="timemode" data-mode="nearest" checked="{{ isNearest }}" onChange="{{ onTimeModeChange }}"/>
+                    <span>Ближайший рейс</span>
+                  </label>
+                  <label class="seg-opt">
+                    <input type="radio" name="timemode" data-mode="choose" checked="{{ isChoose }}" onChange="{{ onTimeModeChange }}"/>
+                    <span>Другая дата</span>
+                  </label>
+                </div>
+
+                <sc-if value="{{ isChoose }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+                    <sc-for list="{{ runsView }}" as="run" hint-placeholder-count="4">
+                      <div onClick="{{ onRunClick }}" data-idx="{{ run.idx }}" style="{{ run.style }}">{{ run.label }}</div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ addressNotSelected }}" hint-placeholder-val="{{ true }}">
+                <div style="background:var(--color-surface-2); border-radius:var(--radius-md); padding:14px; font-size:13px; color:color-mix(in srgb, var(--color-text) 60%, transparent); text-align:center;">Укажем стоимость и время после выбора адреса</div>
+              </sc-if>
+            </div>
+
+            <div style="background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; padding:16px;">
+              <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:12px;">Контакты</div>
+              <div class="field">
+                <label>Телефон</label>
+                <input class="input" value="{{ phone }}" onChange="{{ onPhoneChange }}" inputMode="tel" placeholder="+7 (___) ___-__-__"/>
+              </div>
+              <div style="font-size:12px; opacity:0.7; margin-top:8px; color:var(--color-text);">Пришлём статус заказа</div>
+            </div>
+
+            <div style="background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; padding:16px;">
+              <div style="font-size:15px; font-weight:500; color:var(--color-text); margin-bottom:12px;">Оплата</div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <label class="radio" style="{{ sbpRowStyle }}">
+                  <input type="radio" name="paymethod" data-method="sbp" checked="{{ isSbp }}" onChange="{{ onPayMethodChange }}"/>
+                  <span class="dot"></span>
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-size:14.5px; font-weight:500; color:var(--color-text);">СБП</span>
+                    <span style="font-size:12px; color:color-mix(in srgb, var(--color-text) 60%, transparent);">Оплата в банковском приложении</span>
+                  </div>
+                </label>
+                <label class="radio" style="{{ cardRowStyle }}">
+                  <input type="radio" name="paymethod" data-method="card" checked="{{ isCardMethod }}" onChange="{{ onPayMethodChange }}"/>
+                  <span class="dot"></span>
+                  <span style="font-size:14.5px; font-weight:500; color:var(--color-text);">Банковская карта</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="background:var(--color-surface); border:1px solid rgba(229,184,75,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.4); border-radius:16px; padding:16px;">
+              <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:14.5px; font-weight:500; color:var(--color-text); margin-bottom:6px;">Корзина пуста</div>
+                <div style="font-size:12.5px; line-height:1.5; color:color-mix(in srgb, var(--color-text) 60%, transparent);">Добавьте блюда из каталога, чтобы оформить заказ</div>
+              </sc-if>
+              <sc-if value="{{ cartNotEmpty }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ onToggleOrder }}" style="display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
+                <span style="font-size:14.5px; font-weight:500; color:var(--color-text);">Состав заказа · {{ orderCountLabel }}</span>
+                <span style="{{ orderChevronStyle }}">⌄</span>
+              </div>
+              <sc-if value="{{ orderExpanded }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--color-divider);">
+                  <sc-for list="{{ orderItems }}" as="it" hint-placeholder-count="3">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                      <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+                        <span style="font-size:13px; color:var(--color-text);">{{ it.name }}</span>
+                        <span style="font-size:11.5px; color:color-mix(in srgb, var(--color-text) 55%, transparent);">{{ it.summaryLine }}</span>
+                      </div>
+                      <span style="font-size:13px; color:var(--color-text); flex-shrink:0;">{{ it.priceLabel }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px; padding-top:14px; border-top:1px solid var(--color-divider);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:13.5px; color:color-mix(in srgb, var(--color-text) 70%, transparent);">Товары</span>
+                  <span style="font-size:13.5px; color:var(--color-text);">{{ goodsTotalLabel }}</span>
+                </div>
+                <sc-if value="{{ promoApplied }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span style="font-size:13.5px; color:color-mix(in srgb, var(--color-text) 70%, transparent);">Промокод {{ promoCodeText }}</span>
+                    <span style="font-size:13.5px; color:var(--color-accent);">{{ discountLabel }}</span>
+                  </div>
+                </sc-if>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:13.5px; color:color-mix(in srgb, var(--color-text) 70%, transparent);">Доставка</span>
+                  <span style="{{ deliveryValueStyle }}">{{ deliveryValueLabel }}</span>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px; padding-top:10px; border-top:1px solid var(--color-divider);">
+                  <span style="font-size:15px; font-weight:500; color:var(--color-text);">К оплате</span>
+                  <span style="font-size:18px; font-weight:600; color:var(--color-accent); font-family:var(--font-heading);">{{ totalToPayLabel }}</span>
+                </div>
+              </div>
+              </sc-if>
+            </div>
+
+            <div style="font-size:11.5px; line-height:1.5; color:color-mix(in srgb, var(--color-text) 45%, transparent); text-align:center; padding:2px 8px 4px;">Нажимая «Оплатить», вы соглашаетесь с условиями оферты и политикой конфиденциальности</div>
+          </div>
+        </div>
+
+        <div style="position:absolute; left:0; right:0; bottom:0; padding:14px 18px 18px; background:var(--color-bg); border-top:1px solid var(--color-divider); box-sizing:border-box; z-index:5;">
+          <button onClick="{{ onPayClick }}" disabled="{{ cartEmpty }}" style="{{ payButtonStyle }}">{{ payButtonLabel }}</button>
+        </div>
+
+        <sc-if value="{{ showSbpOverlay }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:0; background:color-mix(in srgb, var(--color-bg) 60%, transparent); z-index:40; display:flex; align-items:flex-end;">
+            <div style="width:100%; background:var(--color-surface); border-radius:20px 20px 0 0; padding:20px 18px 26px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; text-align:center;">
+              <div style="width:36px; height:4px; border-radius:2px; background:var(--color-divider); margin:0 0 18px;"></div>
+              <svg class="spin" width="40" height="40" viewBox="0 0 40 40" fill="none" style="margin-bottom:16px;"><circle cx="20" cy="20" r="16" stroke="var(--color-divider)" stroke-width="3"/><path d="M20 4a16 16 0 0116 16" stroke="var(--color-accent)" stroke-width="3" stroke-linecap="round"/></svg>
+              <div style="font-size:16px; color:var(--color-text); margin-bottom:8px;">Переходим в банковское приложение</div>
+              <p style="margin:0 0 20px; font-size:13px; line-height:1.5; color:color-mix(in srgb, var(--color-text) 65%, transparent);">Подтвердите оплату {{ totalToPayLabel }} в приложении вашего банка. Вернитесь сюда после оплаты.</p>
+              <button onClick="{{ onClosePayOverlay }}" class="btn btn-secondary" style="width:100%; height:44px;">Отмена</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showCardOverlay }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:0; background:color-mix(in srgb, var(--color-bg) 60%, transparent); z-index:40; display:flex; align-items:flex-end;">
+            <div style="width:100%; background:var(--color-surface); border-radius:20px 20px 0 0; padding:20px 18px 22px; box-sizing:border-box;">
+              <div style="width:36px; height:4px; border-radius:2px; background:var(--color-divider); margin:0 auto 18px;"></div>
+              <div style="font-size:16px; color:var(--color-text); margin-bottom:14px;">Оплата картой</div>
+              <div class="field" style="margin-bottom:10px;">
+                <label>Номер карты</label>
+                <input class="input" value="{{ cardNumber }}" onChange="{{ onCardNumberChange }}" placeholder="0000 0000 0000 0000" inputMode="numeric"/>
+              </div>
+              <div style="display:flex; gap:10px; margin-bottom:6px;">
+                <div class="field" style="flex:1;">
+                  <label>Срок</label>
+                  <input class="input" value="{{ cardExpiry }}" onChange="{{ onCardExpiryChange }}" placeholder="ММ/ГГ" inputMode="numeric"/>
+                </div>
+                <div class="field" style="flex:1;">
+                  <label>CVC</label>
+                  <input class="input" value="{{ cardCvc }}" onChange="{{ onCardCvcChange }}" placeholder="000" inputMode="numeric"/>
+                </div>
+              </div>
+              <div style="font-size:11.5px; color:color-mix(in srgb, var(--color-text) 55%, transparent); margin-bottom:16px;">Оплата защищена, данные карты не сохраняются</div>
+              <button onClick="{{ onCardPaySubmit }}" style="width:100%; height:50px; border:none; border-radius:var(--radius-md); background:linear-gradient(135deg, var(--color-accent) 0%, #C59B27 100%); color:var(--color-bg); font-family:var(--font-heading); font-size:15.5px; font-weight:600; cursor:pointer; margin-bottom:8px;">Оплатить {{ totalToPayLabel }}</button>
+              <button onClick="{{ onClosePayOverlay }}" class="btn btn-ghost btn-block" style="height:40px;">Отмена</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- bottom nav -->
+      <div style="position:absolute; left:0; right:0; bottom:0; height:64px; background:rgba(17,24,39,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-top:1px solid var(--color-divider); display:flex; align-items:center; justify-content:space-around; padding:0 8px; box-sizing:border-box; z-index:22;">
+        <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, var(--color-accent) 0%, #C59B27 100%); color:var(--color-bg); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; flex-shrink:0;">З</div>
+        <button onClick="{{ onToggleSearch }}" style="background:none; border:none; padding:4px; display:flex; cursor:pointer;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="var(--color-neutral-400)" stroke-width="1.6"/><path d="M21 21l-4.3-4.3" stroke="var(--color-neutral-400)" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div onClick="{{ onOpenCheckout }}" ref="{{ setCartIconRef }}" style="{{ cartIconWrapStyle }}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1.2 11a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 8z" stroke="var(--color-accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2" stroke="var(--color-accent)" stroke-width="1.6"/></svg>
+          <sc-if value="{{ hasCartItems }}" hint-placeholder-val="{{ false }}">
+            <span style="position:absolute; top:-6px; right:-8px; min-width:15px; height:15px; padding:0 3px; border-radius:999px; background:var(--color-accent); color:var(--color-bg); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1;">{{ cartCount }}</span>
+          </sc-if>
+        </div>
+        <div style="position:relative; display:flex;">
+          <button onClick="{{ onToggleContact }}" style="background:none; border:none; padding:4px; display:flex; cursor:pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1116 0 8 8 0 01-11.5 7.2L4 20l1.1-4.3A7.96 7.96 0 014 12z" stroke="{{ contactIconColor }}" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="12" r="1" fill="{{ contactIconColor }}"/><circle cx="12" cy="12" r="1" fill="{{ contactIconColor }}"/><circle cx="15" cy="12" r="1" fill="{{ contactIconColor }}"/></svg>
+          </button>
+          <sc-if value="{{ contactOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; right:-8px; bottom:46px; width:196px; background:var(--color-surface); border:1px solid var(--color-divider); border-radius:var(--radius-md); box-shadow:var(--shadow-md); padding:6px; z-index:30;">
+              <a href="https://t.me/zamorozka_help" target="_blank" rel="noopener noreferrer" style-hover="background:color-mix(in srgb, var(--color-accent) 12%, transparent);" style="display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:var(--radius-sm); color:var(--color-text); font-size:12.5px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 2L2 9l7 3.5M22 2l-4.5 19-7-7.5M22 2L11.5 13" stroke="var(--color-accent-300)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+                Telegram
+              </a>
+              <a href="https://max.ru/zamorozka_help" target="_blank" rel="noopener noreferrer" style-hover="background:color-mix(in srgb, var(--color-accent) 12%, transparent);" style="display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:var(--radius-sm); color:var(--color-text); font-size:12.5px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7 15.5A4.5 4.5 0 017 6.6a5.5 5.5 0 0110.6-1.4A4.8 4.8 0 0121 9.8a4.3 4.3 0 01-1.2 8.4H8a4.5 4.5 0 01-1-.7z" stroke="var(--color-accent-300)" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                MAX
+              </a>
+              <a href="https://wa.me/79001234567" target="_blank" rel="noopener noreferrer" style-hover="background:color-mix(in srgb, var(--color-accent) 12%, transparent);" style="display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:var(--radius-sm); color:var(--color-text); font-size:12.5px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 00-7.8 13.4L3 21l4.8-1.3A9 9 0 1012 3z" stroke="var(--color-accent-300)" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.8 8.6c.2-.4.5-.6.8-.5.3.1.9 1.6 1 1.8.1.2.1.4-.05.6l-.5.6c-.1.15-.15.3 0 .5.3.5 1.6 1.8 2.5 2.1.2.1.3.05.45-.1l.55-.65c.15-.2.3-.2.5-.1.25.1 1.5.7 1.7.8.15.1.25.15.25.3 0 .2-.05.7-.35 1.1-.3.4-1 .65-1.5.65-.5 0-1.5-.15-3.1-1.35-1.7-1.3-2.7-3-2.85-3.25-.1-.2-.65-1.05-.4-1.75z" stroke="var(--color-accent-300)" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/></svg>
+                WhatsApp
+              </a>
+              <a href="tel:+79001234567" style-hover="background:color-mix(in srgb, var(--color-accent) 12%, transparent);" style="display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:var(--radius-sm); color:var(--color-text); font-size:12.5px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6.5 3h3l1.5 5-2.5 2a13 13 0 006 6l2-2.5 5 1.5v3a2 2 0 01-2.2 2A17 17 0 014.5 5.2 2 2 0 016.5 3z" stroke="var(--color-accent-300)" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                Позвонить
+              </a>
+              <a href="mailto:hello@zamorozka.ru" style-hover="background:color-mix(in srgb, var(--color-accent) 12%, transparent);" style="display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:var(--radius-sm); color:var(--color-text); font-size:12.5px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="var(--color-accent-300)" stroke-width="1.6"/><path d="M4 7l8 6 8-6" stroke="var(--color-accent-300)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Написать на почту
+              </a>
+            </div>
+          </sc-if>
+        </div>
+        <button onClick="{{ onToggleMenu }}" style="background:none; border:none; padding:4px; display:flex; cursor:pointer;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="var(--color-neutral-400)" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div style="{{ searchWrapStyle }}">
+          <input type="text" placeholder="Поиск блюд" style="flex:1; min-width:0; height:100%; background:transparent; border:none; outline:none; color:var(--color-text); font-family:var(--font-body); font-size:13.5px; padding:0 40px 0 14px; box-sizing:border-box;"/>
+          <button onClick="{{ onToggleSearch }}" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); width:32px; height:32px; border-radius:50%; border:none; background:transparent; display:flex; align-items:center; justify-content:center; color:var(--color-accent); cursor:pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; background:color-mix(in srgb, var(--color-bg) 60%, transparent); z-index:42; display:flex; align-items:flex-end;">
+          <div style="width:100%; max-height:80%; overflow-y:auto; background:var(--color-surface); border-radius:20px 20px 0 0; padding:20px 18px 26px; box-sizing:border-box;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+              <span style="font-size:16px; font-weight:500; color:var(--color-text); font-family:var(--font-heading);">Меню</span>
+              <button onClick="{{ onToggleMenu }}" style="background:none; border:none; padding:4px; cursor:pointer; color:var(--color-neutral-400); display:flex;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+
+            <div style="background:var(--color-surface-2); border-radius:var(--radius-md); padding:14px; margin-bottom:16px;">
+              <div style="font-size:14.5px; font-weight:500; color:var(--color-text); margin-bottom:8px;">Мои заказы</div>
+
+              <sc-if value="{{ menuLoggedIn }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px; color:color-mix(in srgb, var(--color-text) 60%, transparent);">Заказов пока нет — оформите первый в корзине</div>
+              </sc-if>
+
+              <sc-if value="{{ menuAwaitingPhone }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:12.5px; line-height:1.5; color:color-mix(in srgb, var(--color-text) 60%, transparent); margin-bottom:10px;">Войдите по номеру телефона — здесь появятся заказы и повтор заказа</div>
+                <div style="display:flex; gap:8px;">
+                  <input class="input" style="flex:1;" value="{{ menuPhone }}" onChange="{{ onMenuPhoneChange }}" inputMode="tel" placeholder="+7 (___) ___-__-__"/>
+                  <button class="btn btn-primary" onClick="{{ onMenuSendCode }}" disabled="{{ menuSendCodeDisabled }}" style="height:44px; padding:0 16px; flex-shrink:0;">Код</button>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ menuAwaitingCode }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px; color:color-mix(in srgb, var(--color-text) 60%, transparent); margin-bottom:10px;">Код отправлен на {{ menuPhone }}</div>
+                <div style="display:flex; gap:8px;">
+                  <input class="input" style="flex:1;" value="{{ menuCode }}" onChange="{{ onMenuCodeChange }}" inputMode="numeric" placeholder="Код из SMS"/>
+                  <button class="btn btn-primary" onClick="{{ onMenuVerifyCode }}" disabled="{{ menuVerifyDisabled }}" style="height:44px; padding:0 16px; flex-shrink:0;">Войти</button>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex; flex-direction:column;">
+              <a href="#" onClick="{{ onDocLinkClick }}" style-hover="color:var(--color-accent);" style="display:flex; align-items:center; justify-content:space-between; padding:12px 2px; border-bottom:1px solid var(--color-divider); color:var(--color-text); font-size:13.5px;">
+                <span>Публичная оферта</span><span style="color:var(--color-neutral-400);">›</span>
+              </a>
+              <a href="#" onClick="{{ onDocLinkClick }}" style-hover="color:var(--color-accent);" style="display:flex; align-items:center; justify-content:space-between; padding:12px 2px; border-bottom:1px solid var(--color-divider); color:var(--color-text); font-size:13.5px;">
+                <span>Политика конфиденциальности</span><span style="color:var(--color-neutral-400);">›</span>
+              </a>
+              <a href="#" onClick="{{ onDocLinkClick }}" style-hover="color:var(--color-accent);" style="display:flex; align-items:center; justify-content:space-between; padding:12px 2px; border-bottom:1px solid var(--color-divider); color:var(--color-text); font-size:13.5px;">
+                <span>Согласие на обработку персональных данных</span><span style="color:var(--color-neutral-400);">›</span>
+              </a>
+              <a href="#" onClick="{{ onDocLinkClick }}" style-hover="color:var(--color-accent);" style="display:flex; align-items:center; justify-content:space-between; padding:12px 2px; border-bottom:1px solid var(--color-divider); color:var(--color-text); font-size:13.5px;">
+                <span>Условия доставки и возврата</span><span style="color:var(--color-neutral-400);">›</span>
+              </a>
+
+              <div onClick="{{ onToggleCookiePrefs }}" style="display:flex; align-items:center; justify-content:space-between; padding:11px 2px 4px; cursor:pointer;">
+                <span style="font-size:12px; color:color-mix(in srgb, var(--color-text) 55%, transparent);">Настройки cookie</span>
+                <span style="{{ cookieChevronStyle }}">⌄</span>
+              </div>
+              <sc-if value="{{ menuCookieOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 2px 2px;">
+                  <span style="font-size:12px; color:color-mix(in srgb, var(--color-text) 60%, transparent);">Аналитические cookie</span>
+                  <div onClick="{{ onToggleCookieAnalytics }}" style="{{ cookieToggleTrackStyle }}">
+                    <div style="{{ cookieToggleDotStyle }}"></div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+
+      <sc-for list="{{ flyingItems }}" as="fly" hint-placeholder-count="0">
+        <div style="{{ fly.style }}"></div>
+      </sc-for>
+
+    </div>
+
+    <x-import component-from-global-scope="AndroidNavBar" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,24px"></x-import>
+  </div>
+  <div style="color:var(--color-neutral-600); font-size:12px; font-family:system-ui,sans-serif;">Прототип · главный экран, карточка товара и оформление заказа</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+const FILLINGS = ['Говядина/свинина','Курица и индейка','Телятина','С грибами','Со шпинатом и сыром','Бабушкин рецепт','Сибирские','Уральские','С бараниной','Классические','Домашние','Мини-формат','Большая упаковка XXL','Постные','Фермерские','С зеленью'];
+
+const CATEGORIES = [
+  { id:'pelmeni', name:'Пельмени', subs:['Классика','Птица','Рыба/Постное'],
+    desc:'Пельмени ручной лепки из охлаждённого мяса. Замораживаем в день лепки — готовим 7 минут, без разморозки.' },
+  { id:'vareniki', name:'Вареники', subs:['С картофелем','С творогом','С вишней'],
+    desc:'Вареники из тонкого теста с начинкой из творога, картофеля или вишни. Лепим вручную и замораживаем сразу после лепки.' },
+  { id:'manty', name:'Манты', subs:['Говядина/баранина','Тыква','Курица'],
+    desc:'Манты на пару из рубленого мяса и лука. Крупная лепка и сочная начинка, готовим на пару 25–30 минут.' },
+  { id:'hinkali', name:'Хинкали', subs:['Классика','Сыр','Грибы'],
+    desc:'Хинкали с бульоном внутри по грузинской рецептуре. Плотное тесто держит сок при варке.' },
+  { id:'khanum', name:'Ханум', subs:['С мясом','С картофелем','Вегетарианские'],
+    desc:'Ханум — рулеты из тонкого теста с мясной или овощной начинкой, приготовленные на пару.' },
+  { id:'lapsha', name:'Лапша', subs:['Домашняя','Гречневая','Рисовая'],
+    desc:'Домашняя лапша и лапша из цельнозерновой муки. Быстро готовится и держит форму при варке.' },
+  { id:'gastrolavka', name:'Гастролавка', subs:['Соусы','Масло и сливки','Бульоны','Топпинги'],
+    desc:'Соусы, топлёное масло, бульонные концентраты и хрустящие топпинги — чтобы разморозка стала настоящим ужином.' },
+];
+
+function buildSubDesc(cat, subName) {
+  return subName + ' — ' + cat.name.toLowerCase() + ' ручной лепки, которые лепим и замораживаем в день производства. Готовим прямо из морозильника, без разморозки. Порция 800 г, срок хранения до 6 месяцев при -18°C.';
+}
+
+const STEPS = [
+  { num: 1, title: 'Продукты', desc: 'Отбираем свежее мясо, овощи и муку у проверенных поставщиков.',
+    icon: '<svg width="22" height="22" viewBox="0 0 256 256" fill="none"><path d="M74 96V68a54 54 0 01108 0v28" stroke="currentColor" stroke-width="16" stroke-linecap="round"/><rect x="40" y="96" width="176" height="120" rx="16" stroke="currentColor" stroke-width="16"/></svg>' },
+  { num: 2, title: 'Лепка', desc: 'Лепим вручную небольшими партиями в день производства.',
+    icon: '<svg width="22" height="22" viewBox="0 0 256 256" fill="none"><path d="M48 128c0-24 20-44 44-44h20l20-20 20 20h20c24 0 44 20 44 44 0 44-64 92-84 104-20-12-84-60-84-104z" stroke="currentColor" stroke-width="16" stroke-linejoin="round"/></svg>' },
+  { num: 3, title: 'Заморозка', desc: 'Шоковая заморозка сразу после лепки сохраняет вкус и форму.',
+    icon: '<svg width="22" height="22" viewBox="0 0 256 256" fill="none"><path d="M128 24v208M50 66l156 124M50 190L206 66" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></svg>' },
+  { num: 4, title: 'Контроль качества', desc: 'Каждую партию проверяем перед упаковкой и отправкой.',
+    icon: '<svg width="22" height="22" viewBox="0 0 256 256" fill="none"><path d="M128 24l84 32v56c0 68-40 108-84 124-44-16-84-56-84-124V56z" stroke="currentColor" stroke-width="16" stroke-linejoin="round"/><path d="M96 132l24 24 44-52" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+];
+
+const OFFERS = [
+  { tag: 'Доставка и оплата', title: 'Бесплатно от 3 000 ₽', desc: 'Привозим за 1–2 часа в термосумке с хладоэлементами. Оплата картой онлайн или курьеру при получении.' },
+  { tag: 'Гарантия вкуса', title: '100% гарантия вкуса', desc: 'Не понравился вкус — вернём деньги за товар или бесплатно заменим его в следующем заказе.' },
+];
+
+const BUNDLES = [
+  { id: 'bundle-degustatsiya', tag: 'Набор · Дегустация', title: 'Попробовать всё', meta: '4 вкуса · 2 кг', desc: 'Пельмени, вареники, манты и хинкали', price: 1990, imgId: 'bundle-degustatsiya' },
+  { id: 'bundle-family', tag: 'Набор · Семейный', title: 'Ужин на неделю', meta: '6 порций · 3 кг', desc: 'Пельмени, вареники, манты и лапша', price: 3490, imgId: 'bundle-family' },
+  { id: 'bundle-lean', tag: 'Набор · Постный', title: 'Постное меню', meta: '4 вкуса · 2 кг', desc: 'Вареники, манты с тыквой, лапша и хинкали с грибами', price: 2190, imgId: 'bundle-lean' },
+];
+
+const FAQS = [
+  { q: 'Нужно ли размораживать перед готовкой?', a: 'Нет, всё готовится сразу из морозильника — без предварительной разморозки.' },
+  { q: 'Сколько хранится продукция?', a: 'До 6 месяцев при температуре -18°C в морозильной камере.' },
+  { q: 'Есть ли варианты без глютена или мяса?', a: 'Да, ищите отметки «Постные» и «Вегетарианские» в подкатегориях.' },
+  { q: 'Как быстро приходит заказ?', a: 'Доставка в термосумке с хладоэлементами — обычно в течение 1–2 часов по городу.' },
+];
+
+const REVIEWS = {
+  pelmeni: [
+    { name: 'Ирина', rating: '★ 4.9', text: 'Пельмени как у бабушки — тесто тонкое, мяса много. Готовятся правда за 7 минут.' },
+    { name: 'Дмитрий', rating: '★ 4.8', text: 'Пробовал классику и с курицей — не разваливаются при варке, начинка сочная.' },
+    { name: 'Анна', rating: '★ 5.0', text: 'Детский вариант берём постоянно, порции маленькие и без специй.' },
+  ],
+  vareniki: [
+    { name: 'Светлана', rating: '★ 4.9', text: 'Вареники с вишней — обалденные, тесто мягкое даже после заморозки.' },
+    { name: 'Павел', rating: '★ 4.7', text: 'С картофелем очень домашние на вкус, дети едят с удовольствием.' },
+    { name: 'Марина', rating: '★ 4.8', text: 'С творогом в меру сладкие, не разваливаются при жарке на сковороде.' },
+  ],
+  manty: [
+    { name: 'Азамат', rating: '★ 4.9', text: 'Манты крупные, сочные — бульон внутри держится, как в хорошей чайхане.' },
+    { name: 'Ольга', rating: '★ 4.8', text: 'С тыквой неожиданно вкусно, готовятся на пару ровно 25 минут.' },
+    { name: 'Роман', rating: '★ 4.7', text: 'Тесто плотное, не расползается, лепка чувствуется — не фабричные.' },
+  ],
+  hinkali: [
+    { name: 'Гиорги', rating: '★ 5.0', text: 'Бульон внутри не вытекает при варке — редкость для заморозки.' },
+    { name: 'Наталья', rating: '★ 4.8', text: 'С сыром — отдельная песня, тесто держит форму идеально.' },
+    { name: 'Илья', rating: '★ 4.7', text: 'Хвостик плотный, есть руками удобно, как в грузинской кухне и должно быть.' },
+  ],
+  khanum: [
+    { name: 'Тимур', rating: '★ 4.8', text: 'Ханум с мясом готовим на пару всей семьёй, рулеты не разваливаются.' },
+    { name: 'Юлия', rating: '★ 4.7', text: 'Вегетарианский вариант неожиданно сытный и ароматный.' },
+    { name: 'Алексей', rating: '★ 4.9', text: 'С картофелем — как у тёщи, тесто тонкое и мягкое.' },
+  ],
+  lapsha: [
+    { name: 'Ксения', rating: '★ 4.8', text: 'Домашняя лапша держит форму в супе, не разваривается.' },
+    { name: 'Артём', rating: '★ 4.7', text: 'Гречневая — отличная альтернатива обычной, вкус насыщенный.' },
+    { name: 'Полина', rating: '★ 4.9', text: 'Рисовая лапша быстро готовится, идеальна для азиатских блюд.' },
+  ],
+};
+
+function buildProducts(cat) {
+  if (cat.id === 'gastrolavka') {
+    return ADDONS.map(a => ({
+      id: 'addon-' + a.id, imgId: 'addon-' + a.id, name: a.name, price: a.price,
+      prices: { 500: a.price, 1000: a.price }, isAddon: true,
+    }));
+  }
+  return FILLINGS.map((f, i) => {
+    const price500 = 350 + ((i * 67) % 900);
+    return {
+      id: cat.id + '-' + i,
+      imgId: 'product-' + cat.id + '-' + i,
+      name: cat.name + ', ' + f,
+      price: price500,
+      prices: { 500: price500, 1000: Math.round(price500 * 1.85 / 10) * 10 },
+    };
+  });
+}
+
+const ADDONS = [
+  { id: 'sauce_mushroom', name: 'Сливочно-грибной соус', price: 149 },
+  { id: 'sauce_satsebeli', name: 'Сацебели', price: 129 },
+  { id: 'sauce_smetana', name: 'Сметанно-чесночный соус', price: 99 },
+  { id: 'sauce_tkemali', name: 'Ткемали', price: 139 },
+  { id: 'ghee', name: 'Топлёное масло Гхи с розмарином', price: 129 },
+  { id: 'green_butter', name: 'Зелёное масло', price: 119 },
+  { id: 'cream_farm', name: 'Густые фермерские сливки 30%', price: 149 },
+  { id: 'broth_beef', name: 'Бульонный концентрат говяжий', price: 89 },
+  { id: 'broth_chicken', name: 'Бульонный концентрат куриный', price: 79 },
+  { id: 'broth_mushroom', name: 'Бульонный концентрат грибной', price: 85 },
+  { id: 'fried_onion', name: 'Хрустящий жареный лук', price: 89 },
+  { id: 'shkvarki', name: 'Копчёные шкварки', price: 109 },
+  { id: 'boil_salt', name: 'Ароматная соль для варки', price: 99 },
+  { id: 'berry_coulis', name: 'Бруснично-вишнёвый кули', price: 119 },
+  { id: 'caramel', name: 'Домашняя карамель', price: 99 },
+];
+
+const CATEGORY_ADDONS = {
+  pelmeni: ['sauce_smetana', 'ghee', 'broth_beef', 'fried_onion', 'boil_salt'],
+  vareniki_sweet: ['berry_coulis', 'caramel', 'cream_farm', 'sauce_smetana'],
+  vareniki: ['fried_onion', 'sauce_smetana', 'sauce_mushroom', 'broth_mushroom'],
+  manty: ['sauce_tkemali', 'ghee', 'broth_beef', 'boil_salt'],
+  hinkali: ['green_butter', 'boil_salt', 'broth_beef', 'sauce_smetana'],
+  khanum: ['sauce_satsebeli', 'sauce_smetana', 'broth_beef'],
+  lapsha: ['broth_chicken', 'broth_beef', 'green_butter'],
+};
+
+function getRelevantAddons(catId, productName) {
+  let key = catId;
+  if (catId === 'vareniki' && /вишн|творог/i.test(productName || '')) key = 'vareniki_sweet';
+  const ids = CATEGORY_ADDONS[key] || CATEGORY_ADDONS.pelmeni;
+  return ids.map(id => ADDONS.find(a => a.id === id)).filter(Boolean);
+}
+
+const DOUGH_OPTIONS = [
+  { id: 'standard', label: 'Высший сорт', delta: 0, bju: { p: 0, f: 0, c: 0, k: 0 }, hint: 'Классическое тесто на пшеничной муке высшего сорта.' },
+  { id: 'polba', label: 'Полбяное', delta: 50, bju: { p: 2, f: 0, c: -4, k: -30 }, hint: '+50 ₽ — больше белка, меньше глютена, на 15% меньше калорий.' },
+  { id: 'wholegrain', label: 'Цельнозерновое', delta: 30, bju: { p: 1, f: 0, c: 1, k: 5 }, hint: '+30 ₽ — грубый помол с оболочкой зерна, максимум клетчатки.' },
+  { id: 'rye', label: 'Ржано-пшеничное', delta: 20, bju: { p: 1, f: 0, c: 2, k: 8 }, hint: '+20 ₽ — плотное, чуть кисловатое тесто, отлично с дичью и грибами.' },
+  { id: 'buckwheat', label: 'Гречневое', delta: 40, bju: { p: 3, f: 1, c: -2, k: 5 }, hint: '+40 ₽ — тёмный цвет, богато железом, благородный ореховый оттенок.' },
+  { id: 'glutenfree', label: 'Безглютеновое', delta: 70, bju: { p: 2, f: 0, c: -2, k: -10 }, hint: '+70 ₽ — рисовая и нутовая мука, без глютена, больше растительного белка.' },
+];
+
+const FAT_OPTIONS = [
+  { id: 'broth', label: 'Бульон', delta: 0, bju: { p: 0, f: 0, c: 0, k: 0 }, hint: 'Насыщенный мясной сок и классический домашний аромат.' },
+  { id: 'butter', label: 'Сливочное масло', delta: 0, bju: { p: 0, f: 3, c: 0, k: 25 }, hint: 'Мягкий молочный вкус — хорошо подходит для детского меню.' },
+  { id: 'olive', label: 'Оливковое масло', delta: 20, bju: { p: 0, f: 1, c: 0, k: 12 }, hint: '+20 ₽ — лёгкий вкус без животных жиров, для контроля холестерина.' },
+  { id: 'cream', label: 'Сливки 33%', delta: 15, bju: { p: 0, f: 4, c: 0, k: 35 }, hint: '+15 ₽ — мягкая сливочная сочность для нежного фарша из индейки или кролика.' },
+];
+
+const COLOR_OPTIONS = [
+  { id: 'standard', label: 'Обычное', delta: 0, bju: { p: 0, f: 0, c: 0, k: 0 }, hint: 'Натуральный цвет теста без добавок.' },
+  { id: 'green', label: 'Зелёное', delta: 20, bju: { p: 0, f: 0, c: 0, k: 0 }, hint: '+20 ₽ — тесто на соке шпината: витамины и лёгкий детокс-эффект.' },
+  { id: 'orange', label: 'Оранжевое', delta: 20, bju: { p: 0, f: 0, c: 0, k: 0 }, hint: '+20 ₽ — куркума и морковный сок: антиоксиданты и яркий цвет для детей.' },
+  { id: 'black', label: 'Чёрное', delta: 30, bju: { p: 0, f: 0, c: 0, k: 0 }, hint: '+30 ₽ — чернила каракатицы: премиальная подача к морепродуктам и рыбе.' },
+];
+
+const TEXTURE_OPTIONS = [
+  { id: 'fine', label: 'Мелкий помол', delta: 0, bju: { p: 0, f: 0, c: 0, k: 0 }, hint: 'Классический мягкий и привычный фарш.' },
+  { id: 'chopped', label: 'Рубленое ножом', delta: 30, bju: { p: 0, f: 0, c: 0, k: 0 }, hint: '+30 ₽ — сочнее и текстурнее, с ощущением настоящего куска мяса.' },
+];
+
+const BASE_BJU = {
+  pelmeni: { p: 11, f: 9, c: 24, k: 222 },
+  vareniki: { p: 7, f: 6, c: 32, k: 212 },
+  manty: { p: 10, f: 11, c: 22, k: 230 },
+  hinkali: { p: 11, f: 10, c: 23, k: 226 },
+  khanum: { p: 9, f: 8, c: 26, k: 216 },
+  lapsha: { p: 9, f: 2, c: 58, k: 280 },
+};
+
+function findProductWithCategory(id) {
+  for (const c of CATEGORIES) {
+    const found = buildProducts(c).find(p => p.id === id);
+    if (found) return { prod: found, cat: c };
+  }
+  return { prod: null, cat: null };
+}
+
+function computeUnitPrice(prod, st) {
+  if (!prod) return 0;
+  const doughOpt = DOUGH_OPTIONS.find(d => d.id === st.selectedDough) || DOUGH_OPTIONS[0];
+  const fatOpt = FAT_OPTIONS.find(f => f.id === st.selectedFat) || FAT_OPTIONS[0];
+  const colorOpt = COLOR_OPTIONS.find(c => c.id === st.selectedColor) || COLOR_OPTIONS[0];
+  const textureOpt = TEXTURE_OPTIONS.find(t => t.id === st.selectedTexture) || TEXTURE_OPTIONS[0];
+  return prod.prices[st.selectedWeight] + doughOpt.delta + fatOpt.delta + colorOpt.delta + textureOpt.delta;
+}
+
+function computeVariantLabel(st) {
+  const parts = [];
+  if (st.selectedDough !== 'standard') { const o = DOUGH_OPTIONS.find(d => d.id === st.selectedDough); if (o) parts.push(o.label); }
+  if (st.selectedFat !== 'broth') { const o = FAT_OPTIONS.find(f => f.id === st.selectedFat); if (o) parts.push(o.label); }
+  if (st.selectedColor !== 'standard') { const o = COLOR_OPTIONS.find(c => c.id === st.selectedColor); if (o) parts.push(o.label); }
+  if (st.selectedTexture !== 'fine') { const o = TEXTURE_OPTIONS.find(t => t.id === st.selectedTexture); if (o) parts.push(o.label); }
+  return parts.length ? parts.join(', ') : 'Стандарт';
+}
+
+const ADDRESS_POOL = [
+  'ул. Тверская, 12', 'ул. Тверская, 18, корп. 1', 'ул. Арбат, 25',
+  'Ленинский проспект, 45', 'Ленинский проспект, 90, корп. 2', 'ул. Профсоюзная, 3',
+  'Кутузовский проспект, 30', 'ул. Пятницкая, 20', 'Ленинградское шоссе, 16', 'ул. Новослободская, 8',
+];
+
+const ZONES = {
+  center: { name: 'Центр', days: [2, 5], window: '18:00–21:00', cost: 200, freeThreshold: 2500, deadlineDaysBefore: 1, deadlineHour: 15 },
+  south:  { name: 'Юг',    days: [3, 6], window: '17:00–20:00', cost: 300, freeThreshold: 3000, deadlineDaysBefore: 1, deadlineHour: 15 },
+  west:   { name: 'Запад', days: [2, 5], window: '19:00–21:00', cost: 300, freeThreshold: 3000, deadlineDaysBefore: 1, deadlineHour: 15 },
+  north:  { name: 'Север', days: [4, 0], window: '18:00–20:00', cost: 350, freeThreshold: 3500, deadlineDaysBefore: 1, deadlineHour: 15 },
+};
+
+const ADDRESS_ZONE_MAP = {
+  'ул. Тверская, 12': 'center', 'ул. Тверская, 18, корп. 1': 'center', 'ул. Арбат, 25': 'center', 'ул. Пятницкая, 20': 'center', 'ул. Новослободская, 8': 'center',
+  'Ленинский проспект, 45': 'south', 'Ленинский проспект, 90, корп. 2': 'south', 'ул. Профсоюзная, 3': 'south',
+  'Кутузовский проспект, 30': 'west',
+  'Ленинградское шоссе, 16': 'north',
+};
+
+function detectZone(address) {
+  const zoneId = ADDRESS_ZONE_MAP[address];
+  return ZONES[zoneId] || null;
+}
+
+const WEEKDAYS_NOM = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+const WEEKDAYS_GEN = ['воскресенья', 'понедельника', 'вторника', 'среды', 'четверга', 'пятницы', 'субботы'];
+const WEEKDAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+const MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+function nextRuns(zone, count, now) {
+  const runs = [];
+  const base = new Date(now); base.setHours(0, 0, 0, 0);
+  for (let i = 0; i < 45 && runs.length < count; i++) {
+    const day = new Date(base); day.setDate(base.getDate() + i);
+    if (zone.days.includes(day.getDay())) {
+      const deadline = new Date(day);
+      deadline.setDate(day.getDate() - zone.deadlineDaysBefore);
+      deadline.setHours(zone.deadlineHour, 0, 0, 0);
+      if (deadline.getTime() > now.getTime()) runs.push({ date: day, deadline });
+    }
+  }
+  return runs;
+}
+function fmtRunLong(d) { return WEEKDAYS_NOM[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS_GEN[d.getMonth()]; }
+function fmtRunShort(d) { return WEEKDAYS_SHORT[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS_GEN[d.getMonth()]; }
+function fmtDeadline(d) { return 'до ' + WEEKDAYS_GEN[d.getDay()] + ', ' + String(d.getHours()).padStart(2, '0') + ':00'; }
+
+function pluralRu(n, one, few, many) {
+  const mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
+}
+
+const ORDER_ITEMS = [
+  { name: 'Пельмени «Классические»', meta: '1 кг', price: 690 },
+  { name: 'Вареники с творогом', meta: '0.5 кг', price: 380 },
+  { name: 'Хинкали, классика', meta: '0.5 кг', price: 448 },
+];
+
+const PROMO_CODES = {
+  FROST10: { type: 'percent', value: 10 },
+  WELCOME300: { type: 'fixed', value: 300 },
+};
+
+class Component extends DCLogic {
+  state = {
+    activeCat: 0,
+    activeSub: 0,
+    visibleCount: 6,
+    screen: 'main',
+    previousScreen: 'main',
+    selectedId: null,
+    qty: 1,
+    docked: false,
+    selectedWeight: 500,
+    selectedDough: 'standard',
+    selectedFat: 'broth',
+    selectedColor: 'standard',
+    selectedTexture: 'fine',
+    upsellOpen: false,
+    upsellAddon: null,
+    activeFaq: -1,
+    searchOpen: false,
+    contactOpen: false,
+    menuOpen: false,
+    menuPhone: '',
+    menuCode: '',
+    menuCodeSent: false,
+    menuLoggedIn: false,
+    menuCookieOpen: false,
+    cookieAnalytics: true,
+    cardWeights: {},
+    cart: ORDER_ITEMS.map((it, i) => {
+      const catId = ['pelmeni', 'vareniki', 'hinkali'][i] || 'pelmeni';
+      const cat = CATEGORIES.find(c => c.id === catId);
+      return { id: 'seed-' + i, name: it.name, variant: 'Стандарт', meta: it.meta, unitPrice: it.price, qty: 1, imgId: 'seed-cart-' + i, desc: cat ? cat.desc : '' };
+    }),
+    checkoutAddress: '',
+    addressSelected: false,
+    addressFocused: false,
+    deliveryTimeMode: 'nearest',
+    selectedRunIndex: 0,
+    phone: '',
+    paymentMethod: 'sbp',
+    orderExpanded: false,
+    payOverlay: null,
+    cardNumber: '',
+    cardExpiry: '',
+    cardCvc: '',
+    flyingItems: [],
+    cartBump: false,
+    promoInput: '',
+    promoApplied: null,
+    promoError: false,
+  };
+
+  setCatalogEl = (el) => { this.catalogEl = el; };
+  setRootAreaEl = (el) => { this.rootAreaEl = el; };
+  setCartIconRef = (el) => { this.cartIconEl = el; };
+
+  spawnFlyItem = (originEl) => {
+    if (!originEl || !this.cartIconEl || !this.rootAreaEl) return;
+    const cRect = this.rootAreaEl.getBoundingClientRect();
+    const oRect = originEl.getBoundingClientRect();
+    const tRect = this.cartIconEl.getBoundingClientRect();
+    const startX = oRect.left - cRect.left + oRect.width / 2 - 7;
+    const startY = oRect.top - cRect.top + oRect.height / 2 - 7;
+    const dx = (tRect.left - cRect.left + tRect.width / 2 - 7) - startX;
+    const dy = (tRect.top - cRect.top + tRect.height / 2 - 7) - startY;
+    const id = 'fly' + Date.now() + Math.random().toString(36).slice(2, 6);
+    this.setState(s => ({ flyingItems: [...s.flyingItems, { id, startX, startY, dx, dy }] }));
+    setTimeout(() => {
+      this.setState(s => ({ flyingItems: s.flyingItems.filter(f => f.id !== id) }));
+      this.triggerCartBump();
+    }, 560);
+  };
+
+  triggerCartBump = () => {
+    clearTimeout(this._cartBumpTimer);
+    this.setState({ cartBump: false });
+    setTimeout(() => {
+      this.setState({ cartBump: true });
+      this._cartBumpTimer = setTimeout(() => this.setState({ cartBump: false }), 420);
+    }, 20);
+  };
+
+  addToCart = (item) => {
+    const id = 'c' + Date.now() + Math.random().toString(36).slice(2, 6);
+    this.setState(s => ({ cart: [...s.cart, { id, qty: 1, meta: '', variant: 'Стандарт', imgId: '', desc: '', ...item }] }));
+  };
+
+  onDecrementItem = (e) => {
+    e.stopPropagation();
+    const id = e.currentTarget.dataset.id;
+    this.setState(s => ({
+      cart: s.cart.map(it => it.id === id ? { ...it, qty: it.qty - 1 } : it).filter(it => it.qty > 0),
+    }));
+  };
+
+  onIncrementItem = (e) => {
+    e.stopPropagation();
+    const id = e.currentTarget.dataset.id;
+    this.spawnFlyItem(e.currentTarget);
+    this.setState(s => ({ cart: s.cart.map(it => it.id === id ? { ...it, qty: it.qty + 1 } : it) }));
+  };
+
+  onMainScroll = (e) => {
+    const scrollTop = e.currentTarget.scrollTop;
+    const hideAt = this.catalogEl ? (this.catalogEl.offsetTop + this.catalogEl.offsetHeight) : Infinity;
+    const shouldDock = scrollTop > 790 && scrollTop < hideAt;
+    if (shouldDock !== this.state.docked) this.setState({ docked: shouldDock });
+  };
+
+  setCategory = (idx) => {
+    const clamped = Math.max(0, Math.min(CATEGORIES.length - 1, idx));
+    if (clamped !== this.state.activeCat) this.setState({ activeCat: clamped, activeSub: 0, visibleCount: 6 });
+  };
+
+  onCategoryClick = (e) => {
+    this.setCategory(Number(e.currentTarget.dataset.idx));
+  };
+
+  onProductsTouchStart = (e) => {
+    const t = e.touches[0];
+    this.touchStartX = t.clientX;
+    this.touchStartY = t.clientY;
+  };
+
+  onProductsTouchEnd = (e) => {
+    if (this.touchStartX === undefined) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - this.touchStartX;
+    const dy = t.clientY - this.touchStartY;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      this.setCategory(this.state.activeCat + (dx < 0 ? 1 : -1));
+    }
+  };
+
+  onSubClick = (e) => {
+    const idx = Number(e.currentTarget.dataset.idx);
+    this.setState({ activeSub: idx, visibleCount: 6 });
+  };
+
+  onShowMore = () => {
+    this.setState(s => ({ visibleCount: s.visibleCount + 2 }));
+  };
+
+  onProductClick = (e) => {
+    if (e.target.closest('[data-no-nav]')) return;
+    const id = e.currentTarget.dataset.id;
+    if (String(id).indexOf('addon-') === 0) {
+      const { prod } = findProductWithCategory(id);
+      this.spawnFlyItem(e.currentTarget);
+      if (prod) {
+        const w = this.state.cardWeights[id] || 500;
+        this.addToCart({ name: prod.name, unitPrice: prod.prices[w], imgId: prod.imgId });
+      }
+      return;
+    }
+    this.setState({ screen: 'product', selectedId: id, qty: 1, selectedWeight: 500, selectedDough: 'standard', selectedFat: 'broth', selectedColor: 'standard', selectedTexture: 'fine' });
+  };
+
+  onProductQuickAdd = (e) => {
+    e.stopPropagation();
+    const id = e.currentTarget.dataset.id;
+    const { prod, cat } = findProductWithCategory(id);
+    this.spawnFlyItem(e.currentTarget);
+    if (prod) {
+      const w = this.state.cardWeights[id] || 500;
+      const meta = w === 1000 ? '1 кг' : '0.5 кг';
+      const desc = (cat && cat.id !== 'gastrolavka') ? cat.desc : '';
+      this.addToCart({ name: prod.name, meta, unitPrice: prod.prices[w], imgId: prod.imgId, desc });
+    }
+  };
+
+  onBack = () => {
+    if (this.state.screen === 'checkout') {
+      this.setState({ screen: 'cart', docked: false });
+    } else if (this.state.screen === 'cart') {
+      this.setState({ screen: this.state.previousScreen || 'main', docked: false });
+    } else {
+      this.setState({ screen: 'main', docked: false });
+    }
+  };
+
+  onWeightClick = (e) => {
+    this.setState({ selectedWeight: Number(e.currentTarget.dataset.w) });
+  };
+
+  onDoughClick = (e) => {
+    this.setState({ selectedDough: e.currentTarget.dataset.id });
+  };
+
+  onFatClick = (e) => {
+    this.setState({ selectedFat: e.currentTarget.dataset.id });
+  };
+
+  onColorClick = (e) => {
+    this.setState({ selectedColor: e.currentTarget.dataset.id });
+  };
+
+  onTextureClick = (e) => {
+    this.setState({ selectedTexture: e.currentTarget.dataset.id });
+  };
+
+  onFaqClick = (e) => {
+    const idx = Number(e.currentTarget.dataset.idx);
+    this.setState(s => ({ activeFaq: s.activeFaq === idx ? -1 : idx }));
+  };
+
+  onToggleSearch = () => {
+    this.setState(s => ({ searchOpen: !s.searchOpen, contactOpen: false }));
+  };
+
+  onToggleContact = () => {
+    this.setState(s => ({ contactOpen: !s.contactOpen, searchOpen: false }));
+  };
+
+  onToggleMenu = () => {
+    this.setState(s => ({ menuOpen: !s.menuOpen }));
+  };
+
+  onMenuPhoneChange = (e) => {
+    let digits = e.target.value.replace(/\D/g, '');
+    if (digits[0] === '8') digits = '7' + digits.slice(1);
+    if (digits[0] !== '7') digits = '7' + digits;
+    digits = digits.slice(0, 11);
+    const rest = digits.slice(1);
+    let out = '+7';
+    if (rest.length > 0) out += ' (' + rest.slice(0, 3);
+    if (rest.length >= 3) out += ')';
+    if (rest.length > 3) out += ' ' + rest.slice(3, 6);
+    if (rest.length > 6) out += '-' + rest.slice(6, 8);
+    if (rest.length > 8) out += '-' + rest.slice(8, 10);
+    this.setState({ menuPhone: out });
+  };
+
+  onMenuSendCode = () => {
+    if (this.state.menuPhone.replace(/\D/g, '').length < 11) return;
+    this.setState({ menuCodeSent: true });
+  };
+
+  onMenuCodeChange = (e) => {
+    this.setState({ menuCode: e.target.value.replace(/\D/g, '').slice(0, 4) });
+  };
+
+  onMenuVerifyCode = () => {
+    if (this.state.menuCode.length < 4) return;
+    this.setState({ menuLoggedIn: true, menuCodeSent: false });
+  };
+
+  onToggleCookiePrefs = () => {
+    this.setState(s => ({ menuCookieOpen: !s.menuCookieOpen }));
+  };
+
+  onToggleCookieAnalytics = () => {
+    this.setState(s => ({ cookieAnalytics: !s.cookieAnalytics }));
+  };
+
+  onDocLinkClick = (e) => {
+    e.preventDefault();
+  };
+
+  onAddToCart = (e) => {
+    const id = this.state.selectedId;
+    let prod = null, catId = 'pelmeni';
+    for (const c of CATEGORIES) {
+      const found = buildProducts(c).find(p => p.id === id);
+      if (found) { prod = found; catId = c.id; break; }
+    }
+    const relevant = getRelevantAddons(catId, prod ? prod.name : '');
+    this.spawnFlyItem(e.currentTarget);
+    if (prod) {
+      const unitPrice = computeUnitPrice(prod, this.state);
+      const meta = this.state.selectedWeight === 1000 ? '1 кг' : '0.5 кг';
+      const variant = computeVariantLabel(this.state);
+      const catDesc = (CATEGORIES.find(c => c.id === catId) || {}).desc || '';
+      this.addToCart({ name: prod.name, meta, unitPrice, qty: this.state.qty, imgId: prod.imgId, variant, desc: catDesc });
+    }
+    this.setState({
+      qty: 1,
+      upsellOpen: relevant.length > 0,
+      upsellAddon: relevant[0] || null,
+    });
+  };
+
+  onUpsellAdd = (e) => {
+    this.spawnFlyItem(e.currentTarget);
+    if (this.state.upsellAddon) this.addToCart({ name: this.state.upsellAddon.name, unitPrice: this.state.upsellAddon.price, imgId: 'addon-' + this.state.upsellAddon.id });
+    this.setState({ upsellOpen: false });
+  };
+
+  onUpsellSkip = () => {
+    this.setState({ upsellOpen: false });
+  };
+
+  onAddonQuickAdd = (e) => {
+    const id = e.currentTarget.dataset.id;
+    const addon = ADDONS.find(a => a.id === id);
+    this.spawnFlyItem(e.currentTarget);
+    if (addon) this.addToCart({ name: addon.name, unitPrice: addon.price, imgId: 'addon-' + addon.id });
+  };
+
+  onBundleAdd = (e) => {
+    const id = e.currentTarget.dataset.id;
+    const b = BUNDLES.find(x => x.id === id);
+    this.spawnFlyItem(e.currentTarget);
+    if (b) this.addToCart({ name: b.title, meta: b.meta, unitPrice: b.price, imgId: b.imgId });
+  };
+
+  onQtyInc = () => this.setState(s => ({ qty: s.qty + 1 }));
+  onQtyDec = () => this.setState(s => ({ qty: Math.max(1, s.qty - 1) }));
+
+  onCardWeightClick = (e) => {
+    e.stopPropagation();
+    const id = e.currentTarget.dataset.id;
+    const w = Number(e.currentTarget.dataset.w);
+    this.setState(s => ({ cardWeights: { ...s.cardWeights, [id]: w } }));
+  };
+
+  onOpenCheckout = () => {
+    if (this.state.screen === 'cart' || this.state.screen === 'checkout') {
+      this.setState({ screen: this.state.previousScreen || 'main', docked: false });
+    } else {
+      this.setState(s => ({ previousScreen: s.screen, screen: 'cart' }));
+    }
+  };
+
+  onProceedToCheckout = () => {
+    if (this.state.cart.length === 0) return;
+    this.setState({ screen: 'checkout' });
+  };
+
+  onPromoInputChange = (e) => {
+    this.setState({ promoInput: e.target.value, promoError: false });
+  };
+
+  onPromoApply = () => {
+    const code = this.state.promoInput.trim().toUpperCase();
+    if (!code) return;
+    const def = PROMO_CODES[code];
+    if (!def) { this.setState({ promoError: true }); return; }
+    this.setState({ promoApplied: { code, def }, promoError: false, promoInput: '' });
+  };
+
+  onPromoRemove = () => {
+    this.setState({ promoApplied: null, promoInput: '', promoError: false });
+  };
+
+  onAddressChange = (e) => {
+    this.setState({ checkoutAddress: e.target.value, addressSelected: false });
+  };
+
+  onAddressFocus = () => {
+    this.setState({ addressFocused: true });
+  };
+
+  onAddressBlur = () => {
+    this.setState({ addressFocused: false });
+  };
+
+  onSuggestionPick = (e) => {
+    e.preventDefault();
+    this.setState({ checkoutAddress: e.currentTarget.dataset.value, addressSelected: true, addressFocused: false, deliveryTimeMode: 'nearest', selectedRunIndex: 0 });
+  };
+
+  onTimeModeChange = (e) => {
+    const mode = e.currentTarget.dataset.mode;
+    if (mode === 'nearest') this.setState({ deliveryTimeMode: 'nearest', selectedRunIndex: 0 });
+    else this.setState({ deliveryTimeMode: 'choose' });
+  };
+
+  onRunClick = (e) => {
+    this.setState({ selectedRunIndex: Number(e.currentTarget.dataset.idx) });
+  };
+
+  onPhoneChange = (e) => {
+    let digits = e.target.value.replace(/\D/g, '');
+    if (digits[0] === '8') digits = '7' + digits.slice(1);
+    if (digits[0] !== '7') digits = '7' + digits;
+    digits = digits.slice(0, 11);
+    const rest = digits.slice(1);
+    let out = '+7';
+    if (rest.length > 0) out += ' (' + rest.slice(0, 3);
+    if (rest.length >= 3) out += ')';
+    if (rest.length > 3) out += ' ' + rest.slice(3, 6);
+    if (rest.length > 6) out += '-' + rest.slice(6, 8);
+    if (rest.length > 8) out += '-' + rest.slice(8, 10);
+    this.setState({ phone: out });
+  };
+
+  onPayMethodChange = (e) => {
+    this.setState({ paymentMethod: e.currentTarget.dataset.method });
+  };
+
+  onToggleOrder = () => {
+    this.setState(s => ({ orderExpanded: !s.orderExpanded }));
+  };
+
+  onPayClick = () => {
+    if (this.state.cart.length === 0) return;
+    this.setState({ payOverlay: this.state.paymentMethod === 'sbp' ? 'sbp' : 'card' });
+  };
+
+  onClosePayOverlay = () => {
+    this.setState({ payOverlay: null });
+  };
+
+  onCardNumberChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 16);
+    this.setState({ cardNumber: digits.replace(/(.{4})/g, '$1 ').trim() });
+  };
+
+  onCardExpiryChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 4);
+    this.setState({ cardExpiry: digits.length > 2 ? digits.slice(0, 2) + '/' + digits.slice(2) : digits });
+  };
+
+  onCardCvcChange = (e) => {
+    this.setState({ cardCvc: e.target.value.replace(/\D/g, '').slice(0, 3) });
+  };
+
+  onCardPaySubmit = () => {
+    this.setState({ payOverlay: null });
+  };
+
+  renderVals() {
+    const cat = CATEGORIES[this.state.activeCat];
+    const allProducts = buildProducts(cat);
+    const visibleProducts = allProducts.slice(0, this.state.visibleCount).map(p => {
+      const w = this.state.cardWeights[p.id] || 500;
+      return {
+        ...p,
+        price: p.prices[w],
+        halfSelected: w === 500,
+        kgSelected: w === 1000,
+      };
+    });
+    const subName = cat.subs[this.state.activeSub] || cat.subs[0];
+    const reviews = (REVIEWS[cat.id] || []).map(r => ({ ...r, initial: r.name[0] }));
+
+    const categories = CATEGORIES.map((c, i) => ({
+      name: c.name,
+      chipStyle: {
+        padding: '7px 14px', borderRadius: 999, fontSize: 14,
+        color: i === this.state.activeCat ? 'var(--color-accent)' : 'var(--color-neutral-400)',
+        background: i === this.state.activeCat ? 'var(--color-surface-2)' : 'transparent',
+        border: i === this.state.activeCat ? '1px solid var(--color-accent)' : '1px solid var(--color-divider)',
+        boxShadow: i === this.state.activeCat ? '0 0 12px rgba(229,184,75,0.18)' : 'none',
+        fontWeight: 500,
+      },
+    }));
+
+    const subs = cat.subs.map((s, i) => ({
+      name: s,
+      chipStyle: {
+        padding: '2px 0', fontSize: 13,
+        color: i === this.state.activeSub ? 'var(--color-accent)' : 'color-mix(in srgb, var(--color-text) 55%, transparent)',
+        fontWeight: 500,
+        borderBottom: i === this.state.activeSub ? '2px solid var(--color-accent)' : '2px solid transparent',
+      },
+    }));
+
+    let selected = null;
+    if (this.state.selectedId) {
+      for (const c of CATEGORIES) {
+        const found = buildProducts(c).find(p => p.id === this.state.selectedId);
+        if (found) { selected = found; break; }
+      }
+    }
+    const doughOpt = DOUGH_OPTIONS.find(d => d.id === this.state.selectedDough) || DOUGH_OPTIONS[0];
+    const fatOpt = FAT_OPTIONS.find(f => f.id === this.state.selectedFat) || FAT_OPTIONS[0];
+    const colorOpt = COLOR_OPTIONS.find(c => c.id === this.state.selectedColor) || COLOR_OPTIONS[0];
+    const textureOpt = TEXTURE_OPTIONS.find(t => t.id === this.state.selectedTexture) || TEXTURE_OPTIONS[0];
+    const pillStyle = (active) => ({
+      padding: '6px 11px', borderRadius: 999, fontSize: 12.5, cursor: 'pointer', whiteSpace: 'nowrap',
+      color: active ? 'var(--color-accent)' : 'var(--color-neutral-400)',
+      background: active ? 'var(--color-surface-2)' : 'transparent',
+      border: active ? '1px solid var(--color-accent)' : '1px solid var(--color-divider)',
+      boxShadow: active ? '0 0 12px rgba(229,184,75,0.18)' : 'none',
+      fontWeight: 500,
+    });
+    const unitPrice = selected ? computeUnitPrice(selected, this.state) : 0;
+    const bjuBase = BASE_BJU[cat.id] || BASE_BJU.pelmeni;
+    const bjuP = bjuBase.p + doughOpt.bju.p + fatOpt.bju.p + colorOpt.bju.p + textureOpt.bju.p;
+    const bjuF = bjuBase.f + doughOpt.bju.f + fatOpt.bju.f + colorOpt.bju.f + textureOpt.bju.f;
+    const bjuC = bjuBase.c + doughOpt.bju.c + fatOpt.bju.c + colorOpt.bju.c + textureOpt.bju.c;
+    const bjuK = bjuBase.k + doughOpt.bju.k + fatOpt.bju.k + colorOpt.bju.k + textureOpt.bju.k;
+    const bjuText = 'Б/Ж/У на 100 г: ' + bjuP + ' / ' + bjuF + ' / ' + bjuC + ' г · ' + bjuK + ' ккал';
+    const flourMap = { standard: 'мука пшеничная высшего сорта', polba: 'полбяная мука', wholegrain: 'цельнозерновая пшеничная мука', rye: 'ржано-пшеничная мука', buckwheat: 'гречневая мука (в замесе с пшеничной)', glutenfree: 'рисовая и нутовая мука (без глютена)' };
+    const fatMap = { broth: 'говяжий/бараний жир', butter: 'сливочное масло 82.5%', olive: 'оливковое масло Extra Virgin', cream: 'сливки 33%' };
+    const textureMap = { fine: 'фарш мелкого помола', chopped: 'рубленое ножом мясо' };
+    const colorMap = { standard: '', green: ', сок шпината (краситель)', orange: ', куркума и морковный сок (краситель)', black: ', чернила каракатицы (краситель)' };
+    const flourTxt = flourMap[this.state.selectedDough] || flourMap.standard;
+    const compositionText = flourTxt.charAt(0).toUpperCase() + flourTxt.slice(1) + ', вода, начинка (' + (textureMap[this.state.selectedTexture] || textureMap.fine) + ', ' + (fatMap[this.state.selectedFat] || fatMap.broth) + (colorMap[this.state.selectedColor] || '') + '), соль, специи.';
+    const relevantAddons = selected ? getRelevantAddons(cat.id, selected.name) : [];
+    const mappedSteps = STEPS.map((s, i) => ({ ...s, iconHtml: { __html: s.icon }, numLabel: '0' + (i + 1) }));
+    const mappedOffers = OFFERS.map(o => ({ ...o, hasButton: !!o.buttonText }));
+
+    const addrQuery = this.state.checkoutAddress.trim().toLowerCase();
+    const addressSuggestions = (this.state.addressFocused && !this.state.addressSelected && addrQuery.length > 0)
+      ? ADDRESS_POOL.filter(a => a.toLowerCase().includes(addrQuery)).slice(0, 4)
+      : [];
+    const zone = this.state.addressSelected ? detectZone(this.state.checkoutAddress) : null;
+    const upcomingRuns = zone ? nextRuns(zone, 4, new Date()) : [];
+    const activeRun = upcomingRuns[this.state.selectedRunIndex] || upcomingRuns[0] || null;
+    const runsView = upcomingRuns.map((r, i) => ({
+      idx: i,
+      label: fmtRunShort(r.date),
+      style: pillStyle(i === this.state.selectedRunIndex),
+    }));
+    const zoneName = zone ? zone.name : '';
+    const nextRunText = activeRun ? (fmtRunLong(activeRun.date) + ' · ' + zone.window) : '';
+    const deadlineText = activeRun ? ('Оформите заказ ' + fmtDeadline(activeRun.deadline)) : '';
+    const paymentRowStyle = (active) => ({
+      display: 'flex', alignItems: 'flex-start', gap: 12, width: '100%', boxSizing: 'border-box',
+      padding: '14px', borderRadius: 'var(--radius-md)',
+      border: active ? '1px solid var(--color-accent)' : '1px solid var(--color-divider)',
+      background: active ? 'var(--color-surface-2)' : 'transparent',
+      cursor: 'pointer',
+    });
+    const fmtRub = (n) => n.toLocaleString('ru-RU') + ' ₽';
+    const cartEmpty = this.state.cart.length === 0;
+    const promo = this.state.promoApplied;
+    const goodsTotal = this.state.cart.reduce((sum, it) => sum + it.unitPrice * it.qty, 0);
+    const discount = promo ? Math.min(goodsTotal, promo.def.type === 'percent' ? Math.round(goodsTotal * promo.def.value / 100) : promo.def.value) : 0;
+    const subtotal = goodsTotal - discount;
+    const orderItems = this.state.cart.map((it, i) => ({
+      ...it,
+      priceLabel: fmtRub(it.unitPrice * it.qty),
+      summaryLine: [it.variant, it.meta, it.qty > 1 ? ('×' + it.qty) : null].filter(Boolean).join(' · '),
+      rowStyle: {
+        display: 'flex', alignItems: 'flex-start', gap: 12, padding: '14px 0',
+        borderBottom: i < this.state.cart.length - 1 ? '1px solid var(--color-divider)' : 'none',
+      },
+    }));
+    const orderCountLabel = this.state.cart.length + ' ' + pluralRu(this.state.cart.length, 'товар', 'товара', 'товаров');
+    const deliveryCost = (this.state.addressSelected && zone) ? (subtotal >= zone.freeThreshold ? 0 : zone.cost) : 0;
+    const totalToPay = subtotal + deliveryCost;
+    const goodsTotalLabel = fmtRub(goodsTotal);
+    const discountLabel = '−' + fmtRub(discount);
+    const subtotalLabel = fmtRub(subtotal);
+    const deliveryValueLabel = !this.state.addressSelected ? '—' : (deliveryCost === 0 ? 'Бесплатно' : fmtRub(deliveryCost));
+    const deliveryValueStyle = { fontSize: 13.5, color: !this.state.addressSelected ? 'color-mix(in srgb, var(--color-text) 50%, transparent)' : (deliveryCost === 0 ? 'var(--color-accent-300)' : 'var(--color-text)') };
+    const remainToFree = zone ? Math.max(0, zone.freeThreshold - subtotal) : 0;
+    const freeDeliveryText = !zone ? '' : (deliveryCost > 0 ? ('До бесплатной доставки осталось ' + fmtRub(remainToFree)) : 'Бесплатная доставка активна');
+    const totalToPayLabel = fmtRub(totalToPay);
+    const payButtonStyle = {
+      width: '100%', height: 52, border: 'none', borderRadius: 'var(--radius-md)',
+      background: 'linear-gradient(135deg, var(--color-accent) 0%, #C59B27 100%)',
+      color: 'var(--color-bg)', fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 600,
+      cursor: cartEmpty ? 'not-allowed' : 'pointer',
+      boxShadow: cartEmpty ? 'none' : '0 8px 20px rgba(229,184,75,0.28)',
+      opacity: cartEmpty ? 0.5 : 1,
+    };
+    const payButtonLabel = cartEmpty ? 'Корзина пуста' : ('Оплатить ' + totalToPayLabel);
+    const cartCtaLabel = cartEmpty ? 'Корзина пуста' : ('Оформить заказ · ' + subtotalLabel);
+    const promoCodeText = promo ? promo.code : '';
+    const promoDiscountLabel = promo ? (promo.def.type === 'percent' ? ('−' + promo.def.value + '%') : ('−' + fmtRub(promo.def.value))) : '';
+    const flyingItemsView = this.state.flyingItems.map(f => ({
+      id: f.id,
+      style: {
+        position: 'absolute', left: f.startX + 'px', top: f.startY + 'px',
+        width: 14, height: 14, borderRadius: '50%',
+        background: 'linear-gradient(135deg, var(--color-accent) 0%, #C59B27 100%)',
+        boxShadow: '0 2px 10px rgba(229,184,75,0.5)', zIndex: 999, pointerEvents: 'none',
+        '--dx': f.dx + 'px', '--dy': f.dy + 'px',
+        animation: 'flyToCart .56s cubic-bezier(.3,.6,.4,1) forwards',
+      },
+    }));
+    const cartIconWrapStyle = {
+      position: 'relative', display: 'flex', cursor: 'pointer', transformOrigin: 'center',
+      animation: this.state.cartBump ? 'cartBump .42s cubic-bezier(.34,1.56,.64,1)' : 'none',
+    };
+
+    return {
+      isMain: this.state.screen === 'main',
+      isProduct: this.state.screen === 'product',
+      docked: this.state.docked,
+      dockedBarStyle: 'position:fixed; left:0; right:0; bottom:64px; z-index:20; background:var(--color-bg); box-shadow:0 -1px 0 var(--color-divider); padding-top:10px; transition:transform .32s cubic-bezier(0.22,1,0.36,1), opacity .28s ease;'
+        + ' transform:translateY(' + (this.state.docked ? '0' : '14px') + '); opacity:' + (this.state.docked ? '1' : '0') + '; pointer-events:' + (this.state.docked ? 'auto' : 'none') + ';',
+      onMainScroll: this.onMainScroll,
+      catalogRef: this.setCatalogEl,
+      heroImgId: 'hero-' + cat.id,
+      heroName: cat.name,
+      heroDesc: cat.desc,
+      categories, subs,
+      subImgId: 'sub-' + cat.id + '-' + this.state.activeSub,
+      subHeading: cat.name + ', ' + subName,
+      subDesc: buildSubDesc(cat, subName),
+      visibleProducts,
+      hasMore: this.state.visibleCount < allProducts.length,
+      reviews,
+      steps: mappedSteps,
+      offers: mappedOffers,
+      bundles: BUNDLES.map(b => ({ ...b, priceLabel: 'В корзину · ' + b.price.toLocaleString('ru-RU') + ' ₽' })),
+      onBundleAdd: this.onBundleAdd,
+      onFaqClick: this.onFaqClick,
+      faqs: FAQS.map((f, i) => ({ ...f, open: this.state.activeFaq === i, icon: this.state.activeFaq === i ? '−' : '+' })),
+      onToggleSearch: this.onToggleSearch,
+      searchWrapStyle: 'position:absolute; top:12px; bottom:12px; left:8px; right:8px; background:var(--color-bg); border:1px solid var(--color-accent); border-radius:999px; display:flex; align-items:center; overflow:hidden; z-index:25; transition:width .34s cubic-bezier(0.22,1,0.36,1), opacity .22s ease;'
+        + ' width:' + (this.state.searchOpen ? '380px' : '40px') + '; opacity:' + (this.state.searchOpen ? '1' : '0') + '; pointer-events:' + (this.state.searchOpen ? 'auto' : 'none') + ';',
+      onToggleContact: this.onToggleContact,
+      contactOpen: this.state.contactOpen,
+      contactIconColor: this.state.contactOpen ? 'var(--color-accent)' : 'var(--color-neutral-400)',
+      onToggleMenu: this.onToggleMenu,
+      menuOpen: this.state.menuOpen,
+      menuLoggedIn: this.state.menuLoggedIn,
+      menuAwaitingPhone: !this.state.menuLoggedIn && !this.state.menuCodeSent,
+      menuAwaitingCode: !this.state.menuLoggedIn && this.state.menuCodeSent,
+      menuPhone: this.state.menuPhone,
+      onMenuPhoneChange: this.onMenuPhoneChange,
+      menuSendCodeDisabled: this.state.menuPhone.replace(/\D/g, '').length < 11,
+      onMenuSendCode: this.onMenuSendCode,
+      menuCode: this.state.menuCode,
+      onMenuCodeChange: this.onMenuCodeChange,
+      menuVerifyDisabled: this.state.menuCode.length < 4,
+      onMenuVerifyCode: this.onMenuVerifyCode,
+      onDocLinkClick: this.onDocLinkClick,
+      menuCookieOpen: this.state.menuCookieOpen,
+      onToggleCookiePrefs: this.onToggleCookiePrefs,
+      cookieChevronStyle: { display: 'inline-block', transition: 'transform .2s ease', color: 'color-mix(in srgb, var(--color-text) 45%, transparent)', fontSize: 11, transform: this.state.menuCookieOpen ? 'rotate(180deg)' : 'rotate(0deg)' },
+      onToggleCookieAnalytics: this.onToggleCookieAnalytics,
+      cookieToggleTrackStyle: { width: 36, height: 20, borderRadius: 999, position: 'relative', cursor: 'pointer', transition: 'background .2s ease', flexShrink: 0, background: this.state.cookieAnalytics ? 'var(--color-accent)' : 'var(--color-neutral-700)' },
+      cookieToggleDotStyle: { position: 'absolute', top: 2, left: this.state.cookieAnalytics ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: 'var(--color-bg)', transition: 'left .2s ease' },
+      onAddToCart: this.onAddToCart,
+      cartCount: this.state.cart.reduce((s, it) => s + it.qty, 0),
+      hasCartItems: this.state.cart.length > 0,
+      onCategoryClick: this.onCategoryClick,
+      onProductsTouchStart: this.onProductsTouchStart,
+      onProductsTouchEnd: this.onProductsTouchEnd,
+      onSubClick: this.onSubClick,
+      onShowMore: this.onShowMore,
+      onProductClick: this.onProductClick,
+      onProductQuickAdd: this.onProductQuickAdd,
+      onCardWeightClick: this.onCardWeightClick,
+      onBack: this.onBack,
+      onQtyInc: this.onQtyInc,
+      onQtyDec: this.onQtyDec,
+      qty: this.state.qty,
+      onWeightClick: this.onWeightClick,
+      weightOptions: [500, 1000].map(w => ({
+        value: w, label: w + ' г',
+        style: {
+          padding: '7px 16px', borderRadius: 999, fontSize: 13.5, cursor: 'pointer',
+          color: w === this.state.selectedWeight ? 'var(--color-accent)' : 'var(--color-neutral-400)',
+          background: w === this.state.selectedWeight ? 'color-mix(in srgb, var(--color-accent) 16%, transparent)' : 'transparent',
+          border: w === this.state.selectedWeight ? '1px solid var(--color-accent)' : '1px solid var(--color-divider)',
+          fontWeight: 500,
+        },
+      })),
+      selectedImgId: selected ? selected.imgId : '',
+      selectedName: selected ? selected.name : '',
+      selectedPrice: unitPrice,
+      selectedTotal: unitPrice * this.state.qty,
+      onDoughClick: this.onDoughClick,
+      doughOptions: DOUGH_OPTIONS.map(d => ({ id: d.id, label: d.label, style: pillStyle(d.id === this.state.selectedDough) })),
+      doughHint: doughOpt.hint,
+      onFatClick: this.onFatClick,
+      fatOptions: FAT_OPTIONS.map(f => ({ id: f.id, label: f.label, style: pillStyle(f.id === this.state.selectedFat) })),
+      fatHint: fatOpt.hint,
+      onColorClick: this.onColorClick,
+      colorOptions: COLOR_OPTIONS.map(c => ({ id: c.id, label: c.label, style: pillStyle(c.id === this.state.selectedColor) })),
+      colorHint: colorOpt.hint,
+      onTextureClick: this.onTextureClick,
+      textureOptions: TEXTURE_OPTIONS.map(t => ({ id: t.id, label: t.label, style: pillStyle(t.id === this.state.selectedTexture) })),
+      textureHint: textureOpt.hint,
+      bjuText,
+      compositionText,
+      relevantAddons: relevantAddons.slice(0, 4),
+      hasRelevantAddons: relevantAddons.length > 0,
+      onAddonQuickAdd: this.onAddonQuickAdd,
+      upsellOpen: this.state.upsellOpen,
+      upsellAddon: this.state.upsellAddon || { name: '', price: 0 },
+      onUpsellAdd: this.onUpsellAdd,
+      onUpsellSkip: this.onUpsellSkip,
+      isCheckout: this.state.screen === 'checkout',
+      isCart: this.state.screen === 'cart',
+      onOpenCheckout: this.onOpenCheckout,
+      onProceedToCheckout: this.onProceedToCheckout,
+      checkoutAddress: this.state.checkoutAddress,
+      onAddressChange: this.onAddressChange,
+      onAddressFocus: this.onAddressFocus,
+      onAddressBlur: this.onAddressBlur,
+      showSuggestions: addressSuggestions.length > 0,
+      addressSuggestions,
+      onSuggestionPick: this.onSuggestionPick,
+      addressSelected: this.state.addressSelected,
+      addressNotSelected: !this.state.addressSelected,
+      zoneName,
+      nextRunText,
+      deadlineText,
+      freeDeliveryText,
+      isNearest: this.state.deliveryTimeMode === 'nearest',
+      isChoose: this.state.deliveryTimeMode === 'choose',
+      onTimeModeChange: this.onTimeModeChange,
+      runsView,
+      onRunClick: this.onRunClick,
+      phone: this.state.phone,
+      onPhoneChange: this.onPhoneChange,
+      isSbp: this.state.paymentMethod === 'sbp',
+      isCardMethod: this.state.paymentMethod === 'card',
+      onPayMethodChange: this.onPayMethodChange,
+      sbpRowStyle: paymentRowStyle(this.state.paymentMethod === 'sbp'),
+      cardRowStyle: paymentRowStyle(this.state.paymentMethod === 'card'),
+      orderExpanded: this.state.orderExpanded,
+      onToggleOrder: this.onToggleOrder,
+      orderChevronStyle: { display: 'inline-block', transition: 'transform .2s ease', color: 'var(--color-accent-300)', fontSize: 13, transform: this.state.orderExpanded ? 'rotate(180deg)' : 'rotate(0deg)' },
+      orderItems,
+      orderCountLabel,
+      cartEmpty,
+      cartNotEmpty: !cartEmpty,
+      onDecrementItem: this.onDecrementItem,
+      onIncrementItem: this.onIncrementItem,
+      goodsTotalLabel,
+      discountLabel,
+      subtotalLabel,
+      deliveryValueLabel,
+      deliveryValueStyle,
+      totalToPayLabel,
+      payButtonStyle,
+      payButtonLabel,
+      cartCtaStyle: payButtonStyle,
+      cartCtaLabel,
+      promoApplied: !!promo,
+      promoNotApplied: !promo,
+      promoCodeText,
+      promoDiscountLabel,
+      promoInput: this.state.promoInput,
+      promoError: this.state.promoError,
+      onPromoInputChange: this.onPromoInputChange,
+      onPromoApply: this.onPromoApply,
+      onPromoRemove: this.onPromoRemove,
+      flyingItems: flyingItemsView,
+      setRootAreaEl: this.setRootAreaEl,
+      setCartIconRef: this.setCartIconRef,
+      cartIconWrapStyle,
+      onPayClick: this.onPayClick,
+      showSbpOverlay: this.state.payOverlay === 'sbp',
+      showCardOverlay: this.state.payOverlay === 'card',
+      onClosePayOverlay: this.onClosePayOverlay,
+      cardNumber: this.state.cardNumber,
+      onCardNumberChange: this.onCardNumberChange,
+      cardExpiry: this.state.cardExpiry,
+      onCardExpiryChange: this.onCardExpiryChange,
+      cardCvc: this.state.cardCvc,
+      onCardCvcChange: this.onCardCvcChange,
+      onCardPaySubmit: this.onCardPaySubmit,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
