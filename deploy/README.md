@@ -3,7 +3,7 @@
 ## Что нужно
 
 - VPS с Ubuntu 22.04 или 24.04, 4 ГБ ОЗУ: сборка образа на сервере съедает ~2 ГБ поверх работающего магазина
-- Домен с A-записью на IP сервера
+- Домен (необязательно): без него магазин работает по IP без HTTPS
 - Репозиторий на GitHub, ключ deploy-пользователя добавлен в него
 
 ## Порядок
@@ -52,8 +52,8 @@ docker compose -f docker-compose.prod.yml exec api node apps/api/dist/seed/seed.
 
 ### 4. Проверить
 
-- `https://ДОМЕН` — витрина
-- `https://ДОМЕН/admin` — админка
+- `$PUBLIC_URL` — витрина
+- `$PUBLIC_URL/admin` — админка
 - `docker compose -f docker-compose.prod.yml ps` — все контейнеры `healthy`
 
 ## Обслуживание

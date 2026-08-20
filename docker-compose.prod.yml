@@ -43,9 +43,9 @@ services:
       SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME:?требуется SUPERADMIN_USERNAME}
       SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:?требуется SUPERADMIN_PASSWORD}
       COOKIE_SECRET: ${COOKIE_SECRET:?требуется COOKIE_SECRET}
-      CORS_ORIGIN: https://${DOMAIN:?требуется DOMAIN}
-      STOREFRONT_URL: https://${DOMAIN}
-      ASSET_URL_PREFIX: https://${DOMAIN}/assets/
+      CORS_ORIGIN: ${PUBLIC_URL:?требуется PUBLIC_URL}
+      STOREFRONT_URL: ${PUBLIC_URL}
+      ASSET_URL_PREFIX: ${PUBLIC_URL}/assets/
     volumes:
       - api_static:/app/apps/api/static
     networks: [internal]
@@ -67,14 +67,14 @@ services:
       dockerfile: apps/web/Dockerfile
       target: production
       args:
-        NEXT_PUBLIC_SHOP_API_URL: https://${DOMAIN}/shop-api
+        NEXT_PUBLIC_SHOP_API_URL: ${PUBLIC_URL}/shop-api
     restart: unless-stopped
     depends_on: [api]
     environment:
       NODE_ENV: production
       # Серверный рендеринг ходит в API внутри сети, минуя интернет.
       SHOP_API_URL_INTERNAL: http://api:3000/shop-api
-      NEXT_PUBLIC_SHOP_API_URL: https://${DOMAIN}/shop-api
+      NEXT_PUBLIC_SHOP_API_URL: ${PUBLIC_URL}/shop-api
     networks: [internal]
 
   caddy:
@@ -85,7 +85,7 @@ services:
       - '80:80'
       - '443:443'
     environment:
-      DOMAIN: ${DOMAIN}
+      PUBLIC_URL: ${PUBLIC_URL}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

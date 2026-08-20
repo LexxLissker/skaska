@@ -1,7 +1,7 @@
-# Caddy сам получает и продлевает сертификаты Let's Encrypt,
-# отдельного certbot не требуется.
+# PUBLIC_URL задаёт адрес сайта: http://IP — без TLS, домен — Caddy сам
+# получит и продлит сертификат Let's Encrypt.
 
-{$DOMAIN} {
+{$PUBLIC_URL} {
 	encode gzip zstd
 
 	# Shop API — публичный, к нему ходит браузер покупателя.
