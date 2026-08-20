@@ -11,7 +11,7 @@ PWA-магазин замороженных полуфабрикатов руч�
 |---|---|
 | Бэкенд | Vendure 3.7, PostgreSQL 16 |
 | Витрина | Next.js 16 (App Router), TypeScript, Tailwind CSS v4 |
-| Инфраструктура | Docker Compose, GitLab CI, Caddy |
+| Инфраструктура | Docker Compose, Caddy, деплой одной командой |
 
 ## Структура
 

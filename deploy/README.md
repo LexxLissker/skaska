@@ -2,9 +2,9 @@
 
 ## Что нужно
 
-- VPS с Ubuntu 22.04 или 24.04, минимум 2 ГБ ОЗУ (Vendure + Postgres + Next)
+- VPS с Ubuntu 22.04 или 24.04, 4 ГБ ОЗУ: сборка образа на сервере съедает ~2 ГБ поверх работающего магазина
 - Домен с A-записью на IP сервера
-- Проект в GitLab с включённым Container Registry
+- Репозиторий на GitHub, ключ deploy-пользователя добавлен в него
 
 ## Порядок
 
@@ -29,26 +29,18 @@ ssh deploy@СЕРВЕР 'chmod 600 /opt/zamorozka/.env && nano /opt/zamorozka/.e
 `superadmin/superadmin` в продакшене недопустим — Vendure об этом
 предупреждает при каждом старте.
 
-### 3. Настроить переменные CI
+### 3. Первый деплой
 
-В GitLab: **Settings → CI/CD → Variables**.
+С ноутбука:
 
-| Переменная | Значение | Флаги |
-|---|---|---|
-| `SSH_PRIVATE_KEY` | приватный ключ доступа к `deploy@СЕРВЕР` | Protected, Masked |
-| `DEPLOY_HOST` | IP или домен сервера | Protected |
-| `DEPLOY_USER` | `deploy` | Protected |
-| `DEPLOY_HOST_KEY` | вывод `ssh-keyscan -H СЕРВЕР` | Protected |
-| `DOMAIN` | домен магазина | Protected |
+```bash
+ssh deploy@СЕРВЕР 'git clone git@github.com:LexxLissker/zamorozka.git /opt/zamorozka'
+DEPLOY_HOST=deploy@СЕРВЕР ./deploy.sh
+```
 
-Отпечаток хоста задаётся переменной, а не собирается через `ssh-keyscan`
-в момент деплоя: keyscan доверяет тому, что ответит сеть, и от подмены
-сервера не защищает.
-
-### 4. Первый деплой
-
-Конвейер собирает образы автоматически при пуше в `main`. Стадия `deploy`
-запускается кнопкой — это намеренно, пока деплой не обкатан.
+`deploy.sh` пушит в GitHub, забирает изменения на сервере и пересобирает
+контейнеры. Отдельный CI не нужен: один сервер, один разработчик —
+конвейер и registry тут только добавляют, что обслуживать.
 
 После первого запуска нужно наполнить базу:
 
@@ -58,7 +50,7 @@ cd /opt/zamorozka
 docker compose -f docker-compose.prod.yml exec api node apps/api/dist/seed/seed.js
 ```
 
-### 5. Проверить
+### 4. Проверить
 
 - `https://ДОМЕН` — витрина
 - `https://ДОМЕН/admin` — админка
@@ -84,13 +76,7 @@ docker compose -f docker-compose.prod.yml logs -f api
 docker compose -f docker-compose.prod.yml logs -f web
 ```
 
-**Откат на предыдущую версию:** образы помечены SHA коммита, поэтому
-
-```bash
-REGISTRY_IMAGE_API=registry.gitlab.com/lexxlissker/zamorozka/api:ПРЕДЫДУЩИЙ_SHA \
-REGISTRY_IMAGE_WEB=registry.gitlab.com/lexxlissker/zamorozka/web:ПРЕДЫДУЩИЙ_SHA \
-docker compose -f docker-compose.prod.yml up -d
-```
+**Откат:** `git revert` нужного коммита и снова `./deploy.sh`.
 
 ## Перед приёмом реальных заказов
 

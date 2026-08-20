@@ -1,9 +1,7 @@
-# Продакшен на VPS. Образы берутся из GitLab Container Registry,
+# Продакшен на VPS. Образы собираются прямо на сервере — registry не нужен.
 # TLS-сертификаты Caddy получает и продлевает сам.
 #
-# Запуск на сервере:
-#   docker compose -f docker-compose.prod.yml pull
-#   docker compose -f docker-compose.prod.yml up -d
+# Запуск с ноутбука: DEPLOY_HOST=deploy@СЕРВЕР ./deploy.sh
 services:
   db:
     image: postgres:16-alpine
@@ -24,7 +22,11 @@ services:
     networks: [internal]
 
   api: &api
-    image: ${REGISTRY_IMAGE_API:?требуется REGISTRY_IMAGE_API}
+    image: zamorozka-api:local
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: production
     restart: unless-stopped
     depends_on:
       db:
@@ -59,7 +61,13 @@ services:
       disable: true
 
   web:
-    image: ${REGISTRY_IMAGE_WEB:?требуется REGISTRY_IMAGE_WEB}
+    image: zamorozka-web:local
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: production
+      args:
+        NEXT_PUBLIC_SHOP_API_URL: https://${DOMAIN}/shop-api
     restart: unless-stopped
     depends_on: [api]
     environment:

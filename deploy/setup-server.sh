@@ -35,7 +35,7 @@ fi
 systemctl enable --now docker
 
 echo "==> Завожу пользователя $DEPLOY_USER"
-# Деплой не должен ходить под root: скомпрометированный ключ CI не должен
+# Деплой не должен ходить под root: скомпрометированный ключ не должен
 # давать полный контроль над машиной.
 if ! id -u "$DEPLOY_USER" >/dev/null 2>&1; then
     adduser --disabled-password --gecos '' "$DEPLOY_USER"
@@ -83,12 +83,8 @@ cat <<INFO
   1. Направьте A-запись домена на IP этого сервера.
   2. Создайте на сервере $APP_DIR/.env — образец в deploy/env.prod.example.
      Пароли сгенерируйте: openssl rand -base64 32
-  3. В GitLab задайте переменные CI:
-       SSH_PRIVATE_KEY   — приватный ключ для доступа к $DEPLOY_USER@сервер
-       DEPLOY_HOST       — IP или домен сервера
-       DEPLOY_USER       — $DEPLOY_USER
-       DEPLOY_HOST_KEY   — вывод: ssh-keyscan -H СЕРВЕР
-       DOMAIN            — домен магазина
-  4. Запустите стадию deploy в конвейере.
+  3. Склонируйте репозиторий:
+       git clone git@github.com:LexxLissker/zamorozka.git $APP_DIR
+  4. С ноутбука: DEPLOY_HOST=$DEPLOY_USER@СЕРВЕР ./deploy.sh
 
 INFO
