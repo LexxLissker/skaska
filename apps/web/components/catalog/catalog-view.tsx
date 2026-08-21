@@ -5,8 +5,8 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { loadProducts } from '@/app/actions/catalog';
 import type { BundleOffer, Category, ProductCard as ProductCardType } from '@/lib/api/catalog';
 import { FAQS, OFFERS, REVIEWS, STEPS } from '@/lib/content';
-import { CategoryChips } from './category-chips';
 import { BundleRail } from './bundle-rail';
+import { CatalogNav } from './catalog-nav';
 import { FaqAccordion } from './faq-accordion';
 import { ImagePlaceholder } from './image-placeholder';
 import { ProductCard } from './product-card';
@@ -16,7 +16,7 @@ import { ReviewRail } from './review-rail';
 const INITIAL_VISIBLE = 6;
 const VISIBLE_STEP = 2;
 
-/** На сколько прокрутить каталог, прежде чем появится липкая панель категорий. */
+/** Порог появления липкой панели — из обработчика прокрутки в прототипе. */
 const DOCK_THRESHOLD = 790;
 
 interface Props {
@@ -41,23 +41,24 @@ export function CatalogView({
     const [docked, setDocked] = useState(false);
     const [pending, startTransition] = useTransition();
 
-    const catalogEndRef = useRef<HTMLDivElement>(null);
+    const catalogRef = useRef<HTMLDivElement>(null);
 
     const category = categories.find(c => c.slug === activeCategory) ?? categories[0];
     const subcategory = category.children.find(s => s.slug === activeSub) ?? null;
 
-    // Липкая панель появляется, когда каталог ушёл вверх, и исчезает,
-    // когда он полностью прокручен — ниже она уже не нужна.
+    // Панель показывается, пока каталог в поле зрения: после порога прокрутки
+    // и до того, как блок с товарами уйдёт вверх целиком.
     useEffect(() => {
         const onScroll = () => {
-            const end = catalogEndRef.current?.getBoundingClientRect().bottom ?? 0;
-            setDocked(window.scrollY > DOCK_THRESHOLD && end > 0);
+            const node = catalogRef.current;
+            const hideAt = node ? node.offsetTop + node.offsetHeight : Infinity;
+            setDocked(window.scrollY > DOCK_THRESHOLD && window.scrollY < hideAt);
         };
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
-    /** Смена категории открывает её первую подкатегорию — так в макете. */
+    /** Смена категории открывает её первую подкатегорию и сбрасывает сетку. */
     function selectCategory(categorySlug: string) {
         const next = categories.find(c => c.slug === categorySlug);
         switchTo(categorySlug, next?.children[0]?.slug ?? null);
@@ -66,7 +67,6 @@ export function CatalogView({
     function switchTo(categorySlug: string, subSlug: string | null) {
         setActiveCategory(categorySlug);
         setActiveSub(subSlug);
-        // Переключение всегда возвращает сетку к исходным шести карточкам.
         setVisibleCount(INITIAL_VISIBLE);
 
         startTransition(async () => {
@@ -79,102 +79,109 @@ export function CatalogView({
 
     return (
         <>
-            {/* ── Герой категории ───────────────────────────────────────────── */}
-            <header className="relative">
+            {/* ── Герой категории: 580px с затемнением к низу ────────────────── */}
+            <header className="relative h-[580px] w-full">
                 <ImagePlaceholder
                     src={category.assetUrl}
                     alt={category.name}
-                    className="aspect-[4/3] w-full"
+                    className="h-full w-full"
                 />
-                {/* Затемнение к низу, чтобы текст читался поверх фотографии. */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg via-bg/85 to-transparent px-5 pb-[22px] pt-16 text-center">
-                    <h1 className="text-[24px] font-medium">{category.name}</h1>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-text/65">
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0
+                        [background:linear-gradient(to_bottom,transparent_58%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]"
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-[22px]">
+                    <h1 className="mb-2 text-center text-[24px] text-[#eef6ff] text-pretty">
+                        {category.name}
+                    </h1>
+                    <p className="m-0 text-center text-[13.5px] leading-[1.5] text-[#eef6ff] opacity-[0.82] text-pretty">
                         {category.description}
                     </p>
                 </div>
             </header>
 
-            {/* ── Липкая панель категорий ───────────────────────────────────── */}
+            {/* Навигация наезжает на герой и растворяется в фоне. */}
             <div
-                className={`fixed top-0 z-30 w-full max-w-[480px] border-b border-divider
-                    [background:rgba(9,13,22,.92)] [backdrop-filter:blur(12px)]
-                    transition-[opacity,transform] duration-[320ms]
-                    ${docked ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-full opacity-0'}`}
-                aria-hidden={!docked}
+                className="relative z-[2] -mt-4 pt-10
+                    [background:linear-gradient(to_bottom,transparent_0,var(--color-bg)_50px,var(--color-bg)_100%)]"
             >
-                <CategoryChips
+                <CatalogNav
                     categories={categories}
-                    activeSlug={activeCategory}
-                    onSelect={selectCategory}
-                    compact
+                    activeCategory={activeCategory}
+                    activeSub={activeSub}
+                    onCategory={selectCategory}
+                    onSub={slug => switchTo(activeCategory, slug)}
                 />
             </div>
 
-            {/* ── Категории и подкатегории ──────────────────────────────────── */}
-            <CategoryChips
-                categories={categories}
-                activeSlug={activeCategory}
-                onSelect={selectCategory}
-            />
+            {/* ── Липкая панель: внизу, над навигацией ───────────────────────── */}
+            <div
+                className={`fixed inset-x-0 bottom-16 z-20 mx-auto w-full max-w-[480px] bg-bg pt-2.5
+                    shadow-[0_-1px_0_var(--color-divider)]
+                    [transition:transform_.32s_cubic-bezier(0.22,1,0.36,1),opacity_.28s_ease]
+                    ${docked ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-[14px] opacity-0'}`}
+                aria-hidden={!docked}
+            >
+                <CatalogNav
+                    categories={categories}
+                    activeCategory={activeCategory}
+                    activeSub={activeSub}
+                    onCategory={selectCategory}
+                    onSub={slug => switchTo(activeCategory, slug)}
+                />
+            </div>
 
-            {category.children.length > 0 && (
-                <nav className="noscroll flex gap-4 overflow-x-auto border-b border-divider px-4">
-                    {category.children.map(sub => (
-                        <SubTab
-                            key={sub.slug}
-                            label={sub.name}
-                            active={activeSub === sub.slug}
-                            onClick={() => switchTo(activeCategory, sub.slug)}
+            <div ref={catalogRef}>
+                {/* ── Баннер подкатегории: 414px ─────────────────────────────── */}
+                {subcategory && (
+                    <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden">
+                        <ImagePlaceholder
+                            src={null}
+                            alt={subcategory.name}
+                            className="h-full w-full"
                         />
-                    ))}
-                </nav>
-            )}
-
-            {subcategory && (
-                <section className="relative">
-                    <ImagePlaceholder
-                        src={null}
-                        alt={subcategory.name}
-                        className="h-[180px] w-full"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg to-transparent px-4 pb-4 pt-10">
-                        <h2 className="font-heading text-[19px] font-medium">{subcategory.name}</h2>
-                        <p className="mt-1 line-clamp-2 text-[12.5px] leading-relaxed text-text/60">
-                            {subcategory.description}
-                        </p>
-                    </div>
-                </section>
-            )}
-
-            {/* ── Сетка товаров ─────────────────────────────────────────────── */}
-            <section className="px-4 pt-5" aria-busy={pending}>
-                {products.length === 0 ? (
-                    <p className="py-10 text-center text-[13px] text-text/45">
-                        В этой подкатегории пока нет товаров
-                    </p>
-                ) : (
-                    <>
-                        <div className={`grid grid-cols-2 gap-3 ${pending ? 'opacity-60' : ''}`}>
-                            {visible.map(product => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0
+                                [background:linear-gradient(to_bottom,transparent_40%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]"
+                        />
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-5">
+                            <h3 className="mb-2 text-[19px] text-[#eef6ff]">{subcategory.name}</h3>
+                            <p className="m-0 max-w-[88%] text-[13.5px] leading-[1.55] text-[#eef6ff] opacity-[0.82]">
+                                {subcategory.description}
+                            </p>
                         </div>
-
-                        {visibleCount < products.length && (
-                            <button
-                                type="button"
-                                onClick={() => setVisibleCount(c => c + VISIBLE_STEP)}
-                                className="btn btn-secondary btn-block mt-4 h-11"
-                            >
-                                Показать ещё
-                            </button>
-                        )}
-                    </>
+                    </section>
                 )}
-            </section>
 
-            <div ref={catalogEndRef} />
+                {/* ── Сетка товаров ──────────────────────────────────────────── */}
+                <section className="px-4" aria-busy={pending}>
+                    {products.length === 0 ? (
+                        <p className="py-10 text-center text-[13px] text-text/45">
+                            В этой подкатегории пока нет товаров
+                        </p>
+                    ) : (
+                        <>
+                            <div className={`grid grid-cols-2 gap-3 ${pending ? 'opacity-60' : ''}`}>
+                                {visible.map(product => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </div>
+
+                            {visibleCount < products.length && (
+                                <button
+                                    type="button"
+                                    onClick={() => setVisibleCount(c => c + VISIBLE_STEP)}
+                                    className="btn btn-secondary btn-block mt-4 h-11"
+                                >
+                                    Показать ещё
+                                </button>
+                            )}
+                        </>
+                    )}
+                </section>
+            </div>
 
             {/* ── Наборы для дома ───────────────────────────────────────────── */}
             <BundleRail offers={bundles} />
@@ -184,22 +191,16 @@ export function CatalogView({
 
             {/* ── Почему выбирают нас ───────────────────────────────────────── */}
             <section className="pt-8">
-                <h2 className="px-4 pb-3 font-heading text-[22px] font-medium">
-                    Почему выбирают нас
-                </h2>
+                <h2 className="mb-3 px-4 text-[22px] font-medium">Почему выбирают нас</h2>
                 <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
                     {OFFERS.map(offer => (
                         <article
                             key={offer.title}
                             className="card w-[290px] shrink-0 bg-gradient-to-br from-surface
-                                to-[#1a2336] p-4"
+                                to-surface-2 p-4"
                         >
-                            <p className="text-[11px] uppercase tracking-wider text-accent-300">
-                                {offer.tag}
-                            </p>
-                            <h3 className="mt-1.5 font-heading text-[16px] font-medium">
-                                {offer.title}
-                            </h3>
+                            <span className="tag tag-accent">{offer.tag}</span>
+                            <h3 className="mt-2 text-[16px] font-medium">{offer.title}</h3>
                             <p className="mt-1.5 text-[12.5px] leading-relaxed text-text/60">
                                 {offer.desc}
                             </p>
@@ -210,18 +211,18 @@ export function CatalogView({
 
             {/* ── Как мы готовим ────────────────────────────────────────────── */}
             <section className="pt-8">
-                <h2 className="px-4 pb-3 font-heading text-[22px] font-medium">Как мы готовим</h2>
+                <h2 className="mb-3 px-4 text-[22px] font-medium">Как мы готовим</h2>
                 <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
                     {STEPS.map(step => (
                         <article key={step.num} className="card relative w-[220px] shrink-0 p-4">
                             <span
                                 aria-hidden="true"
                                 className="absolute right-3 top-2 font-heading text-[40px]
-                                    font-medium leading-none text-text/8"
+                                    font-medium leading-none text-text/10"
                             >
                                 {String(step.num).padStart(2, '0')}
                             </span>
-                            <h3 className="font-heading text-[15px] font-medium">{step.title}</h3>
+                            <h3 className="text-[15px] font-medium">{step.title}</h3>
                             <p className="mt-1.5 text-[12.5px] leading-relaxed text-text/60">
                                 {step.desc}
                             </p>
@@ -232,32 +233,9 @@ export function CatalogView({
 
             {/* ── Вопросы и ответы ──────────────────────────────────────────── */}
             <section className="px-4 pb-10 pt-8">
-                <h2 className="pb-3 font-heading text-[22px] font-medium">Вопросы и ответы</h2>
+                <h2 className="mb-3 text-[22px] font-medium">Вопросы и ответы</h2>
                 <FaqAccordion items={FAQS} />
             </section>
         </>
-    );
-}
-
-function SubTab({
-    label,
-    active,
-    onClick,
-}: {
-    label: string;
-    active: boolean;
-    onClick: () => void;
-}) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            aria-current={active ? 'true' : undefined}
-            className={`shrink-0 whitespace-nowrap border-b-2 py-3 font-heading text-[14px]
-                transition-colors
-                ${active ? 'border-accent text-accent' : 'border-transparent text-text/55 hover:text-text'}`}
-        >
-            {label}
-        </button>
     );
 }
