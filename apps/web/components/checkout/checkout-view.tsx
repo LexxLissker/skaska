@@ -65,8 +65,7 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
         });
     }
 
-    const ready =
-        options?.zone != null && selectedRunId != null && isPhoneComplete(phone.digits);
+    const ready = options?.zone != null && selectedRunId != null && isPhoneComplete(phone.digits);
 
     function startPayment() {
         setError(null);
@@ -93,201 +92,195 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
     }
 
     const discount = cart.discounts.reduce((sum, d) => sum + d.amount, 0);
+    const deliveryCost = options?.zone?.cost ?? null;
+    const total = cart.subTotal + (deliveryCost ?? 0);
 
     return (
         <>
-            <header className="flex items-center gap-3 px-4 pb-1 pt-5">
+            <header className="flex items-center gap-3 px-[18px] pb-[18px] pt-4">
                 <button
                     type="button"
                     onClick={() => router.back()}
                     aria-label="Назад"
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-2"
+                    className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full
+                        border border-divider bg-surface"
                 >
                     <svg
-                        width="17"
-                        height="17"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="currentColor"
+                        stroke="var(--color-text)"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         aria-hidden="true"
                     >
-                        <path d="M15 18l-6-6 6-6" />
+                        <path d="M15 5l-7 7 7 7" />
                     </svg>
                 </button>
-                <h1 className="font-heading text-[24px] font-medium">Оформление</h1>
+                <h2 className="m-0 text-[21px] font-medium text-text">Оформление</h2>
             </header>
 
-            <DeliverySection
-                address={address}
-                onAddressChange={setAddress}
-                onAddressSelect={pickAddress}
-                options={options}
-                selectedRunId={selectedRunId}
-                onRunSelect={pickRun}
-                pending={pending}
-            />
-
-            {/* ── Контакты ──────────────────────────────────────────────────── */}
-            <section className="card mx-4 mt-4 p-4">
-                <h2 className="pb-3 font-heading text-[17px] font-medium">Контакты</h2>
-                <label className="block text-[12px] text-text/70" htmlFor="phone">
-                    Телефон
-                </label>
-                <input
-                    id="phone"
-                    inputMode="tel"
-                    value={phone.display}
-                    onChange={e => setPhone(formatPhone(e.target.value))}
-                    placeholder="+7 (___) ___-__-__"
-                    className="mt-1 min-h-9 w-full rounded-md border border-divider bg-surface-2 px-3
-                        text-sm placeholder:text-text/45 focus-visible:border-accent"
+            <div className="flex flex-col gap-[14px] px-[18px] pb-[18px]">
+                <DeliverySection
+                    address={address}
+                    onAddressChange={setAddress}
+                    onAddressSelect={pickAddress}
+                    options={options}
+                    selectedRunId={selectedRunId}
+                    onRunSelect={pickRun}
+                    pending={pending}
                 />
-                <p className="pt-1.5 text-[11.5px] text-text/45">Пришлём статус заказа</p>
-            </section>
 
-            {/* ── Оплата ────────────────────────────────────────────────────── */}
-            <section className="card mx-4 mt-4 p-4">
-                <h2 className="pb-3 font-heading text-[17px] font-medium">Оплата</h2>
-                <div className="flex flex-col gap-2" role="radiogroup" aria-label="Способ оплаты">
-                    {(
-                        [
-                            { id: 'sbp', label: 'СБП', hint: 'Оплата в банковском приложении' },
-                            { id: 'card', label: 'Банковская карта', hint: '' },
-                        ] as const
-                    ).map(option => {
-                        const active = method === option.id;
-                        return (
-                            <button
-                                key={option.id}
-                                type="button"
-                                role="radio"
-                                aria-checked={active}
-                                onClick={() => setMethod(option.id)}
-                                className={`flex items-center gap-3 rounded-md border px-3 py-2.5 text-left
-                                    transition-colors
-                                    ${
-                                        active
-                                            ? 'border-accent bg-[rgba(229,184,75,.07)]'
-                                            : 'border-divider'
-                                    }`}
-                            >
-                                <span
-                                    aria-hidden="true"
-                                    className={`h-4 w-4 shrink-0 rounded-full border-[1.5px]
-                                        ${active ? 'border-accent bg-accent shadow-[inset_0_0_0_3px_var(--color-bg)]' : 'border-divider'}`}
-                                />
-                                <span>
-                                    <span className="block text-[14px]">{option.label}</span>
-                                    {option.hint && (
-                                        <span className="block text-[11.5px] text-text/45">
-                                            {option.hint}
-                                        </span>
-                                    )}
-                                </span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </section>
-
-            {/* ── Товары ────────────────────────────────────────────────────── */}
-            <section className="card mx-4 mt-4 p-4">
-                <button
-                    type="button"
-                    onClick={() => setOrderExpanded(o => !o)}
-                    aria-expanded={orderExpanded}
-                    className="flex w-full items-center justify-between"
-                >
-                    <h2 className="text-[14.5px] font-medium text-text">
-                        Состав заказа · {cart.totalQuantity}{' '}
-                        {pluralRu(cart.totalQuantity, 'товар', 'товара', 'товаров')}
-                    </h2>
-                    <span
-                        aria-hidden="true"
-                        className={`text-text/50 transition-transform ${orderExpanded ? 'rotate-180' : ''}`}
-                    >
-                        ⌄
-                    </span>
-                </button>
-
-                {orderExpanded && (
-                    <ul className="mt-3 flex flex-col gap-2 border-t border-divider pt-3">
-                        {cart.lines.map(line => (
-                            <li key={line.id} className="flex justify-between gap-3 text-[13px]">
-                                <span className="min-w-0 text-text/75">
-                                    {line.productName}
-                                    <span className="block text-[11.5px] text-text/45">
-                                        {line.weight} · {line.variantLabel} · {line.quantity} шт
-                                    </span>
-                                </span>
-                                <span className="shrink-0 font-heading">
-                                    {formatPrice(line.linePrice)}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-
-                <div className="mt-3 border-t border-divider pt-3">
-                    <SummaryRow label="Товары" value={formatPrice(cart.subTotal - discount)} />
-                    {discount !== 0 && (
-                        <SummaryRow
-                            label="Промокод"
-                            value={`−${formatPrice(Math.abs(discount))}`}
+                {/* ── Контакты ──────────────────────────────────────────────── */}
+                <section className="card p-4">
+                    <p className="mb-3 text-[15px] font-medium text-text">Контакты</p>
+                    <div className="field">
+                        <label htmlFor="phone">Телефон</label>
+                        <input
+                            id="phone"
+                            className="input"
+                            inputMode="tel"
+                            placeholder="+7 (___) ___-__-__"
+                            value={phone.display}
+                            onChange={e => setPhone(formatPhone(e.target.value))}
                         />
-                    )}
-                    <SummaryRow
-                        label="Доставка"
-                        value={
-                            options?.zone
-                                ? options.zone.cost === 0
-                                    ? 'Бесплатно'
-                                    : formatPrice(options.zone.cost)
-                                : '—'
-                        }
-                    />
-                    <div className="mt-2 flex items-center justify-between border-t border-divider pt-2.5">
-                        <span className="text-[14px]">К оплате</span>
-                        <span className="font-heading text-[20px] font-semibold text-accent">
-                            {formatPrice(cart.subTotal + (options?.zone?.cost ?? 0))}
-                        </span>
                     </div>
-                </div>
-            </section>
+                    <p className="mt-2 text-[12px] text-text opacity-70">Пришлём статус заказа</p>
+                </section>
 
-            {error && <p className="px-4 pt-3 text-[12.5px] text-red-400">{error}</p>}
+                {/* ── Оплата ────────────────────────────────────────────────── */}
+                <section className="card p-4">
+                    <p className="mb-3 text-[15px] font-medium text-text">Оплата</p>
+                    <div className="flex flex-col gap-2.5">
+                        <PaymentRow
+                            active={method === 'sbp'}
+                            onSelect={() => setMethod('sbp')}
+                            label="СБП"
+                            hint="Оплата в банковском приложении"
+                        />
+                        <PaymentRow
+                            active={method === 'card'}
+                            onSelect={() => setMethod('card')}
+                            label="Банковская карта"
+                        />
+                    </div>
+                </section>
 
-            {/* ── Липкая кнопка оплаты ──────────────────────────────────────── */}
-            <div className="fixed bottom-16 z-30 w-full max-w-[480px] border-t border-divider bg-bg/95 px-4 py-3 backdrop-blur-sm">
-                <p className="mb-2 text-center text-[11px] leading-[1.35] text-text/45">
+                {/* ── Состав заказа ─────────────────────────────────────────── */}
+                <section className="card p-4">
+                    <button
+                        type="button"
+                        onClick={() => setOrderExpanded(o => !o)}
+                        aria-expanded={orderExpanded}
+                        className="flex w-full items-center justify-between"
+                    >
+                        <span className="text-[14.5px] font-medium text-text">
+                            Состав заказа · {cart.totalQuantity}{' '}
+                            {pluralRu(cart.totalQuantity, 'товар', 'товара', 'товаров')}
+                        </span>
+                        <span
+                            aria-hidden="true"
+                            className={`text-text/50 transition-transform ${orderExpanded ? 'rotate-180' : ''}`}
+                        >
+                            ⌄
+                        </span>
+                    </button>
+
+                    {orderExpanded && (
+                        <div className="mt-2.5 flex flex-col gap-2 border-t border-divider pt-2.5">
+                            {cart.lines.map(line => (
+                                <div
+                                    key={line.id}
+                                    className="flex items-center justify-between gap-2.5"
+                                >
+                                    <div className="flex min-w-0 flex-col gap-0.5">
+                                        <span className="text-[13px] text-text">
+                                            {line.productName}
+                                        </span>
+                                        <span className="text-[11.5px] text-text/55">
+                                            {[
+                                                line.variantLabel,
+                                                line.weight,
+                                                line.quantity > 1 ? `×${line.quantity}` : null,
+                                            ]
+                                                .filter(Boolean)
+                                                .join(' · ')}
+                                        </span>
+                                    </div>
+                                    <span className="shrink-0 text-[13px] text-text">
+                                        {formatPrice(line.linePrice)}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="mt-3.5 flex flex-col gap-2 border-t border-divider pt-3.5">
+                        <SummaryRow
+                            label="Товары"
+                            value={formatPrice(cart.subTotal - discount)}
+                        />
+                        {discount !== 0 && (
+                            <SummaryRow
+                                label={`Промокод ${cart.couponCodes[0] ?? ''}`.trim()}
+                                value={`−${formatPrice(Math.abs(discount))}`}
+                                accent
+                            />
+                        )}
+                        <SummaryRow
+                            label="Доставка"
+                            value={
+                                deliveryCost === null
+                                    ? '—'
+                                    : deliveryCost === 0
+                                      ? 'Бесплатно'
+                                      : formatPrice(deliveryCost)
+                            }
+                            accent={deliveryCost === 0}
+                        />
+                        <div className="mt-1 flex items-center justify-between border-t border-divider pt-2.5">
+                            <span className="text-[15px] font-medium text-text">К оплате</span>
+                            <span className="font-heading text-[18px] font-semibold text-accent">
+                                {formatPrice(total)}
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                {error && <p className="text-center text-[12.5px] text-red-400">{error}</p>}
+
+                <p className="px-2 pb-1 pt-0.5 text-center text-[11.5px] leading-[1.5] text-text/45">
                     Нажимая «Оплатить», вы соглашаетесь с{' '}
-                    <a href="/docs/oferta" className="text-accent-300 underline-offset-2 hover:underline">
+                    <a href="/docs/oferta" className="text-accent-300">
                         условиями оферты
                     </a>{' '}
                     и{' '}
-                    <a href="/docs/privacy" className="text-accent-300 underline-offset-2 hover:underline">
+                    <a href="/docs/privacy" className="text-accent-300">
                         политикой конфиденциальности
                     </a>
                 </p>
+            </div>
+
+            {/* ── Липкий подвал ─────────────────────────────────────────────── */}
+            <div className="fixed bottom-16 z-30 w-full max-w-[480px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px]">
                 <button
                     type="button"
                     onClick={startPayment}
                     disabled={!ready || pending}
                     className="btn-cta disabled:is-disabled"
                 >
-                    Оплатить {formatPrice(cart.subTotal + (options?.zone?.cost ?? 0))}
+                    Оплатить {formatPrice(total)}
                 </button>
             </div>
 
-            <div className="h-36" />
+            <div className="h-[104px]" />
 
             {sheetOpen && (
                 <PaymentSheet
                     method={method}
-                    amount={cart.subTotal + (options?.zone?.cost ?? 0)}
+                    amount={total}
                     pending={pending}
                     onConfirm={confirmPayment}
                     onCancel={() => setSheetOpen(false)}
@@ -297,11 +290,46 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
     );
 }
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
+/** Строка выбора способа оплаты на радиокнопке дизайн-системы. */
+function PaymentRow({
+    active,
+    onSelect,
+    label,
+    hint,
+}: {
+    active: boolean;
+    onSelect: () => void;
+    label: string;
+    hint?: string;
+}) {
     return (
-        <div className="flex items-center justify-between py-1">
+        <label
+            className={`radio w-full cursor-pointer items-start gap-3 rounded-md border p-3.5
+                ${active ? 'border-accent bg-surface-2' : 'border-divider bg-transparent'}`}
+        >
+            <input type="radio" name="paymethod" checked={active} onChange={onSelect} />
+            <span className="dot" />
+            <span className="flex flex-col gap-0.5">
+                <span className="text-[14.5px] font-medium text-text">{label}</span>
+                {hint && <span className="text-[12px] text-text/60">{hint}</span>}
+            </span>
+        </label>
+    );
+}
+
+function SummaryRow({
+    label,
+    value,
+    accent = false,
+}: {
+    label: string;
+    value: string;
+    accent?: boolean;
+}) {
+    return (
+        <div className="flex items-center justify-between">
             <span className="text-[13.5px] text-text/70">{label}</span>
-            <span className="font-heading text-[14px]">{value}</span>
+            <span className={`text-[13.5px] ${accent ? 'text-accent' : 'text-text'}`}>{value}</span>
         </div>
     );
 }
