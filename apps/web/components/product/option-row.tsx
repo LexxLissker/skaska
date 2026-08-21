@@ -4,10 +4,8 @@ import type { OptionGroup } from '@/lib/api/catalog';
 
 /**
  * Ряд пилюль одной группы опций с подсказкой под ним.
- *
- * Подсказка показывается для выбранного варианта — в макете она объясняет,
- * что даёт этот выбор («+50 ₽ — больше белка, меньше глютена»), и меняется
- * при переключении.
+ * Размеры и состояния сняты с прототипа: 12.5px/500, активная —
+ * акцентная рамка на surface-2 с мягким свечением.
  */
 export function OptionRow({
     group,
@@ -21,11 +19,11 @@ export function OptionRow({
     const selected = group.choices.find(c => c.id === value) ?? group.choices[0];
 
     return (
-        <section className="pt-4">
-            <h3 className="px-4 pb-2 text-[13px] text-text/70">{group.label}</h3>
+        <section className="px-4 pb-4">
+            <div className="mb-2 text-[15px] font-medium text-text">{group.label}</div>
 
             <div
-                className="noscroll flex gap-2 overflow-x-auto px-4"
+                className="noscroll -mx-4 flex gap-2 overflow-x-auto px-4"
                 role="radiogroup"
                 aria-label={group.label}
             >
@@ -38,12 +36,12 @@ export function OptionRow({
                             role="radio"
                             aria-checked={active}
                             onClick={() => onChange(choice.id)}
-                            className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5
-                                font-heading text-[13px] transition-colors
+                            className={`shrink-0 whitespace-nowrap rounded-full border px-[11px] py-1.5
+                                text-[12.5px] font-medium transition-colors
                                 ${
                                     active
                                         ? 'chip-active bg-surface-2 text-accent'
-                                        : 'border-divider text-text/70 hover:text-text'
+                                        : 'border-divider bg-transparent text-[#a5b8de]'
                                 }`}
                         >
                             {choice.label}
@@ -52,7 +50,7 @@ export function OptionRow({
                 })}
             </div>
 
-            <p className="px-4 pt-2 text-[12px] leading-relaxed text-text/50">{selected.hint}</p>
+            <p className="mt-2 text-[12px] leading-[1.4] opacity-70">{selected.hint}</p>
         </section>
     );
 }

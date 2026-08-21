@@ -32,6 +32,7 @@ export class ConfiguratorResolver {
                     label: choice.label,
                     delta: toMinorUnits(choice.delta),
                     hint: choice.hint,
+                    ingredient: choice.ingredient,
                     bju: {
                         protein: choice.bju.p,
                         fat: choice.bju.f,

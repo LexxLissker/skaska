@@ -12,7 +12,7 @@ import {
     type DeliveryRunOption,
 } from '@/app/actions/checkout';
 import type { Cart } from '@/lib/api/cart';
-import { formatPhone, formatPrice, isPhoneComplete } from '@/lib/format';
+import { formatPhone, formatPrice, isPhoneComplete, pluralRu } from '@/lib/format';
 import { DeliverySection } from './delivery-section';
 import { PaymentSheet } from './payment-sheet';
 
@@ -154,8 +154,8 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                 <div className="flex flex-col gap-2" role="radiogroup" aria-label="Способ оплаты">
                     {(
                         [
-                            { id: 'sbp', label: 'СБП', hint: 'Система быстрых платежей' },
-                            { id: 'card', label: 'Банковская карта', hint: 'Visa, Mastercard, МИР' },
+                            { id: 'sbp', label: 'СБП', hint: 'Оплата в банковском приложении' },
+                            { id: 'card', label: 'Банковская карта', hint: '' },
                         ] as const
                     ).map(option => {
                         const active = method === option.id;
@@ -181,9 +181,11 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                                 />
                                 <span>
                                     <span className="block text-[14px]">{option.label}</span>
-                                    <span className="block text-[11.5px] text-text/45">
-                                        {option.hint}
-                                    </span>
+                                    {option.hint && (
+                                        <span className="block text-[11.5px] text-text/45">
+                                            {option.hint}
+                                        </span>
+                                    )}
                                 </span>
                             </button>
                         );
@@ -199,7 +201,10 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                     aria-expanded={orderExpanded}
                     className="flex w-full items-center justify-between"
                 >
-                    <h2 className="font-heading text-[17px] font-medium">Товары</h2>
+                    <h2 className="text-[14.5px] font-medium text-text">
+                        Состав заказа · {cart.totalQuantity}{' '}
+                        {pluralRu(cart.totalQuantity, 'товар', 'товара', 'товаров')}
+                    </h2>
                     <span
                         aria-hidden="true"
                         className={`text-text/50 transition-transform ${orderExpanded ? 'rotate-180' : ''}`}
@@ -257,18 +262,27 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
 
             {/* ── Липкая кнопка оплаты ──────────────────────────────────────── */}
             <div className="fixed bottom-16 z-30 w-full max-w-[480px] border-t border-divider bg-bg/95 px-4 py-3 backdrop-blur-sm">
+                <p className="mb-2 text-center text-[11px] leading-[1.35] text-text/45">
+                    Нажимая «Оплатить», вы соглашаетесь с{' '}
+                    <a href="/docs/oferta" className="text-accent-300 underline-offset-2 hover:underline">
+                        условиями оферты
+                    </a>{' '}
+                    и{' '}
+                    <a href="/docs/privacy" className="text-accent-300 underline-offset-2 hover:underline">
+                        политикой конфиденциальности
+                    </a>
+                </p>
                 <button
                     type="button"
                     onClick={startPayment}
                     disabled={!ready || pending}
-                    className="btn-gradient w-full rounded-md py-3 font-heading text-[15px]
-                        font-semibold disabled:is-disabled"
+                    className="btn-cta disabled:is-disabled"
                 >
                     Оплатить {formatPrice(cart.subTotal + (options?.zone?.cost ?? 0))}
                 </button>
             </div>
 
-            <div className="h-24" />
+            <div className="h-36" />
 
             {sheetOpen && (
                 <PaymentSheet

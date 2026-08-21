@@ -19,6 +19,8 @@ export const shopApiExtensions = gql`
         "Наценка в минорных единицах (копейках)"
         delta: Int!
         hint: String!
+        "Название опции в составе продукта; пустая строка — в состав не входит"
+        ingredient: String!
         bju: ConfiguratorBju!
     }
 

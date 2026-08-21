@@ -7,7 +7,7 @@ import { useState, useTransition } from 'react';
 import { applyPromoCode, removePromoCode, setLineQuantity } from '@/app/actions/cart';
 import { ImagePlaceholder } from '@/components/catalog/image-placeholder';
 import type { Cart } from '@/lib/api/cart';
-import { formatPrice } from '@/lib/format';
+import { formatPrice, pluralRu } from '@/lib/format';
 
 export function CartView({ cart }: { cart: Cart | null }) {
     const router = useRouter();
@@ -52,6 +52,12 @@ export function CartView({ cart }: { cart: Cart | null }) {
         <>
             <header className="px-4 pb-2 pt-5">
                 <h1 className="font-heading text-[26px] font-medium">Корзина</h1>
+                {!isEmpty && (
+                    <p className="mt-0.5 text-[12.5px] text-text/55">
+                        {cart.totalQuantity}{' '}
+                        {pluralRu(cart.totalQuantity, 'товар', 'товара', 'товаров')}
+                    </p>
+                )}
             </header>
 
             {isEmpty ? (
@@ -72,60 +78,53 @@ export function CartView({ cart }: { cart: Cart | null }) {
                         {cart.lines.map(line => (
                             <li
                                 key={line.id}
-                                className="flex gap-3 border-b border-divider py-3 last:border-0"
+                                className="flex items-start gap-3 border-b border-divider py-[14px] last:border-0"
                             >
                                 <Link href={`/product/${line.productSlug}`} className="shrink-0">
                                     <ImagePlaceholder
                                         src={line.assetUrl}
                                         alt={line.productName}
-                                        className="h-16 w-16 rounded-lg"
+                                        className="h-16 w-16 rounded-md"
                                     />
                                 </Link>
 
-                                <div className="min-w-0 flex-1">
+                                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                                     <Link href={`/product/${line.productSlug}`}>
-                                        <p className="line-clamp-2 text-[13.5px] leading-snug">
+                                        <span className="text-[13.5px] text-text">
                                             {line.productName}
-                                        </p>
-                                    </Link>
-                                    <p className="mt-0.5 text-[12px] text-text/50">
-                                        {line.weight} · {line.variantLabel}
-                                    </p>
-
-                                    <div className="mt-2 flex items-center justify-between">
-                                        <div className="flex items-center gap-1 rounded-full border border-divider px-1">
-                                            <button
-                                                type="button"
-                                                aria-label="Уменьшить количество"
-                                                onClick={() =>
-                                                    changeQuantity(line.id, line.quantity - 1)
-                                                }
-                                                className="flex h-7 w-7 items-center justify-center
-                                                    font-heading text-[16px] text-text/45"
-                                            >
-                                                −
-                                            </button>
-                                            <span className="min-w-[18px] text-center font-heading text-[13.5px]">
-                                                {line.quantity}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                aria-label="Увеличить количество"
-                                                onClick={() =>
-                                                    changeQuantity(line.id, line.quantity + 1)
-                                                }
-                                                className="flex h-7 w-7 items-center justify-center
-                                                    font-heading text-[16px] text-accent"
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-
-                                        <span className="font-heading text-[14px] font-medium">
-                                            {formatPrice(line.linePrice)}
                                         </span>
+                                    </Link>
+                                    <span className="text-[11.5px] text-text/55">
+                                        {line.variantLabel}
+                                    </span>
+                                    <span className="text-[11.5px] text-text/55">{line.weight}</span>
+
+                                    <div className="mt-2 flex items-center gap-1.5 self-start py-1">
+                                        <button
+                                            type="button"
+                                            aria-label="Уменьшить количество"
+                                            onClick={() => changeQuantity(line.id, line.quantity - 1)}
+                                            className="h-5 w-5 text-[16px] leading-none text-text/45"
+                                        >
+                                            −
+                                        </button>
+                                        <span className="min-w-[16px] text-center text-[13.5px]">
+                                            {line.quantity}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            aria-label="Увеличить количество"
+                                            onClick={() => changeQuantity(line.id, line.quantity + 1)}
+                                            className="h-5 w-5 text-[16px] leading-none text-accent"
+                                        >
+                                            +
+                                        </button>
                                     </div>
                                 </div>
+
+                                <span className="shrink-0 self-center font-heading text-[14px] font-medium">
+                                    {formatPrice(line.linePrice)}
+                                </span>
                             </li>
                         ))}
                     </ul>
@@ -209,8 +208,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
                 <Link
                     href="/checkout"
                     aria-disabled={isEmpty}
-                    className={`btn-gradient block rounded-md py-3 text-center font-heading
-                        text-[15px] font-semibold ${isEmpty ? 'is-disabled' : ''}`}
+                    className={`btn-cta flex items-center justify-center ${isEmpty ? 'is-disabled' : ''}`}
                 >
                     {isEmpty ? 'Оформить заказ' : `Оформить заказ · ${formatPrice(cart.subTotal)}`}
                 </Link>

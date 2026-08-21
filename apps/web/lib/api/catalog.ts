@@ -34,6 +34,7 @@ export interface OptionChoice {
     label: string;
     delta: number;
     hint: string;
+    ingredient: string;
     bju: { protein: number; fat: number; carbs: number; kcal: number };
 }
 
@@ -255,6 +256,7 @@ const CONFIGURATOR_QUERY = /* GraphQL */ `
                     label
                     delta
                     hint
+                    ingredient
                     bju {
                         protein
                         fat

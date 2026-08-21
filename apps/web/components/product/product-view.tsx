@@ -7,7 +7,7 @@ import { addToCart } from '@/app/actions/cart';
 import { ImagePlaceholder } from '@/components/catalog/image-placeholder';
 import { flyToCart } from '@/lib/fly-to-cart';
 import type { ConfiguratorData, ProductDetail } from '@/lib/api/catalog';
-import { formatAmount, formatPrice } from '@/lib/format';
+import { formatAmount } from '@/lib/format';
 import { OptionRow } from './option-row';
 
 /** Значения по умолчанию совпадают с первым вариантом каждой группы на сервере. */
@@ -17,6 +17,11 @@ const DEFAULTS: Record<string, string> = {
     color: 'standard',
     texture: 'fine',
 };
+
+/** Общий для всех товаров текст: конкретика — на упаковке. */
+const DESCRIPTION =
+    'Замороженный полуфабрикат ручной лепки. Хранить при -18°C, готовить из ' +
+    'замороженного, не размораживая. Состав и время приготовления уточняются на упаковке.';
 
 export function ProductView({
     product,
@@ -35,12 +40,16 @@ export function ProductView({
 
     const addButtonRef = useRef<HTMLButtonElement>(null);
 
-    const variant =
-        product.variants.find(v => v.weight === weight) ?? product.variants[0];
+    const variant = product.variants.find(v => v.weight === weight) ?? product.variants[0];
     const hasWeights = product.variants.length > 1;
 
-    // Цена пересчитывается из того же справочника наценок, что и на сервере.
-    // Сервер всё равно посчитает заново — здесь это только предпросмотр.
+    const choiceOf = (code: string) =>
+        configurator.groups
+            .find(g => g.code === code)
+            ?.choices.find(c => c.id === (options[code] ?? DEFAULTS[code]));
+
+    // Цена — предпросмотр из того же справочника наценок, что и на сервере.
+    // Окончательную всё равно считает Vendure при добавлении в заказ.
     const unitPrice = useMemo(() => {
         const surcharge = configurator.groups.reduce((sum, group) => {
             const choice = group.choices.find(c => c.id === options[group.code]);
@@ -64,6 +73,20 @@ export function ProductView({
         return total;
     }, [configurator, options]);
 
+    // Состав собирается из выбранных опций: мука, начинка, жир, краситель.
+    const composition = useMemo(() => {
+        const flour = choiceOf('dough')?.ingredient;
+        if (!flour) return null;
+
+        const texture = choiceOf('texture')?.ingredient ?? '';
+        const fat = choiceOf('fat')?.ingredient ?? '';
+        const dye = choiceOf('color')?.ingredient;
+
+        const inside = [texture, fat].filter(Boolean).join(', ') + (dye ? `, ${dye}` : '');
+        return `${flour.charAt(0).toUpperCase()}${flour.slice(1)}, вода, начинка (${inside}), соль, специи.`;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [configurator, options]);
+
     function handleAdd() {
         setError(null);
         if (!variant) return;
@@ -82,20 +105,20 @@ export function ProductView({
 
     return (
         <>
-            {/* ── Фото и название ───────────────────────────────────────────── */}
-            <header className="relative">
+            {/* ── Фото 4:3 с названием поверх ───────────────────────────────── */}
+            <header className="relative aspect-[4/3] w-full">
                 <ImagePlaceholder
                     src={product.assetUrl}
                     alt={product.name}
-                    className="aspect-[4/3] w-full"
+                    className="h-full w-full"
                 />
 
                 <button
                     type="button"
                     onClick={() => router.back()}
                     aria-label="Назад"
-                    className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center
-                        rounded-full bg-black/45 text-text backdrop-blur-sm"
+                    className="absolute left-[14px] top-[14px] flex h-[38px] w-[38px] items-center
+                        justify-center rounded-full bg-[color-mix(in_srgb,var(--color-bg)_65%,transparent)]"
                 >
                     <svg
                         width="18"
@@ -112,74 +135,82 @@ export function ProductView({
                     </svg>
                 </button>
 
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg to-transparent px-4 pb-4 pt-14">
-                    <h1 className="font-heading text-[23px] font-medium leading-tight">
-                        {product.name}
-                    </h1>
-                </div>
+                <h1 className="absolute inset-x-[18px] bottom-[14px] m-0 text-[20px] font-medium text-[#eef6ff] text-pretty">
+                    {product.name}
+                </h1>
             </header>
 
-            {/* ── Вес, количество, добавление ───────────────────────────────── */}
-            <div className="flex items-center gap-2 px-4 pt-4">
-                {hasWeights && (
-                    <div className="flex shrink-0 gap-1" role="group" aria-label="Вес">
-                        {(['500', '1000'] as const).map(option => (
-                            <button
-                                key={option}
-                                type="button"
-                                onClick={() => setWeight(option)}
-                                aria-pressed={weight === option}
-                                className={`rounded-full border px-2.5 py-1.5 font-heading text-[12px]
-                                    transition-colors
-                                    ${
-                                        weight === option
-                                            ? 'chip-active bg-surface-2 text-accent'
-                                            : 'border-divider text-text/55'
-                                    }`}
-                            >
-                                {option === '500' ? '0.5 кг' : '1 кг'}
-                            </button>
-                        ))}
-                    </div>
-                )}
+            <div className="px-4 pt-4">
+                {/* ── Вес · количество · добавить ───────────────────────────── */}
+                <div className="mb-3 flex items-center justify-between gap-2">
+                    {hasWeights && (
+                        <div className="flex gap-2" role="radiogroup" aria-label="Вес">
+                            {(['500', '1000'] as const).map(option => {
+                                const active = weight === option;
+                                return (
+                                    <button
+                                        key={option}
+                                        type="button"
+                                        role="radio"
+                                        aria-checked={active}
+                                        onClick={() => setWeight(option)}
+                                        className={`rounded-full border px-4 py-[7px] text-[13.5px]
+                                            font-medium transition-colors
+                                            ${
+                                                active
+                                                    ? 'border-accent bg-[color-mix(in_srgb,var(--color-accent)_16%,transparent)] text-accent'
+                                                    : 'border-divider bg-transparent text-[#a5b8de]'
+                                            }`}
+                                    >
+                                        {option} г
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
 
-                <div className="flex shrink-0 items-center gap-1 rounded-full border border-divider px-1">
-                    <StepperButton
-                        label="Убрать один"
-                        muted
-                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    <div className="flex items-center gap-2 rounded-md border border-divider px-2 py-[5px]">
+                        <button
+                            type="button"
+                            aria-label="Убрать один"
+                            onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                            className="h-[22px] w-[22px] text-[16px] leading-none text-text"
+                        >
+                            −
+                        </button>
+                        <span className="min-w-[14px] text-center text-[14px]">{quantity}</span>
+                        <button
+                            type="button"
+                            aria-label="Добавить один"
+                            onClick={() => setQuantity(q => q + 1)}
+                            className="h-[22px] w-[22px] text-[16px] leading-none text-text"
+                        >
+                            +
+                        </button>
+                    </div>
+
+                    <button
+                        ref={addButtonRef}
+                        type="button"
+                        onClick={handleAdd}
+                        disabled={pending || !variant}
+                        className="btn-gradient h-[34px] shrink-0 whitespace-nowrap rounded-md px-[14px]
+                            text-[14px] font-semibold disabled:is-disabled"
                     >
-                        −
-                    </StepperButton>
-                    <span className="min-w-[18px] text-center font-heading text-[14px]">
-                        {quantity}
-                    </span>
-                    <StepperButton label="Добавить один" onClick={() => setQuantity(q => q + 1)}>
-                        +
-                    </StepperButton>
+                        {pending ? 'Добавляем…' : `+ ${formatAmount(unitPrice * quantity)} ₽`}
+                    </button>
                 </div>
 
-                <button
-                    ref={addButtonRef}
-                    type="button"
-                    onClick={handleAdd}
-                    disabled={pending || !variant}
-                    className="btn-gradient min-w-0 flex-1 rounded-md py-2.5 font-heading
-                        text-[14px] font-semibold disabled:is-disabled"
-                >
-                    {pending ? 'Добавляем…' : `+ ${formatAmount(unitPrice * quantity)} ₽`}
-                </button>
+                {error && <p className="mb-2 text-[12.5px] text-red-400">{error}</p>}
+
+                {/* ── Б/Ж/У ─────────────────────────────────────────────────── */}
+                {bju && (
+                    <p className="mb-[14px] text-[12px] text-text/60">
+                        Б/Ж/У на 100 г: {Math.round(bju.protein)} / {Math.round(bju.fat)} /{' '}
+                        {Math.round(bju.carbs)} г · {Math.round(bju.kcal)} ккал
+                    </p>
+                )}
             </div>
-
-            {error && <p className="px-4 pt-2 text-[12.5px] text-red-400">{error}</p>}
-
-            {/* ── БЖУ ───────────────────────────────────────────────────────── */}
-            {bju && (
-                <p className="px-4 pt-3 text-[12px] text-text/50">
-                    На 100 г: белки {bju.protein.toFixed(0)} г · жиры {bju.fat.toFixed(0)} г ·
-                    углеводы {bju.carbs.toFixed(0)} г · {bju.kcal.toFixed(0)} ккал
-                </p>
-            )}
 
             {/* ── Группы опций ──────────────────────────────────────────────── */}
             {configurator.groups.map(group => (
@@ -195,53 +226,41 @@ export function ProductView({
 
             {/* ── С чем подать ──────────────────────────────────────────────── */}
             {configurator.addons.length > 0 && (
-                <section className="pt-7">
-                    <h2 className="px-4 pb-3 font-heading text-[22px] font-medium">С чем подать?</h2>
-                    <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
+                <section className="pb-2">
+                    <h2 className="px-4 pb-2 text-[15px] font-medium">С чем подать?</h2>
+                    <div className="noscroll flex gap-2 overflow-x-auto px-4 pb-1">
                         {configurator.addons.map(addon => (
-                            <AddonCard key={addon.id} addon={addon} onAdded={() => router.refresh()} />
+                            <AddonCard
+                                key={addon.id}
+                                addon={addon}
+                                onAdded={() => router.refresh()}
+                            />
                         ))}
                     </div>
                 </section>
             )}
 
-            {/* ── Описание ──────────────────────────────────────────────────── */}
-            <section className="px-4 pb-10 pt-7">
-                <h2 className="pb-2 font-heading text-[22px] font-medium">Описание</h2>
-                <div
-                    className="text-[13px] leading-relaxed text-text/60"
-                    // Описание приходит из админки как размеченный текст.
-                    dangerouslySetInnerHTML={{ __html: product.description }}
-                />
+            {/* ── Описание и состав ─────────────────────────────────────────── */}
+            <section className="px-4 pb-10">
+                <h2 className="mb-1.5 mt-[14px] text-[16px] font-medium text-text/70">Описание</h2>
+                <p className="m-0 text-[14px] leading-relaxed opacity-80 text-pretty">
+                    {DESCRIPTION}
+                </p>
+
+                {composition && (
+                    <>
+                        <h2 className="mb-1.5 mt-[14px] text-[16px] font-medium text-text/70">
+                            Состав
+                        </h2>
+                        <p className="m-0 text-[14px] leading-relaxed opacity-80">{composition}</p>
+                    </>
+                )}
             </section>
         </>
     );
 }
 
-function StepperButton({
-    children,
-    label,
-    muted = false,
-    onClick,
-}: {
-    children: React.ReactNode;
-    label: string;
-    muted?: boolean;
-    onClick: () => void;
-}) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            aria-label={label}
-            className={`flex h-7 w-7 items-center justify-center font-heading text-[16px]
-                ${muted ? 'text-text/45' : 'text-accent'}`}
-        >
-            {children}
-        </button>
-    );
-}
-
+/** Карточка дополнения: 120×98, цена с золотым свечением и круглая кнопка «+». */
 function AddonCard({
     addon,
     onAdded,
@@ -262,14 +281,15 @@ function AddonCard({
     }
 
     return (
-        <article className="card flex w-[170px] shrink-0 flex-col justify-between p-3">
-            <h3 className="line-clamp-3 text-[13px] leading-snug">{addon.name}</h3>
-            <div className="mt-3 flex items-center justify-between">
+        <article className="flex h-[98px] w-[120px] shrink-0 flex-col rounded-md bg-surface p-2.5">
+            <p className="line-clamp-3 text-[11.5px] leading-[1.3] text-text">{addon.name}</p>
+
+            <div className="mt-auto flex items-center justify-between gap-1">
                 <span
-                    className="font-heading text-[14px] font-medium text-[#E5B84B]"
-                    style={{ textShadow: '0 0 10px rgba(229,184,75,.25)' }}
+                    className="text-[12px] text-[#E5B84B]"
+                    style={{ textShadow: '0 2px 10px rgba(229,184,75,.2)' }}
                 >
-                    {formatPrice(addon.price)}
+                    +{formatAmount(addon.price)} ₽
                 </span>
                 <button
                     ref={buttonRef}
@@ -277,8 +297,8 @@ function AddonCard({
                     onClick={add}
                     disabled={pending || !addon.productVariantId}
                     aria-label={`Добавить: ${addon.name}`}
-                    className="flex h-7 w-7 items-center justify-center rounded-full border
-                        border-accent font-heading text-[15px] text-accent disabled:is-disabled"
+                    className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full
+                        border border-accent text-[13px] leading-none text-accent disabled:is-disabled"
                 >
                     +
                 </button>
