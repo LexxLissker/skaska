@@ -53,6 +53,9 @@ echo "==> Готовлю каталог приложения"
 install -d -m 755 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$APP_DIR"
 install -d -m 755 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$APP_DIR/backups"
 install -d -m 755 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$APP_DIR/deploy"
+# Репозиторий мог быть склонирован сюда до запуска скрипта — тогда файлы
+# принадлежат root, и `git pull` от имени deploy позже упадёт.
+chown -R "$DEPLOY_USER:$DEPLOY_USER" "$APP_DIR"
 
 echo "==> Настраиваю файрвол"
 apt-get install -y -qq ufw
