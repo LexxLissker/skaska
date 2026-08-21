@@ -134,7 +134,7 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                 />
 
                 {/* ── Контакты ──────────────────────────────────────────────── */}
-                <section className="card p-4">
+                <section className="panel p-4">
                     <p className="mb-3 text-[15px] font-medium text-text">Контакты</p>
                     <div className="field">
                         <label htmlFor="phone">Телефон</label>
@@ -151,7 +151,7 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                 </section>
 
                 {/* ── Оплата ────────────────────────────────────────────────── */}
-                <section className="card p-4">
+                <section className="panel p-4">
                     <p className="mb-3 text-[15px] font-medium text-text">Оплата</p>
                     <div className="flex flex-col gap-2.5">
                         <PaymentRow
@@ -169,7 +169,7 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                 </section>
 
                 {/* ── Состав заказа ─────────────────────────────────────────── */}
-                <section className="card p-4">
+                <section className="panel p-4">
                     <button
                         type="button"
                         onClick={() => setOrderExpanded(o => !o)}

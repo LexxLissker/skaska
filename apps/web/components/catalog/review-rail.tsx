@@ -8,7 +8,7 @@ export function ReviewRail({
             <h2 className="px-4 pb-3 font-heading text-[22px] font-medium">Отзывы</h2>
             <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
                 {reviews.map(review => (
-                    <article key={review.name} className="card w-[260px] shrink-0 p-4">
+                    <article key={review.name} className="panel w-[260px] shrink-0 p-4">
                         <div className="flex items-center gap-2.5">
                             <span
                                 aria-hidden="true"

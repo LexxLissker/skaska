@@ -81,7 +81,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
 
             <div className={`flex flex-col gap-[14px] px-[18px] pb-[18px] ${pending ? 'opacity-60' : ''}`}>
                 {/* ── Позиции ───────────────────────────────────────────────── */}
-                <section className="card p-4">
+                <section className="panel p-4">
                     {isEmpty ? (
                         <>
                             <p className="mb-1.5 text-[14.5px] font-medium text-text">Корзина пуста</p>
@@ -167,7 +167,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
                 {!isEmpty && (
                     <>
                         {/* ── Промокод ──────────────────────────────────────── */}
-                        <section className="card p-4">
+                        <section className="panel p-4">
                             <p className="mb-3 text-[15px] font-medium text-text">Промокод</p>
 
                             {appliedCode ? (
@@ -217,7 +217,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
                         </section>
 
                         {/* ── Итоги ─────────────────────────────────────────── */}
-                        <section className="card p-4">
+                        <section className="panel p-4">
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center justify-between">
                                     <span className="text-[13.5px] text-text/70">Товары</span>

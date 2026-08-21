@@ -37,7 +37,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
     }
 
     return (
-        <article className="card flex flex-col overflow-hidden">
+        <article className="panel flex flex-col overflow-hidden">
             <Link href={`/product/${product.slug}`} className="block">
                 <ImagePlaceholder
                     src={product.assetUrl}

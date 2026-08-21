@@ -196,7 +196,7 @@ export function CatalogView({
                     {OFFERS.map(offer => (
                         <article
                             key={offer.title}
-                            className="card w-[290px] shrink-0 bg-gradient-to-br from-surface
+                            className="panel w-[290px] shrink-0 bg-gradient-to-br from-surface
                                 to-surface-2 p-4"
                         >
                             <span className="tag tag-accent">{offer.tag}</span>
@@ -214,7 +214,7 @@ export function CatalogView({
                 <h2 className="mb-3 px-4 text-[22px] font-medium">Как мы готовим</h2>
                 <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
                     {STEPS.map(step => (
-                        <article key={step.num} className="card relative w-[220px] shrink-0 p-4">
+                        <article key={step.num} className="panel relative w-[220px] shrink-0 p-4">
                             <span
                                 aria-hidden="true"
                                 className="absolute right-3 top-2 font-heading text-[40px]

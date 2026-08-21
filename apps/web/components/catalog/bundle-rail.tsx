@@ -48,7 +48,7 @@ function BundleCard({
     }
 
     return (
-        <article className="card flex w-60 shrink-0 flex-col overflow-hidden">
+        <article className="panel flex w-60 shrink-0 flex-col overflow-hidden">
             <div className="relative h-[120px] w-full">
                 <ImagePlaceholder src={offer.assetUrl} alt={bundle.title} className="h-full w-full" />
                 <span className="tag tag-accent absolute left-2.5 top-2.5">{bundle.tag}</span>
