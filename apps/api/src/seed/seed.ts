@@ -56,6 +56,12 @@ async function run(): Promise<void> {
 
         console.log('\nГотово.\n');
     } finally {
+        // Создание коллекций ставит фоновые задачи пересчёта уже после возврата
+        // из вызова. Закрытие соединения прямо в этот момент валит процесс
+        // QueryRunnerAlreadyReleasedError, а задачи не попадают в очередь.
+        // ponytail: пауза вместо ожидания дренажа очереди; если сид снова
+        // начнёт падать — ждать опустошения JobQueue явно.
+        await new Promise(resolve => setTimeout(resolve, 3000));
         await app.close();
     }
 }
