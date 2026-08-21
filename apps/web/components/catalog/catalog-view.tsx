@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 
 import { loadProducts } from '@/app/actions/catalog';
-import type { Category, ProductCard as ProductCardType } from '@/lib/api/catalog';
+import type { BundleOffer, Category, ProductCard as ProductCardType } from '@/lib/api/catalog';
 import { FAQS, OFFERS, REVIEWS, STEPS } from '@/lib/content';
 import { CategoryChips } from './category-chips';
+import { BundleRail } from './bundle-rail';
 import { FaqAccordion } from './faq-accordion';
 import { ImagePlaceholder } from './image-placeholder';
 import { ProductCard } from './product-card';
@@ -21,12 +22,20 @@ const DOCK_THRESHOLD = 790;
 interface Props {
     categories: Category[];
     initialCategorySlug: string;
+    initialSubSlug: string | null;
     initialProducts: ProductCardType[];
+    bundles: BundleOffer[];
 }
 
-export function CatalogView({ categories, initialCategorySlug, initialProducts }: Props) {
+export function CatalogView({
+    categories,
+    initialCategorySlug,
+    initialSubSlug,
+    initialProducts,
+    bundles,
+}: Props) {
     const [activeCategory, setActiveCategory] = useState(initialCategorySlug);
-    const [activeSub, setActiveSub] = useState<string | null>(null);
+    const [activeSub, setActiveSub] = useState<string | null>(initialSubSlug);
     const [products, setProducts] = useState(initialProducts);
     const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
     const [docked, setDocked] = useState(false);
@@ -47,6 +56,12 @@ export function CatalogView({ categories, initialCategorySlug, initialProducts }
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
+    /** Смена категории открывает её первую подкатегорию — так в макете. */
+    function selectCategory(categorySlug: string) {
+        const next = categories.find(c => c.slug === categorySlug);
+        switchTo(categorySlug, next?.children[0]?.slug ?? null);
+    }
 
     function switchTo(categorySlug: string, subSlug: string | null) {
         setActiveCategory(categorySlug);
@@ -91,7 +106,7 @@ export function CatalogView({ categories, initialCategorySlug, initialProducts }
                 <CategoryChips
                     categories={categories}
                     activeSlug={activeCategory}
-                    onSelect={slug => switchTo(slug, null)}
+                    onSelect={selectCategory}
                     compact
                 />
             </div>
@@ -100,16 +115,11 @@ export function CatalogView({ categories, initialCategorySlug, initialProducts }
             <CategoryChips
                 categories={categories}
                 activeSlug={activeCategory}
-                onSelect={slug => switchTo(slug, null)}
+                onSelect={selectCategory}
             />
 
             {category.children.length > 0 && (
                 <nav className="noscroll flex gap-4 overflow-x-auto border-b border-divider px-4">
-                    <SubTab
-                        label="Все"
-                        active={activeSub === null}
-                        onClick={() => switchTo(activeCategory, null)}
-                    />
                     {category.children.map(sub => (
                         <SubTab
                             key={sub.slug}
@@ -168,6 +178,9 @@ export function CatalogView({ categories, initialCategorySlug, initialProducts }
 
             <div ref={catalogEndRef} />
 
+            {/* ── Наборы для дома ───────────────────────────────────────────── */}
+            <BundleRail offers={bundles} />
+
             {/* ── Отзывы ────────────────────────────────────────────────────── */}
             <ReviewRail reviews={reviews} />
 
@@ -208,7 +221,7 @@ export function CatalogView({ categories, initialCategorySlug, initialProducts }
                                 className="absolute right-3 top-2 font-heading text-[40px]
                                     font-medium leading-none text-text/8"
                             >
-                                {step.num}
+                                {String(step.num).padStart(2, '0')}
                             </span>
                             <h3 className="font-heading text-[15px] font-medium">{step.title}</h3>
                             <p className="mt-1.5 text-[12.5px] leading-relaxed text-text/60">

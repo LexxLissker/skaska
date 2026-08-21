@@ -293,3 +293,49 @@ export async function getConfigurator(productId?: string): Promise<ConfiguratorD
     );
     return data.productConfigurator;
 }
+
+const BUNDLES_QUERY = /* GraphQL */ `
+    query Bundles($slugs: [String!]!) {
+        products(options: { filter: { slug: { in: $slugs } }, take: 10 }) {
+            items {
+                slug
+                featuredAsset {
+                    preview
+                }
+                variants {
+                    id
+                    priceWithTax
+                }
+            }
+        }
+    }
+`;
+
+export interface BundleOffer {
+    slug: string;
+    assetUrl: string | null;
+    price: number;
+    variantId: string;
+}
+
+/** Наборы для ленты на главной. Пустой массив, если их ещё нет в каталоге. */
+export async function getBundles(slugs: string[]): Promise<BundleOffer[]> {
+    const data = await shopApi<{
+        products: {
+            items: Array<{
+                slug: string;
+                featuredAsset: { preview: string } | null;
+                variants: Array<{ id: string; priceWithTax: number }>;
+            }>;
+        };
+    }>(BUNDLES_QUERY, { slugs }, CATALOG_CACHE);
+
+    return data.products.items
+        .filter(p => p.variants.length > 0)
+        .map(p => ({
+            slug: p.slug,
+            assetUrl: p.featuredAsset?.preview ?? null,
+            price: p.variants[0].priceWithTax,
+            variantId: p.variants[0].id,
+        }));
+}

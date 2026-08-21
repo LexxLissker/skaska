@@ -1,5 +1,6 @@
 import { CatalogView } from '@/components/catalog/catalog-view';
-import { getCategories, getCollectionProducts } from '@/lib/api/catalog';
+import { getBundles, getCategories, getCollectionProducts } from '@/lib/api/catalog';
+import { BUNDLES } from '@/lib/content';
 
 /**
  * Главная — каталог.
@@ -23,13 +24,21 @@ export default async function CatalogPage() {
     }
 
     const firstCategory = categories[0];
-    const products = await getCollectionProducts(firstCategory.slug);
+    // В макете сразу открыта первая подкатегория, а не «все товары категории».
+    const firstSub = firstCategory.children[0] ?? null;
+
+    const [products, bundles] = await Promise.all([
+        getCollectionProducts(firstSub?.slug ?? firstCategory.slug),
+        getBundles(BUNDLES.map(b => b.slug)),
+    ]);
 
     return (
         <CatalogView
             categories={categories}
             initialCategorySlug={firstCategory.slug}
+            initialSubSlug={firstSub?.slug ?? null}
             initialProducts={products}
+            bundles={bundles}
         />
     );
 }

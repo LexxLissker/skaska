@@ -20,6 +20,7 @@ import {
     ADDONS,
     buildProducts,
     buildSubDescription,
+    BUNDLES,
     CATEGORIES,
     FILLINGS,
     toMinorUnits,
@@ -178,7 +179,38 @@ export async function seedCatalog(app: INestApplicationContext, ctx: RequestCont
         ]);
     }
 
-    console.log(`  ✓ товаров: ${products.length} + ${ADDONS.length} дополнений`);
+    // ─── Наборы для дома ──────────────────────────────────────────────────────
+    // На главной это отдельная лента с кнопкой «В корзину», поэтому наборы —
+    // обычные товары без опций, а не витринная заглушка.
+    for (const bundle of BUNDLES) {
+        const product = await productService.create(ctx, {
+            facetValueIds: [],
+            translations: [
+                {
+                    languageCode: LanguageCode.ru,
+                    name: bundle.title,
+                    slug: bundle.slug,
+                    description: bundle.desc,
+                },
+            ],
+            customFields: { categoryCode: 'bundle', filling: null },
+        });
+
+        await productVariantService.create(ctx, [
+            {
+                productId: product.id,
+                sku: bundle.slug,
+                price: toMinorUnits(bundle.price),
+                taxCategoryId,
+                optionIds: [],
+                stockOnHand: 100,
+                trackInventory: GlobalFlag.FALSE,
+                translations: [{ languageCode: LanguageCode.ru, name: bundle.title }],
+            },
+        ]);
+    }
+
+    console.log(`  ✓ товаров: ${products.length} + ${ADDONS.length} дополнений + ${BUNDLES.length} набора`);
 }
 
 async function seedFacets(

@@ -93,3 +93,10 @@ export const REVIEWS: Record<string, Array<{ name: string; rating: string; text:
         { name: 'Дарья', rating: '4.7', text: 'Бульонный концентрат экономит кучу времени в будни.' },
     ],
 };
+
+/** Наборы на главной. Цена и id варианта подтягиваются из каталога по slug. */
+export const BUNDLES = [
+    { slug: 'bundle-degustatsiya', tag: 'Набор · Дегустация', title: 'Попробовать всё', meta: '4 вкуса · 2 кг', desc: 'Пельмени, вареники, манты и хинкали' },
+    { slug: 'bundle-family', tag: 'Набор · Семейный', title: 'Ужин на неделю', meta: '6 порций · 3 кг', desc: 'Пельмени, вареники, манты и лапша' },
+    { slug: 'bundle-lean', tag: 'Набор · Постный', title: 'Постное меню', meta: '4 вкуса · 2 кг', desc: 'Вареники, манты с тыквой, лапша и хинкали с грибами' },
+];
