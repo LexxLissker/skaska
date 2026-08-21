@@ -28,10 +28,10 @@ async function run(): Promise<void> {
     const worker = await bootstrapWorker(config);
     const app: INestApplicationContext = worker.app;
 
-    const ctx: RequestContext = await app.get(RequestContextService).create({
-        apiType: 'admin',
-        languageCode: LanguageCode.ru,
-    });
+    const newContext = (): Promise<RequestContext> =>
+        app.get(RequestContextService).create({ apiType: 'admin', languageCode: LanguageCode.ru });
+
+    let ctx = await newContext();
 
     try {
         const existing = await app.get(ProductService).findAll(ctx, { take: 1 });
@@ -46,6 +46,11 @@ async function run(): Promise<void> {
             console.log('\nЗаполняю базу:');
             await seedCommerce(app, ctx);
             await seedDeliveryZones(app, ctx);
+
+            // Контекст держит снимок канала, а seedCommerce только что прописала
+            // каналу налоговую зону. Со старым снимком расчёт цены варианта
+            // падает с no-active-tax-zone — берём свежий.
+            ctx = await newContext();
             await seedCatalog(app, ctx);
         }
 
