@@ -87,8 +87,8 @@ export function CatalogView({
                     className="aspect-[4/3] w-full"
                 />
                 {/* Затемнение к низу, чтобы текст читался поверх фотографии. */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg via-bg/85 to-transparent px-4 pb-5 pt-16">
-                    <h1 className="font-heading text-[26px] font-medium">{category.name}</h1>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg via-bg/85 to-transparent px-5 pb-[22px] pt-16 text-center">
+                    <h1 className="text-[24px] font-medium">{category.name}</h1>
                     <p className="mt-1.5 text-[13px] leading-relaxed text-text/65">
                         {category.description}
                     </p>
@@ -165,9 +165,7 @@ export function CatalogView({
                             <button
                                 type="button"
                                 onClick={() => setVisibleCount(c => c + VISIBLE_STEP)}
-                                className="mt-4 w-full rounded-md border border-divider py-2.5
-                                    font-heading text-[14px] text-text/80 transition-colors
-                                    hover:border-accent hover:text-accent"
+                                className="btn btn-secondary btn-block mt-4 h-11"
                             >
                                 Показать ещё
                             </button>

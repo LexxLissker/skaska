@@ -51,12 +51,7 @@ function BundleCard({
         <article className="card flex w-60 shrink-0 flex-col overflow-hidden">
             <div className="relative h-[120px] w-full">
                 <ImagePlaceholder src={offer.assetUrl} alt={bundle.title} className="h-full w-full" />
-                <span
-                    className="absolute left-2.5 top-2.5 rounded-full border border-accent/40
-                        bg-bg/70 px-2 py-0.5 text-[10.5px] text-accent-300 backdrop-blur-sm"
-                >
-                    {bundle.tag}
-                </span>
+                <span className="tag tag-accent absolute left-2.5 top-2.5">{bundle.tag}</span>
             </div>
 
             <div className="flex flex-1 flex-col gap-1.5 px-3.5 pb-3.5 pt-3">
@@ -71,7 +66,7 @@ function BundleCard({
                         type="button"
                         onClick={add}
                         disabled={pending}
-                        className="btn-gradient h-8 shrink-0 whitespace-nowrap rounded-full px-3
+                        className="btn btn-primary h-8 shrink-0 whitespace-nowrap rounded-full px-3
                             text-[12px] font-semibold disabled:is-disabled"
                     >
                         В корзину · {formatPrice(offer.price)}

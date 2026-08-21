@@ -62,7 +62,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                         onClick={add}
                         disabled={pending || !variantId}
                         aria-label={`Добавить в корзину: ${product.name}`}
-                        className={`btn-gradient h-9 shrink-0 whitespace-nowrap rounded-full px-3
+                        className={`btn btn-primary h-9 shrink-0 whitespace-nowrap rounded-full px-3
                             text-[12.5px] font-semibold disabled:is-disabled
                             ${hasWeights ? '' : 'flex-1'}`}
                     >

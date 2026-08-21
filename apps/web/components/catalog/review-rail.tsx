@@ -12,8 +12,7 @@ export function ReviewRail({
                         <div className="flex items-center gap-2.5">
                             <span
                                 aria-hidden="true"
-                                className="flex h-8 w-8 items-center justify-center rounded-full
-                                    bg-surface-2 font-heading text-[14px] text-accent-300"
+                                className="gold-circle h-7 w-7 text-[12px]"
                             >
                                 {review.name[0]}
                             </span>

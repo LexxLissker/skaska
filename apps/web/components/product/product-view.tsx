@@ -194,8 +194,8 @@ export function ProductView({
                         type="button"
                         onClick={handleAdd}
                         disabled={pending || !variant}
-                        className="btn-gradient h-[34px] shrink-0 whitespace-nowrap rounded-md px-[14px]
-                            text-[14px] font-semibold disabled:is-disabled"
+                        className="btn btn-primary h-[34px] shrink-0 whitespace-nowrap px-[14px]
+                            text-[14px] disabled:is-disabled"
                     >
                         {pending ? 'Добавляем…' : `+ ${formatAmount(unitPrice * quantity)} ₽`}
                     </button>

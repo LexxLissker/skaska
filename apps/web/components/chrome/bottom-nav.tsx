@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { AccountSheet } from './account-sheet';
@@ -8,12 +9,13 @@ import { ContactPopover } from './contact-popover';
 import { SearchPanel } from './search-panel';
 
 /**
- * Постоянная нижняя панель: бренд, поиск, контакты, корзина и меню.
+ * Постоянная нижняя панель из макета: золотой бренд-кружок, поиск, корзина,
+ * контакты и меню. Порядок и размеры иконок — как в прототипе.
  *
- * Поиск и контакты взаимоисключающие — открытие одного закрывает другое.
- * Меню аккаунта живёт отдельно и может быть открыто поверх чего угодно.
+ * Поиск и контакты взаимоисключающие: открытие одного закрывает другое.
  */
 export function BottomNav({ cartQuantity }: { cartQuantity: number }) {
+    const router = useRouter();
     const [panel, setPanel] = useState<'search' | 'contact' | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -27,78 +29,72 @@ export function BottomNav({ cartQuantity }: { cartQuantity: number }) {
 
             <nav
                 className="fixed bottom-0 z-40 flex h-16 w-full max-w-[480px] items-center
-                    justify-between border-t border-divider px-4
+                    justify-around border-t border-divider px-2
                     [background:rgba(17,24,39,.85)] [backdrop-filter:blur(12px)]"
                 aria-label="Основная навигация"
             >
                 <Link
                     href="/"
-                    className="font-heading text-[15px] font-medium tracking-tight text-accent-300"
+                    aria-label="На главную"
+                    className="gold-circle h-[34px] w-[34px] text-[13px]"
                 >
-                    Заморозка
+                    З
                 </Link>
 
-                <div className="flex items-center gap-1">
-                    <NavButton
-                        label="Поиск"
-                        active={panel === 'search'}
-                        onClick={() => toggle('search')}
-                    >
-                        <path d="M11 4a7 7 0 105.2 11.7l4 4" />
-                    </NavButton>
+                <IconButton label="Поиск" active={panel === 'search'} onClick={() => toggle('search')}>
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
+                </IconButton>
 
-                    <NavButton
-                        label="Связаться"
-                        active={panel === 'contact'}
-                        onClick={() => toggle('contact')}
+                {/* Корзина — единственная акцентная иконка в панели. */}
+                <button
+                    type="button"
+                    onClick={() => router.push('/cart')}
+                    aria-label={`Корзина, товаров: ${cartQuantity}`}
+                    data-cart-icon
+                    className="relative flex p-1"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="var(--color-accent)"
+                        strokeWidth="1.6"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
                     >
-                        <path d="M4 5h16v12H7l-3 3z" />
-                    </NavButton>
-
-                    <Link
-                        href="/cart"
-                        aria-label={`Корзина, ${cartQuantity} товаров`}
-                        className="relative flex h-10 w-10 items-center justify-center rounded-full
-                            text-text/70 transition-colors hover:text-accent"
-                        data-cart-icon
-                    >
-                        <svg
-                            width="21"
-                            height="21"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
+                        <path d="M6 8h12l-1.2 11a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 8z" />
+                        <path d="M9 8V6a3 3 0 016 0v2" />
+                    </svg>
+                    {cartQuantity > 0 && (
+                        <span
+                            className="absolute -right-2 -top-1.5 flex h-[15px] min-w-[15px] items-center
+                                justify-center rounded-full bg-accent px-[3px] text-[10px] font-bold
+                                leading-none text-bg"
                         >
-                            <path d="M6 6h15l-1.5 9h-12z" />
-                            <circle cx="9" cy="20" r="1.4" />
-                            <circle cx="18" cy="20" r="1.4" />
-                            <path d="M6 6L5 2H2" />
-                        </svg>
-                        {cartQuantity > 0 && (
-                            <span
-                                className="absolute right-1 top-1 min-w-[17px] rounded-full
-                                    bg-accent px-1 text-center font-heading text-[10px]
-                                    font-semibold leading-[17px] text-[#1a1206]"
-                            >
-                                {cartQuantity}
-                            </span>
-                        )}
-                    </Link>
+                            {cartQuantity}
+                        </span>
+                    )}
+                </button>
 
-                    <NavButton label="Меню" active={menuOpen} onClick={() => setMenuOpen(true)}>
-                        <path d="M4 7h16M4 12h16M4 17h16" />
-                    </NavButton>
-                </div>
+                <IconButton
+                    label="Связаться"
+                    active={panel === 'contact'}
+                    onClick={() => toggle('contact')}
+                >
+                    <path d="M4 5h16v12H7l-3 3z" strokeLinejoin="round" />
+                </IconButton>
+
+                <IconButton label="Меню" active={menuOpen} onClick={() => setMenuOpen(true)}>
+                    <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+                </IconButton>
             </nav>
         </>
     );
 }
 
-function NavButton({
+function IconButton({
     label,
     active,
     onClick,
@@ -115,18 +111,15 @@ function NavButton({
             onClick={onClick}
             aria-label={label}
             aria-pressed={active}
-            className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors
-                ${active ? 'text-accent' : 'text-text/70 hover:text-accent'}`}
+            className="flex p-1"
         >
             <svg
-                width="21"
-                height="21"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="currentColor"
+                stroke={active ? 'var(--color-accent)' : 'var(--color-neutral-400)'}
                 strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
                 aria-hidden="true"
             >
                 {children}
