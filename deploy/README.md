@@ -34,7 +34,7 @@ ssh deploy@СЕРВЕР 'chmod 600 /opt/zamorozka/.env && nano /opt/zamorozka/.e
 С ноутбука:
 
 ```bash
-ssh deploy@СЕРВЕР 'git clone git@github.com:LexxLissker/zamorozka.git /opt/zamorozka'
+ssh deploy@СЕРВЕР 'git clone git@github.com:LexxLissker/skaska.git /opt/zamorozka'
 DEPLOY_HOST=deploy@СЕРВЕР ./deploy.sh
 ```
 

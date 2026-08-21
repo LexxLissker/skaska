@@ -87,7 +87,7 @@ cat <<INFO
   2. Создайте на сервере $APP_DIR/.env — образец в deploy/env.prod.example.
      Пароли сгенерируйте: openssl rand -base64 32
   3. Склонируйте репозиторий:
-       git clone git@github.com:LexxLissker/zamorozka.git $APP_DIR
+       git clone git@github.com:LexxLissker/skaska.git $APP_DIR
   4. С ноутбука: DEPLOY_HOST=$DEPLOY_USER@СЕРВЕР ./deploy.sh
 
 INFO
