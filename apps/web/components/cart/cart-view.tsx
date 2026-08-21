@@ -9,6 +9,10 @@ import { ImagePlaceholder } from '@/components/catalog/image-placeholder';
 import type { Cart } from '@/lib/api/cart';
 import { formatPrice, pluralRu } from '@/lib/format';
 
+/**
+ * Корзина. В макете экран разложен на три карточки: позиции, промокод и
+ * итоги, а кнопка оформления живёт в липком подвале.
+ */
 export function CartView({ cart }: { cart: Cart | null }) {
     const router = useRouter();
     const [pending, startTransition] = useTransition();
@@ -50,161 +54,201 @@ export function CartView({ cart }: { cart: Cart | null }) {
 
     return (
         <>
-            <header className="px-4 pb-2 pt-5">
-                <h1 className="font-heading text-[26px] font-medium">Корзина</h1>
-                {!isEmpty && (
-                    <p className="mt-0.5 text-[12.5px] text-text/55">
-                        {cart.totalQuantity}{' '}
-                        {pluralRu(cart.totalQuantity, 'товар', 'товара', 'товаров')}
-                    </p>
-                )}
+            <header className="flex items-center gap-3 px-[18px] pb-[18px] pt-4">
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    aria-label="Назад"
+                    className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full
+                        border border-divider bg-surface"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="var(--color-text)"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M15 5l-7 7 7 7" />
+                    </svg>
+                </button>
+                <h2 className="m-0 text-[21px] font-medium text-text">Корзина</h2>
             </header>
 
-            {isEmpty ? (
-                <div className="px-4 py-16 text-center">
-                    <p className="text-[14px] text-text/55">Корзина пуста</p>
-                    <Link
-                        href="/"
-                        className="mt-4 inline-block rounded-md border border-divider px-4 py-2
-                            font-heading text-[14px] text-text/80 hover:border-accent hover:text-accent"
-                    >
-                        В каталог
-                    </Link>
-                </div>
-            ) : (
-                <div className={pending ? 'opacity-60' : ''}>
-                    {/* ── Позиции ───────────────────────────────────────────── */}
-                    <ul className="flex flex-col px-4">
-                        {cart.lines.map(line => (
-                            <li
-                                key={line.id}
-                                className="flex items-start gap-3 border-b border-divider py-[14px] last:border-0"
-                            >
-                                <Link href={`/product/${line.productSlug}`} className="shrink-0">
-                                    <ImagePlaceholder
-                                        src={line.assetUrl}
-                                        alt={line.productName}
-                                        className="h-16 w-16 rounded-md"
-                                    />
-                                </Link>
-
-                                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                                    <Link href={`/product/${line.productSlug}`}>
-                                        <span className="text-[13.5px] text-text">
-                                            {line.productName}
-                                        </span>
-                                    </Link>
-                                    <span className="text-[11.5px] text-text/55">
-                                        {line.variantLabel}
-                                    </span>
-                                    <span className="text-[11.5px] text-text/55">{line.weight}</span>
-
-                                    <div className="mt-2 flex items-center gap-1.5 self-start py-1">
-                                        <button
-                                            type="button"
-                                            aria-label="Уменьшить количество"
-                                            onClick={() => changeQuantity(line.id, line.quantity - 1)}
-                                            className="h-5 w-5 text-[16px] leading-none text-text/45"
+            <div className={`flex flex-col gap-[14px] px-[18px] pb-[18px] ${pending ? 'opacity-60' : ''}`}>
+                {/* ── Позиции ───────────────────────────────────────────────── */}
+                <section className="card p-4">
+                    {isEmpty ? (
+                        <>
+                            <p className="mb-1.5 text-[14.5px] font-medium text-text">Корзина пуста</p>
+                            <p className="text-[12.5px] leading-[1.5] text-text/60">
+                                Добавьте блюда из каталога, чтобы оформить заказ
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <p className="mb-1 text-[14.5px] font-medium text-text">
+                                {cart.totalQuantity}{' '}
+                                {pluralRu(cart.totalQuantity, 'товар', 'товара', 'товаров')}
+                            </p>
+                            <ul className="flex flex-col">
+                                {cart.lines.map(line => (
+                                    <li
+                                        key={line.id}
+                                        className="flex items-start gap-3 border-b border-divider py-[14px] last:border-0"
+                                    >
+                                        <Link
+                                            href={`/product/${line.productSlug}`}
+                                            className="shrink-0"
                                         >
-                                            −
-                                        </button>
-                                        <span className="min-w-[16px] text-center text-[13.5px]">
-                                            {line.quantity}
+                                            <ImagePlaceholder
+                                                src={line.assetUrl}
+                                                alt={line.productName}
+                                                className="h-16 w-16 rounded-md"
+                                            />
+                                        </Link>
+
+                                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                                            <Link href={`/product/${line.productSlug}`}>
+                                                <span className="text-[13.5px] text-text">
+                                                    {line.productName}
+                                                </span>
+                                            </Link>
+                                            <span className="text-[11.5px] text-text/55">
+                                                {line.variantLabel}
+                                            </span>
+                                            <span className="text-[11.5px] text-text/55">
+                                                {line.weight}
+                                            </span>
+
+                                            <div className="mt-2 flex items-center gap-1.5 self-start py-1">
+                                                <button
+                                                    type="button"
+                                                    aria-label="Убрать одну"
+                                                    onClick={() =>
+                                                        changeQuantity(line.id, line.quantity - 1)
+                                                    }
+                                                    className="flex h-5 w-5 items-center justify-center
+                                                        text-[15px] leading-none text-text/60"
+                                                >
+                                                    −
+                                                </button>
+                                                <span className="min-w-[14px] text-center text-[13px] text-text">
+                                                    {line.quantity}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    aria-label="Добавить ещё одну"
+                                                    onClick={() =>
+                                                        changeQuantity(line.id, line.quantity + 1)
+                                                    }
+                                                    className="flex h-5 w-5 items-center justify-center
+                                                        text-[15px] leading-none text-accent"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <span className="shrink-0 text-[14px] font-medium text-text">
+                                            {formatPrice(line.linePrice)}
                                         </span>
-                                        <button
-                                            type="button"
-                                            aria-label="Увеличить количество"
-                                            onClick={() => changeQuantity(line.id, line.quantity + 1)}
-                                            className="h-5 w-5 text-[16px] leading-none text-accent"
-                                        >
-                                            +
-                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
+                </section>
+
+                {!isEmpty && (
+                    <>
+                        {/* ── Промокод ──────────────────────────────────────── */}
+                        <section className="card p-4">
+                            <p className="mb-3 text-[15px] font-medium text-text">Промокод</p>
+
+                            {appliedCode ? (
+                                <div className="flex items-center justify-between gap-2.5">
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="font-heading text-[14.5px] font-semibold text-accent">
+                                            {appliedCode}
+                                        </span>
+                                        <span className="text-[12px] text-text/60">
+                                            −{formatPrice(Math.abs(discount))}
+                                        </span>
                                     </div>
-                                </div>
-
-                                <span className="shrink-0 self-center font-heading text-[14px] font-medium">
-                                    {formatPrice(line.linePrice)}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-
-                    {/* ── Промокод ──────────────────────────────────────────── */}
-                    <section className="px-4 pt-4">
-                        {appliedCode ? (
-                            <div className="flex items-center justify-between rounded-md border border-divider bg-surface px-3 py-2.5">
-                                <div>
-                                    <span className="font-heading text-[13.5px] font-semibold text-accent">
-                                        {appliedCode}
-                                    </span>
-                                    <span className="ml-2 text-[12.5px] text-text/55">
-                                        −{formatPrice(Math.abs(discount))}
-                                    </span>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={removePromo}
-                                    aria-label="Убрать промокод"
-                                    className="px-2 text-[16px] text-text/45 hover:text-accent"
-                                >
-                                    ×
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="flex gap-2">
-                                    <input
-                                        value={promoInput}
-                                        onChange={e => setPromoInput(e.target.value)}
-                                        placeholder="Промокод"
-                                        aria-label="Промокод"
-                                        className="min-h-9 w-full rounded-md border border-divider bg-surface-2
-                                            px-3 text-sm uppercase placeholder:normal-case
-                                            placeholder:text-text/45 focus-visible:border-accent"
-                                    />
                                     <button
                                         type="button"
-                                        onClick={applyPromo}
-                                        disabled={!promoInput.trim()}
-                                        className="shrink-0 rounded-md border border-divider px-4
-                                            font-heading text-[13.5px] text-text/80
-                                            hover:border-accent hover:text-accent disabled:is-disabled"
+                                        onClick={removePromo}
+                                        aria-label="Убрать промокод"
+                                        className="flex h-6 w-6 items-center justify-center rounded-full
+                                            border border-divider text-[14px] leading-none text-text/60"
                                     >
-                                        Применить
+                                        ×
                                     </button>
                                 </div>
-                                {promoError && (
-                                    <p className="pt-1.5 text-[12.5px] text-red-400">{promoError}</p>
+                            ) : (
+                                <>
+                                    <div className="flex gap-2">
+                                        <input
+                                            className="input flex-1"
+                                            placeholder="Введите промокод"
+                                            aria-label="Промокод"
+                                            value={promoInput}
+                                            onChange={e => setPromoInput(e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={applyPromo}
+                                            disabled={!promoInput.trim()}
+                                            className="btn btn-secondary h-11 shrink-0 px-4 disabled:is-disabled"
+                                        >
+                                            Применить
+                                        </button>
+                                    </div>
+                                    {promoError && (
+                                        <p className="mt-2 text-[12px] text-text/55">{promoError}</p>
+                                    )}
+                                </>
+                            )}
+                        </section>
+
+                        {/* ── Итоги ─────────────────────────────────────────── */}
+                        <section className="card p-4">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[13.5px] text-text/70">Товары</span>
+                                    <span className="text-[13.5px] text-text">
+                                        {formatPrice(cart.subTotal - discount)}
+                                    </span>
+                                </div>
+
+                                {discount !== 0 && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[13.5px] text-text/70">Скидка</span>
+                                        <span className="text-[13.5px] text-accent">
+                                            −{formatPrice(Math.abs(discount))}
+                                        </span>
+                                    </div>
                                 )}
-                            </>
-                        )}
-                    </section>
 
-                    {/* ── Итоги ─────────────────────────────────────────────── */}
-                    <section className="card mx-4 mt-4 p-4">
-                        <Row label="Товары" value={formatPrice(cart.subTotal - discount)} />
-                        {discount !== 0 && (
-                            <Row
-                                label="Скидка"
-                                value={`−${formatPrice(Math.abs(discount))}`}
-                                muted
-                            />
-                        )}
-                        <div className="mt-2 flex items-center justify-between border-t border-divider pt-2.5">
-                            <span className="text-[14px]">Итого</span>
-                            <span className="font-heading text-[19px] font-semibold text-accent">
-                                {formatPrice(cart.subTotal)}
-                            </span>
-                        </div>
-                        <p className="pt-1 text-[11.5px] text-text/45">
-                            Доставку посчитаем на следующем шаге — она зависит от вашей зоны
-                        </p>
-                    </section>
-                </div>
-            )}
+                                <div className="mt-1 flex items-center justify-between border-t border-divider pt-2.5">
+                                    <span className="text-[15px] font-medium text-text">Итого</span>
+                                    <span className="font-heading text-[18px] font-semibold text-accent">
+                                        {formatPrice(cart.subTotal)}
+                                    </span>
+                                </div>
+                            </div>
+                        </section>
+                    </>
+                )}
+            </div>
 
-            {/* ── Липкая кнопка ─────────────────────────────────────────────── */}
-            <div className="fixed bottom-16 z-30 w-full max-w-[480px] border-t border-divider bg-bg/95 px-4 py-3 backdrop-blur-sm">
+            {/* ── Липкий подвал ─────────────────────────────────────────────── */}
+            <div className="fixed bottom-16 z-30 w-full max-w-[480px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px]">
                 <Link
                     href="/checkout"
                     aria-disabled={isEmpty}
@@ -214,19 +258,8 @@ export function CartView({ cart }: { cart: Cart | null }) {
                 </Link>
             </div>
 
-            {/* Компенсируем высоту липкой кнопки, чтобы она не перекрывала итоги. */}
-            <div className="h-20" />
+            {/* Компенсируем высоту липкого подвала. */}
+            <div className="h-[104px]" />
         </>
-    );
-}
-
-function Row({ label, value, muted = false }: { label: string; value: string; muted?: boolean }) {
-    return (
-        <div className="flex items-center justify-between py-1">
-            <span className={`text-[13.5px] ${muted ? 'text-text/55' : 'text-text/80'}`}>
-                {label}
-            </span>
-            <span className="font-heading text-[14px]">{value}</span>
-        </div>
     );
 }

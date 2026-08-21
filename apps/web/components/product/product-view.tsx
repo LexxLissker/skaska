@@ -9,6 +9,7 @@ import { flyToCart } from '@/lib/fly-to-cart';
 import type { ConfiguratorData, ProductDetail } from '@/lib/api/catalog';
 import { formatAmount } from '@/lib/format';
 import { OptionRow } from './option-row';
+import { UpsellSheet } from './upsell-sheet';
 
 /** Значения по умолчанию совпадают с первым вариантом каждой группы на сервере. */
 const DEFAULTS: Record<string, string> = {
@@ -37,8 +38,12 @@ export function ProductView({
     const [quantity, setQuantity] = useState(1);
     const [options, setOptions] = useState<Record<string, string>>(DEFAULTS);
     const [error, setError] = useState<string | null>(null);
+    const [upsellOpen, setUpsellOpen] = useState(false);
 
     const addButtonRef = useRef<HTMLButtonElement>(null);
+
+    // Предлагаем первое подходящее дополнение — так в прототипе.
+    const upsellAddon = configurator.addons.find(a => a.productVariantId) ?? null;
 
     const variant = product.variants.find(v => v.weight === weight) ?? product.variants[0];
     const hasWeights = product.variants.length > 1;
@@ -99,6 +104,18 @@ export function ProductView({
                 setError(result.error);
                 return;
             }
+            // После добавления товара шеф предлагает дополнение.
+            if (upsellAddon) setUpsellOpen(true);
+            setQuantity(1);
+            router.refresh();
+        });
+    }
+
+    function addUpsell() {
+        if (!upsellAddon?.productVariantId) return;
+        startTransition(async () => {
+            await addToCart(upsellAddon.productVariantId!, 1);
+            setUpsellOpen(false);
             router.refresh();
         });
     }
@@ -256,6 +273,15 @@ export function ProductView({
                     </>
                 )}
             </section>
+
+            {upsellOpen && upsellAddon && (
+                <UpsellSheet
+                    addon={upsellAddon}
+                    pending={pending}
+                    onAdd={addUpsell}
+                    onSkip={() => setUpsellOpen(false)}
+                />
+            )}
         </>
     );
 }
