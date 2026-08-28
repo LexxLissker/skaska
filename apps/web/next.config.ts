@@ -1,9 +1,14 @@
 import type { NextConfig } from 'next';
 
+const localDevOrigins = (process.env.NEXT_ALLOWED_DEV_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
 const nextConfig: NextConfig = {
-    // Локальный предпросмотр открывается по 127.0.0.1. В dev-режиме Next
-    // проверяет Origin и без этого адреса блокирует HMR и клиентские ресурсы.
-    allowedDevOrigins: ['127.0.0.1'],
+    // В dev-режиме Next проверяет Origin и без этого блокирует HMR и клиентские
+    // ресурсы. Дополнительные LAN-адреса задаются локально через запятую.
+    allowedDevOrigins: ['127.0.0.1', ...localDevOrigins],
     // standalone кладёт в .next/standalone минимальный сервер со своими
     // зависимостями — в образ не нужно тащить весь node_modules монорепозитория.
     output: 'standalone',
