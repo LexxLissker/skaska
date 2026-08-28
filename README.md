@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Заморозка storefront
 
-## Getting Started
+Next.js storefront, пересобранный по PWA-прототипу. Интерфейс работает как мобильное приложение: каталог, карточка товара с конструктором, корзина, допродажи, чекаут с доставкой и оплатой, поиск и меню.
 
-First, run the development server:
+## Запуск
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Production-проверка:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Vendure
 
-## Learn More
+Скопируйте `.env.example` в `.env.local` и задайте адрес Shop API:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+NEXT_PUBLIC_VENDURE_API_URL=https://api.example.ru/shop-api
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Пока переменная не задана, storefront использует демонстрационный каталог и локальную корзину, чтобы дизайн можно было просматривать и до запуска Vendure. При заданном API каталог и активная корзина работают через Shop API: добавление товара и изменение количества записываются в Vendure.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Фото больше не загружаются пользователем из браузера. Карточка выводит `featuredAsset` товара/варианта Vendure, а при его отсутствии показывает нейтральный плейсхолдер. Файлы должны загружаться через Vendure Admin.
 
-## Deploy on Vercel
+Подробнее о вариантах товаров, фото, custom fields конструктора и серверной доставке — в [docs/vendure-integration.md](docs/vendure-integration.md).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Следующим этапом
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- плагин доставки со слотами, зонами и расчётом стоимости;
+- платёжный провайдер и настоящий переход в СБП/оплату картой;
+- промокоды и применение наборов как отдельных составных позиций.
