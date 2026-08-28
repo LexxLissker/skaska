@@ -4,7 +4,7 @@ RUN corepack enable
 
 FROM base AS dependencies
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 FROM base AS build
 COPY --from=dependencies /app/node_modules ./node_modules
