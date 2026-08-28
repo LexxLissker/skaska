@@ -68,6 +68,7 @@ services:
       target: production
       args:
         NEXT_PUBLIC_SHOP_API_URL: ${PUBLIC_URL}/shop-api
+        NEXT_PUBLIC_USE_VENDURE: 'true'
     restart: unless-stopped
     depends_on: [api]
     environment:
@@ -75,6 +76,7 @@ services:
       # Серверный рендеринг ходит в API внутри сети, минуя интернет.
       SHOP_API_URL_INTERNAL: http://api:3000/shop-api
       NEXT_PUBLIC_SHOP_API_URL: ${PUBLIC_URL}/shop-api
+      NEXT_PUBLIC_USE_VENDURE: 'true'
     networks: [internal]
 
   caddy:

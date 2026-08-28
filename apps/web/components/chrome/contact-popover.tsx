@@ -54,7 +54,7 @@ export function ContactPopover({ onClose }: { onClose: () => void }) {
             <div
                 className="fixed bottom-[110px] left-1/2 z-30 w-[196px] -translate-x-1/2 rounded-md
                     border border-divider bg-surface p-1.5 shadow-[var(--shadow-md)]
-                    min-[480px]:left-auto min-[480px]:right-[calc(50%-240px+56px)] min-[480px]:translate-x-0"
+                    min-[412px]:left-auto min-[412px]:right-[calc(50%-206px+56px)] min-[412px]:translate-x-0"
                 role="menu"
             >
                 {CONTACTS.map(contact => (

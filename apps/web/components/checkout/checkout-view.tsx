@@ -264,7 +264,7 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
             </div>
 
             {/* ── Липкий подвал ─────────────────────────────────────────────── */}
-            <div className="fixed bottom-16 z-30 w-full max-w-[480px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px]">
+            <div className="fixed bottom-16 z-30 w-full max-w-[412px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px]">
                 <button
                     type="button"
                     onClick={startPayment}

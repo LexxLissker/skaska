@@ -1,6 +1,7 @@
 'use server';
 
 import { shopApi } from '@/lib/vendure';
+import { demoSearch } from '@/lib/demo-catalog';
 
 export interface SearchHit {
     name: string;
@@ -29,7 +30,8 @@ const SEARCH_QUERY = /* GraphQL */ `
 `;
 
 export async function searchProducts(term: string): Promise<SearchHit[]> {
-    const data = await shopApi<{
+    try {
+        const data = await shopApi<{
         search: {
             items: Array<{
                 productName: string;
@@ -39,9 +41,12 @@ export async function searchProducts(term: string): Promise<SearchHit[]> {
         };
     }>(SEARCH_QUERY, { term }, { revalidate: 30 });
 
-    return data.search.items.map(item => ({
+        return data.search.items.map(item => ({
         name: item.productName,
         slug: item.slug,
         price: item.priceWithTax.min ?? item.priceWithTax.value ?? 0,
-    }));
+        }));
+    } catch {
+        return demoSearch(term);
+    }
 }

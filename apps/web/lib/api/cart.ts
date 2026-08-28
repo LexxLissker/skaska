@@ -1,4 +1,5 @@
 import { shopApi } from '../vendure';
+import { demoCart, isDemoStorefront } from '../demo-catalog';
 
 /** Всё, что касается заказа, читается всегда свежим — кэшировать корзину нельзя. */
 const NO_CACHE = { revalidate: false as const };
@@ -178,8 +179,15 @@ const ACTIVE_ORDER_QUERY = /* GraphQL */ `
 `;
 
 export async function getCart(): Promise<Cart | null> {
-    const data = await shopApi<{ activeOrder: RawOrder | null }>(ACTIVE_ORDER_QUERY, {}, NO_CACHE);
-    return normalizeOrder(data.activeOrder);
+    // На этапе фронтенд-просмотра Shop API ещё не запущен. Пустая корзина
+    // позволяет открыть экран и проверить дизайн, не маскируя его ошибкой сети.
+    try {
+        const data = await shopApi<{ activeOrder: RawOrder | null }>(ACTIVE_ORDER_QUERY, {}, NO_CACHE);
+        return normalizeOrder(data.activeOrder);
+    } catch (error) {
+        if (isDemoStorefront) return demoCart;
+        throw error;
+    }
 }
 
 export { ORDER_FRAGMENT, NO_CACHE };

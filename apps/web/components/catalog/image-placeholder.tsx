@@ -2,8 +2,8 @@
  * Изображение товара или категории.
  *
  * В дизайн-прототипе все слоты пустые (`<image-slot>`), реальной съёмки ещё нет.
- * Пока фотографий нет, показываем нейтральную заглушку в тон подложки —
- * это честнее «битой картинки» и не ломает раскладку.
+ * Пока фотографий нет, показываем явный пунктирный слот из макета —
+ * это честнее «битой картинки» и не создаёт впечатления, что фото уже есть.
  */
 export function ImagePlaceholder({
     src,
@@ -25,8 +25,8 @@ export function ImagePlaceholder({
 
     return (
         <div
-            className={`flex items-center justify-center bg-gradient-to-br from-surface
-                to-surface-2 ${className}`}
+            className={`flex flex-col items-center justify-center gap-2 border border-dashed
+                border-[rgba(229,184,75,.35)] bg-surface-2 ${className}`}
             role="img"
             aria-label={alt}
         >
@@ -37,13 +37,14 @@ export function ImagePlaceholder({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.2"
-                className="text-text/15"
+                className="text-text/45"
                 aria-hidden="true"
             >
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <circle cx="8.5" cy="10" r="1.5" />
                 <path d="M21 16l-5-5-4 4-2-2-4 4" />
             </svg>
+            <span className="text-center font-heading text-[12px] text-text/75">Фото товара</span>
         </div>
     );
 }

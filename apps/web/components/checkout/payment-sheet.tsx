@@ -36,7 +36,7 @@ export function PaymentSheet({
                 className="absolute inset-0 bg-black/60"
             />
 
-            <div className="relative w-full max-w-[480px] rounded-t-[16px] border-t border-divider bg-surface px-4 pb-8 pt-5">
+            <div className="relative w-full max-w-[412px] rounded-t-[16px] border-t border-divider bg-surface px-4 pb-8 pt-5">
                 <p className="mb-1 rounded-md bg-surface-2 px-3 py-2 text-[11.5px] leading-relaxed text-text/50">
                     Демо-режим: платёжный провайдер ещё не подключён, деньги не списываются.
                 </p>

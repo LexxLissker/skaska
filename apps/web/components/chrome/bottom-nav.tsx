@@ -28,7 +28,7 @@ export function BottomNav({ cartQuantity }: { cartQuantity: number }) {
             {menuOpen && <AccountSheet onClose={() => setMenuOpen(false)} />}
 
             <nav
-                className="fixed bottom-0 z-40 flex h-16 w-full max-w-[480px] items-center
+                className="fixed bottom-0 z-40 flex h-16 w-full max-w-[412px] items-center
                     justify-around border-t border-divider px-2
                     [background:rgba(17,24,39,.85)] [backdrop-filter:blur(12px)]"
                 aria-label="Основная навигация"

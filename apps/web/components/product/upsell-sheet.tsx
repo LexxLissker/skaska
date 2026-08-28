@@ -26,7 +26,7 @@ export function UpsellSheet({
                 className="absolute inset-0 bg-black/60"
             />
 
-            <div className="relative w-full max-w-[480px] rounded-t-[20px] bg-surface px-[18px] pb-[22px] pt-5">
+            <div className="relative w-full max-w-[412px] rounded-t-[20px] bg-surface px-[18px] pb-[22px] pt-5">
                 <div
                     aria-hidden="true"
                     className="mx-auto mb-4 h-1 w-9 rounded-sm bg-divider"

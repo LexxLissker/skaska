@@ -33,7 +33,7 @@ export function AccountSheet({ onClose }: { onClose: () => void }) {
                 className="absolute inset-0"
             />
 
-            <div className="relative max-h-[80%] w-full max-w-[480px] overflow-y-auto rounded-t-[20px] bg-surface px-[18px] pb-[26px] pt-5">
+            <div className="relative max-h-[80%] w-full max-w-[412px] overflow-y-auto rounded-t-[20px] bg-surface px-[18px] pb-[26px] pt-5">
                 <div className="mb-4 flex items-center justify-between">
                     <span className="font-heading text-[16px] font-medium text-text">Меню</span>
                     <button

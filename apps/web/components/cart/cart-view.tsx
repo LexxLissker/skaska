@@ -105,11 +105,23 @@ export function CartView({ cart }: { cart: Cart | null }) {
                                             href={`/product/${line.productSlug}`}
                                             className="shrink-0"
                                         >
-                                            <ImagePlaceholder
-                                                src={line.assetUrl}
-                                                alt={line.productName}
-                                                className="h-16 w-16 rounded-md"
-                                            />
+                                            {line.assetUrl ? (
+                                                <ImagePlaceholder
+                                                    src={line.assetUrl}
+                                                    alt={line.productName}
+                                                    className="h-16 w-16 rounded-md"
+                                                />
+                                            ) : (
+                                                <div
+                                                    className="flex h-16 w-16 items-center justify-center rounded-md
+                                                        border border-dashed border-text/35 bg-surface-2 px-1 text-center
+                                                        text-[11px] font-medium leading-[1.2] text-text/55"
+                                                    role="img"
+                                                    aria-label={`Фото товара: ${line.productName}`}
+                                                >
+                                                    Фото<br />товара
+                                                </div>
+                                            )}
                                         </Link>
 
                                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -248,7 +260,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
             </div>
 
             {/* ── Липкий подвал ─────────────────────────────────────────────── */}
-            <div className="fixed bottom-16 z-30 w-full max-w-[480px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px]">
+            <div className="fixed bottom-16 z-30 w-full max-w-[412px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px]">
                 <Link
                     href="/checkout"
                     aria-disabled={isEmpty}

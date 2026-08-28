@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { NO_CACHE, ORDER_FRAGMENT, normalizeOrder, type Cart, type RawOrder } from '@/lib/api/cart';
+import { NO_CACHE, ORDER_FRAGMENT, normalizeOrder, type Cart, type CartLine, type RawOrder } from '@/lib/api/cart';
+import { demoCart, demoProduct, isDemoStorefront } from '@/lib/demo-catalog';
 import { shopApi } from '@/lib/vendure';
 
 export interface CartActionResult {
@@ -19,6 +20,56 @@ function toResult(payload: { __typename?: string; message?: string } & Partial<R
         return { cart: null, error: payload.message ?? 'Не удалось выполнить действие' };
     }
     return { cart: normalizeOrder(payload as RawOrder), error: null };
+}
+
+function refreshDemoTotals() {
+    demoCart.totalQuantity = demoCart.lines.reduce((sum, line) => sum + line.quantity, 0);
+    demoCart.subTotal = demoCart.lines.reduce((sum, line) => sum + line.linePrice, 0);
+    demoCart.total = demoCart.subTotal + demoCart.shipping;
+}
+
+function demoVariantLabel(options: Record<string, string>) {
+    const labels: Record<string, string> = {
+        polba: 'Полбяное', wholegrain: 'Цельнозерновое', butter: 'Сливочное масло',
+        olive: 'Оливковое масло', green: 'Зелёное', orange: 'Оранжевое', chopped: 'Рубленое ножом',
+    };
+    const selected = Object.values(options).map(option => labels[option]).filter(Boolean);
+    return selected.length ? selected.join(', ') : 'Стандарт';
+}
+
+function demoAddItem(variantId: string, quantity: number, options: Record<string, string>): CartActionResult {
+    const match = /^demo-(.+)-(\d+)-(500|1000)$/.exec(variantId);
+    if (!match) return { cart: null, error: 'Этот товар появится после подключения каталога' };
+
+    const [, category, index, weight] = match;
+    const product = demoProduct(`${category}-${index}`);
+    const variant = product?.variants.find(item => item.weight === weight);
+    if (!product || !variant) return { cart: null, error: 'Не удалось найти товар' };
+
+    const existing = demoCart.lines.find(
+        line => line.productSlug === product.slug && line.weight === `${weight === '500' ? '0.5' : '1'} кг` && line.variantLabel === demoVariantLabel(options),
+    );
+    if (existing) {
+        existing.quantity += quantity;
+        existing.linePrice = existing.unitPrice * existing.quantity;
+    } else {
+        const line: CartLine = {
+            id: `demo-line-${crypto.randomUUID()}`,
+            quantity,
+            unitPrice: variant.price,
+            linePrice: variant.price * quantity,
+            productName: product.name,
+            productSlug: product.slug,
+            variantName: variant.name,
+            weight: weight === '500' ? '0.5 кг' : '1 кг',
+            assetUrl: product.assetUrl,
+            variantLabel: demoVariantLabel(options),
+            options,
+        };
+        demoCart.lines.push(line);
+    }
+    refreshDemoTotals();
+    return { cart: demoCart, error: null };
 }
 
 const ADD_ITEM = /* GraphQL */ `
@@ -44,6 +95,7 @@ export async function addToCart(
     quantity: number,
     options: Record<string, string> = {},
 ): Promise<CartActionResult> {
+    if (isDemoStorefront) return demoAddItem(variantId, quantity, options);
     const data = await shopApi<{ addItemToOrder: any }>(
         ADD_ITEM,
         { variantId, quantity, customFields: options },
@@ -69,6 +121,17 @@ const ADJUST_LINE = /* GraphQL */ `
 
 /** Количество 0 удаляет строку — отдельная мутация для этого не нужна. */
 export async function setLineQuantity(lineId: string, quantity: number): Promise<CartActionResult> {
+    if (isDemoStorefront) {
+        const line = demoCart.lines.find(item => item.id === lineId);
+        if (!line) return { cart: demoCart, error: null };
+        if (quantity <= 0) demoCart.lines = demoCart.lines.filter(item => item.id !== lineId);
+        else {
+            line.quantity = quantity;
+            line.linePrice = line.unitPrice * quantity;
+        }
+        refreshDemoTotals();
+        return { cart: demoCart, error: null };
+    }
     const data = await shopApi<{ adjustOrderLine: any }>(
         ADJUST_LINE,
         { lineId, quantity: Math.max(0, quantity) },
@@ -96,6 +159,8 @@ export async function applyPromoCode(code: string): Promise<CartActionResult> {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) return { cart: null, error: 'Введите промокод' };
 
+    if (isDemoStorefront) return { cart: null, error: 'Промокоды подключим вместе с Vendure' };
+
     const data = await shopApi<{ applyCouponCode: any }>(APPLY_COUPON, { code: trimmed }, NO_CACHE);
     const result = toResult(data.applyCouponCode);
 
@@ -117,6 +182,7 @@ const REMOVE_COUPON = /* GraphQL */ `
 `;
 
 export async function removePromoCode(code: string): Promise<CartActionResult> {
+    if (isDemoStorefront) return { cart: demoCart, error: null };
     const data = await shopApi<{ removeCouponCode: RawOrder | null }>(
         REMOVE_COUPON,
         { code },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition, type TouchEvent } from 'react';
 
 import { loadProducts } from '@/app/actions/catalog';
 import type { BundleOffer, Category, ProductCard as ProductCardType } from '@/lib/api/catalog';
@@ -18,6 +18,7 @@ const VISIBLE_STEP = 2;
 
 /** Порог появления липкой панели — из обработчика прокрутки в прототипе. */
 const DOCK_THRESHOLD = 790;
+const SWIPE_DISTANCE = 55;
 
 interface Props {
     categories: Category[];
@@ -42,6 +43,7 @@ export function CatalogView({
     const [pending, startTransition] = useTransition();
 
     const catalogRef = useRef<HTMLDivElement>(null);
+    const touchStart = useRef<{ x: number; y: number } | null>(null);
 
     const category = categories.find(c => c.slug === activeCategory) ?? categories[0];
     const subcategory = category.children.find(s => s.slug === activeSub) ?? null;
@@ -49,13 +51,31 @@ export function CatalogView({
     // Панель показывается, пока каталог в поле зрения: после порога прокрутки
     // и до того, как блок с товарами уйдёт вверх целиком.
     useEffect(() => {
-        const onScroll = () => {
+        const updateDock = () => {
             const node = catalogRef.current;
             const hideAt = node ? node.offsetTop + node.offsetHeight : Infinity;
-            setDocked(window.scrollY > DOCK_THRESHOLD && window.scrollY < hideAt);
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const shouldDock = scrollTop > DOCK_THRESHOLD && scrollTop < hideAt;
+            setDocked(current => (current === shouldDock ? current : shouldDock));
         };
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => window.removeEventListener('scroll', onScroll);
+
+        // На телефонах прокрутка может приходить как на window, так и на
+        // корневой документ. Слушаем оба источника — это повторяет поведение
+        // отдельного scroll-контейнера в исходном прототипе.
+        window.addEventListener('scroll', updateDock, { passive: true });
+        document.addEventListener('scroll', updateDock, { passive: true, capture: true });
+        window.addEventListener('resize', updateDock);
+
+        const observer = new ResizeObserver(updateDock);
+        if (catalogRef.current) observer.observe(catalogRef.current);
+        requestAnimationFrame(updateDock);
+
+        return () => {
+            window.removeEventListener('scroll', updateDock);
+            document.removeEventListener('scroll', updateDock, true);
+            window.removeEventListener('resize', updateDock);
+            observer.disconnect();
+        };
     }, []);
 
     /** Смена категории открывает её первую подкатегорию и сбрасывает сетку. */
@@ -72,6 +92,34 @@ export function CatalogView({
         startTransition(async () => {
             setProducts(await loadProducts(subSlug ?? categorySlug));
         });
+    }
+
+    /**
+     * Свайп внутри блока каталога листает только главные категории. Это не
+     * карусель подкатегорий: их, как и в оригинальном прототипе, выбирают табом.
+     */
+    function onCatalogTouchStart(event: TouchEvent<HTMLDivElement>) {
+        const point = event.touches[0];
+        if (point) touchStart.current = { x: point.clientX, y: point.clientY };
+    }
+
+    function onCatalogTouchEnd(event: TouchEvent<HTMLDivElement>) {
+        const start = touchStart.current;
+        touchStart.current = null;
+        const point = event.changedTouches[0];
+        if (!start || !point) return;
+
+        const dx = point.clientX - start.x;
+        const dy = point.clientY - start.y;
+        if (Math.abs(dx) <= SWIPE_DISTANCE || Math.abs(dx) <= Math.abs(dy) * 1.4) return;
+
+        const currentIndex = categories.findIndex(item => item.slug === activeCategory);
+        const nextIndex = Math.max(
+            0,
+            Math.min(categories.length - 1, currentIndex + (dx < 0 ? 1 : -1)),
+        );
+        const next = categories[nextIndex];
+        if (next && next.slug !== activeCategory) selectCategory(next.slug);
     }
 
     const visible = products.slice(0, visibleCount);
@@ -117,7 +165,7 @@ export function CatalogView({
 
             {/* ── Липкая панель: внизу, над навигацией ───────────────────────── */}
             <div
-                className={`fixed inset-x-0 bottom-16 z-20 mx-auto w-full max-w-[480px] bg-bg pt-2.5
+                className={`fixed inset-x-0 bottom-16 z-20 mx-auto w-full max-w-[412px] bg-bg pt-2.5
                     shadow-[0_-1px_0_var(--color-divider)]
                     [transition:transform_.32s_cubic-bezier(0.22,1,0.36,1),opacity_.28s_ease]
                     ${docked ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-[14px] opacity-0'}`}
@@ -132,7 +180,11 @@ export function CatalogView({
                 />
             </div>
 
-            <div ref={catalogRef}>
+            <div
+                ref={catalogRef}
+                onTouchStart={onCatalogTouchStart}
+                onTouchEnd={onCatalogTouchEnd}
+            >
                 {/* ── Баннер подкатегории: 414px ─────────────────────────────── */}
                 {subcategory && (
                     <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden">

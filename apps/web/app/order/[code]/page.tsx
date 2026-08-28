@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = { title: 'Заказ оформлен — Заморозка' };
 
-export default async function OrderPage({ params }: PageProps<'/order/[code]'>) {
+export default async function OrderPage({ params }: { params: Promise<{ code: string }> }) {
     const { code } = await params;
 
     return (

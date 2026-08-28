@@ -41,7 +41,7 @@ export function SearchPanel({ onClose }: { onClose: () => void }) {
     }, [query]);
 
     return (
-        <div className="fixed bottom-16 z-40 w-full max-w-[480px] border-t border-divider bg-bg px-4 py-2.5">
+        <div className="fixed bottom-16 z-40 w-full max-w-[412px] border-t border-divider bg-bg px-4 py-2.5">
             <div className="relative flex h-10 items-center rounded-full border border-divider bg-surface-2">
                 <input
                     ref={inputRef}

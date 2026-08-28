@@ -99,15 +99,19 @@ export function ProductView({
         flyToCart(addButtonRef.current);
 
         startTransition(async () => {
-            const result = await addToCart(variant.id, quantity, options);
-            if (result.error) {
-                setError(result.error);
-                return;
+            try {
+                const result = await addToCart(variant.id, quantity, options);
+                if (result.error) {
+                    setError(result.error);
+                    return;
+                }
+                // После добавления товара шеф предлагает дополнение.
+                if (upsellAddon) setUpsellOpen(true);
+                setQuantity(1);
+                router.refresh();
+            } catch {
+                setError('Не удалось добавить товар. Попробуйте ещё раз.');
             }
-            // После добавления товара шеф предлагает дополнение.
-            if (upsellAddon) setUpsellOpen(true);
-            setQuantity(1);
-            router.refresh();
         });
     }
 

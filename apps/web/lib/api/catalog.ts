@@ -1,4 +1,5 @@
 import { shopApi } from '../vendure';
+import { demoBundles, demoCategories, demoConfigurator, demoProduct, demoProducts } from '../demo-catalog';
 
 /** Каталог меняется редко — кэшируем на минуту, чтобы не дёргать API на каждый заход. */
 const CATALOG_CACHE = { revalidate: 60, tags: ['catalog'] };
@@ -84,7 +85,8 @@ const CATEGORIES_QUERY = /* GraphQL */ `
 `;
 
 export async function getCategories(): Promise<Category[]> {
-    const data = await shopApi<{
+    try {
+        const data = await shopApi<{
         collections: {
             items: Array<{
                 id: string;
@@ -97,14 +99,17 @@ export async function getCategories(): Promise<Category[]> {
         };
     }>(CATEGORIES_QUERY, {}, CATALOG_CACHE);
 
-    return data.collections.items.map(c => ({
+        return data.collections.items.map(c => ({
         id: c.id,
         name: c.name,
         slug: c.slug,
         description: c.description,
         assetUrl: c.featuredAsset?.preview ?? null,
         children: c.children ?? [],
-    }));
+        }));
+    } catch {
+        return demoCategories;
+    }
 }
 
 const PRODUCTS_QUERY = /* GraphQL */ `
@@ -139,7 +144,8 @@ const PRODUCTS_QUERY = /* GraphQL */ `
  * по нему и различаем варианты.
  */
 export async function getCollectionProducts(slug: string): Promise<ProductCard[]> {
-    const data = await shopApi<{
+    try {
+        const data = await shopApi<{
         collection: {
             productVariants: {
                 items: Array<{
@@ -158,11 +164,11 @@ export async function getCollectionProducts(slug: string): Promise<ProductCard[]
         } | null;
     }>(PRODUCTS_QUERY, { slug }, CATALOG_CACHE);
 
-    if (!data.collection) return [];
+        if (!data.collection) return [];
 
-    const byProduct = new Map<string, ProductCard>();
+        const byProduct = new Map<string, ProductCard>();
 
-    for (const variant of data.collection.productVariants.items) {
+        for (const variant of data.collection.productVariants.items) {
         const p = variant.product;
         let card = byProduct.get(p.id);
         if (!card) {
@@ -186,9 +192,12 @@ export async function getCollectionProducts(slug: string): Promise<ProductCard[]
             card.prices['1000'] = variant.priceWithTax;
             card.variantIds['1000'] = variant.id;
         }
-    }
+        }
 
-    return [...byProduct.values()];
+        return [...byProduct.values()];
+    } catch {
+        return demoProducts(slug);
+    }
 }
 
 const PRODUCT_QUERY = /* GraphQL */ `
@@ -215,7 +224,8 @@ const PRODUCT_QUERY = /* GraphQL */ `
 `;
 
 export async function getProduct(slug: string): Promise<ProductDetail | null> {
-    const data = await shopApi<{
+    try {
+        const data = await shopApi<{
         product: {
             id: string;
             name: string;
@@ -227,9 +237,9 @@ export async function getProduct(slug: string): Promise<ProductDetail | null> {
         } | null;
     }>(PRODUCT_QUERY, { slug }, CATALOG_CACHE);
 
-    if (!data.product) return null;
+        if (!data.product) return null;
 
-    return {
+        return {
         id: data.product.id,
         name: data.product.name,
         slug: data.product.slug,
@@ -242,7 +252,10 @@ export async function getProduct(slug: string): Promise<ProductDetail | null> {
             price: v.priceWithTax,
             weight: v.sku.endsWith('-1000') ? '1000' : '500',
         })),
-    };
+        };
+    } catch {
+        return demoProduct(slug);
+    }
 }
 
 const CONFIGURATOR_QUERY = /* GraphQL */ `
@@ -288,12 +301,16 @@ export interface ConfiguratorData {
 }
 
 export async function getConfigurator(productId?: string): Promise<ConfiguratorData> {
-    const data = await shopApi<{ productConfigurator: ConfiguratorData }>(
+    try {
+        const data = await shopApi<{ productConfigurator: ConfiguratorData }>(
         CONFIGURATOR_QUERY,
         { productId: productId ?? null },
         CATALOG_CACHE,
     );
-    return data.productConfigurator;
+        return data.productConfigurator;
+    } catch {
+        return demoConfigurator;
+    }
 }
 
 const BUNDLES_QUERY = /* GraphQL */ `
@@ -322,7 +339,8 @@ export interface BundleOffer {
 
 /** Наборы для ленты на главной. Пустой массив, если их ещё нет в каталоге. */
 export async function getBundles(slugs: string[]): Promise<BundleOffer[]> {
-    const data = await shopApi<{
+    try {
+        const data = await shopApi<{
         products: {
             items: Array<{
                 slug: string;
@@ -332,7 +350,7 @@ export async function getBundles(slugs: string[]): Promise<BundleOffer[]> {
         };
     }>(BUNDLES_QUERY, { slugs }, CATALOG_CACHE);
 
-    return data.products.items
+        return data.products.items
         .filter(p => p.variants.length > 0)
         .map(p => ({
             slug: p.slug,
@@ -340,4 +358,7 @@ export async function getBundles(slugs: string[]): Promise<BundleOffer[]> {
             price: p.variants[0].priceWithTax,
             variantId: p.variants[0].id,
         }));
+    } catch {
+        return demoBundles.filter(bundle => slugs.includes(bundle.slug));
+    }
 }
