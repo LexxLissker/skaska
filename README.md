@@ -15,6 +15,18 @@ Production-проверка:
 pnpm build
 ```
 
+## Запуск в Docker
+
+На VPS storefront запускается одной командой:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Она поднимает два контейнера: Next.js-витрину и Caddy, который принимает трафик
+на 80/443 портах. Пока backend Vendure не подключён, витрина использует
+демонстрационный каталог; это не мешает показать и проверить интерфейс.
+
 ## Vendure
 
 Скопируйте `.env.example` в `.env.local` и задайте адрес Shop API:

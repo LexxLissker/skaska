@@ -1,0 +1,6 @@
+# Пока витрина открывается по IP. Когда появится домен, заменим `:80` на него:
+# shop.example.ru { reverse_proxy web:3000 }
+:80 {
+  encode zstd gzip
+  reverse_proxy web:3000
+}
