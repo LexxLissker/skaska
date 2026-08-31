@@ -5,8 +5,8 @@
  * золотая шайба. Активная сторона показывает вес внутри шайбы, неактивная —
  * только цифру приглушённым цветом.
  *
- * Обе половины по 40px: неактивное значение занимает ровно столько же места,
- * сколько активная золотая шайба. Шайба выше дорожки (36px) намеренно.
+ * Обе половины по 40px. Золотая шайба — 44px: она намеренно выше дорожки
+ * (36px) и немного заходит на соседнюю неактивную половину.
  */
 export function WeightToggle({
     value,
@@ -39,7 +39,7 @@ export function WeightToggle({
                             <span
                                 aria-hidden="true"
                                 className="pointer-events-none absolute left-1/2 top-1/2 z-[2] flex
-                                    h-10 w-10 -translate-x-1/2 -translate-y-1/2 flex-col items-center
+                                    h-11 w-11 -translate-x-1/2 -translate-y-1/2 flex-col items-center
                                     justify-center rounded-full border-2 border-surface bg-accent
                                     text-bg shadow-[0_4px_14px_rgba(0,0,0,0.45)]"
                             >
