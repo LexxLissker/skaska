@@ -5,7 +5,8 @@
  * золотая шайба. Активная сторона показывает вес внутри шайбы, неактивная —
  * только цифру приглушённым цветом.
  *
- * Шайба (44px) выше дорожки (36px) намеренно — так в макете.
+ * Обе половины по 40px: неактивное значение занимает ровно столько же места,
+ * сколько активная золотая шайба. Шайба выше дорожки (36px) намеренно.
  */
 export function WeightToggle({
     value,
@@ -16,7 +17,7 @@ export function WeightToggle({
 }) {
     return (
         <div
-            className="relative flex h-9 flex-1 rounded-full border border-divider bg-surface-2"
+            className="relative flex h-9 w-20 shrink-0 rounded-full border border-divider bg-surface-2"
             role="radiogroup"
             aria-label="Вес"
         >
@@ -38,7 +39,7 @@ export function WeightToggle({
                             <span
                                 aria-hidden="true"
                                 className="pointer-events-none absolute left-1/2 top-1/2 z-[2] flex
-                                    h-11 w-11 -translate-x-1/2 -translate-y-1/2 flex-col items-center
+                                    h-10 w-10 -translate-x-1/2 -translate-y-1/2 flex-col items-center
                                     justify-center rounded-full border-2 border-surface bg-accent
                                     text-bg shadow-[0_4px_14px_rgba(0,0,0,0.45)]"
                             >
