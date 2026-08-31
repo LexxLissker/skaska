@@ -11,12 +11,7 @@ const DOCUMENTS = [
     { label: 'Условия доставки и возврата', href: '/docs/delivery' },
 ];
 
-/**
- * Нижняя шторка «Меню»: заказы и юридические документы.
- *
- * Вход по телефону включается фичефлагом: без SMS-шлюза форма, которая
- * не отправит код, вводила бы покупателя в заблуждение.
- */
+/** Первый вариант шторки «аккаунт и документы». */
 export function AccountSheet({ onClose }: { onClose: () => void }) {
     const [cookieOpen, setCookieOpen] = useState(false);
     const [analytics, setAnalytics] = useState(false);
@@ -25,126 +20,104 @@ export function AccountSheet({ onClose }: { onClose: () => void }) {
     const loginEnabled = process.env.NEXT_PUBLIC_PHONE_LOGIN_ENABLED === 'true';
 
     return (
-        <div className="fixed inset-0 z-[42] flex items-end justify-center bg-[color-mix(in_srgb,var(--color-bg)_60%,transparent)]">
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
             <button
                 type="button"
                 aria-label="Закрыть меню"
                 onClick={onClose}
-                className="absolute inset-0"
+                className="absolute inset-0 bg-black/60"
             />
 
-            <div className="relative max-h-[80%] w-full max-w-[412px] overflow-y-auto rounded-t-[20px] bg-surface px-[18px] pb-[26px] pt-5">
+            <div className="relative w-full max-w-[412px] rounded-t-[16px] border-t border-divider bg-surface px-4 pb-6 pt-4">
                 <div className="mb-4 flex items-center justify-between">
-                    <span className="font-heading text-[16px] font-medium text-text">Меню</span>
+                    <h2 className="font-heading text-[22px] font-medium">Меню</h2>
                     <button
                         type="button"
                         onClick={onClose}
                         aria-label="Закрыть"
-                        className="flex p-1 text-[#a5b8de]"
+                        className="px-2 text-xl text-text/55 hover:text-accent"
                     >
-                        <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            aria-hidden="true"
-                        >
-                            <path d="M6 6l12 12M18 6L6 18" />
-                        </svg>
+                        ×
                     </button>
                 </div>
 
-                {/* ── Мои заказы ────────────────────────────────────────────── */}
-                <div className="mb-4 rounded-md bg-surface-2 p-3.5">
-                    <p className="mb-2 text-[14.5px] font-medium text-text">Мои заказы</p>
-
+                <section className="card mb-3 p-4">
+                    <h3 className="mb-2 text-[15px] font-medium">Мои заказы</h3>
                     {loginEnabled ? (
-                        <>
-                            <p className="mb-2.5 text-[12.5px] leading-[1.5] text-text/60">
-                                Войдите по номеру телефона — здесь появятся заказы и повтор заказа
-                            </p>
-                            <div className="flex gap-2">
-                                <input
-                                    className="input flex-1"
-                                    inputMode="tel"
-                                    placeholder="+7 (___) ___-__-__"
-                                    aria-label="Номер телефона"
-                                    value={phone.display}
-                                    onChange={e => setPhone(formatPhone(e.target.value))}
-                                />
-                                <button
-                                    type="button"
-                                    disabled={!isPhoneComplete(phone.digits)}
-                                    className="btn btn-primary h-11 shrink-0 px-4 disabled:is-disabled"
-                                >
-                                    Код
-                                </button>
-                            </div>
-                        </>
+                        <div className="flex gap-2">
+                            <input
+                                inputMode="tel"
+                                value={phone.display}
+                                onChange={e => setPhone(formatPhone(e.target.value))}
+                                placeholder="+7 (___) ___-__-__"
+                                aria-label="Номер телефона"
+                                className="min-h-9 w-full rounded-md border border-divider bg-surface-2
+                                    px-3 text-sm placeholder:text-text/45 focus-visible:border-accent"
+                            />
+                            <button
+                                type="button"
+                                disabled={!isPhoneComplete(phone.digits)}
+                                className="btn-gradient shrink-0 rounded-md px-4 font-heading
+                                    text-[14px] font-medium disabled:is-disabled"
+                            >
+                                Код
+                            </button>
+                        </div>
                     ) : (
-                        <p className="text-[12.5px] leading-[1.5] text-text/60">
+                        <p className="text-[13px] leading-relaxed text-text/55">
                             Личный кабинет скоро откроем. Статус заказа пришлём в сообщении на
                             указанный при оформлении номер.
                         </p>
                     )}
-                </div>
+                </section>
 
-                {/* ── Документы ─────────────────────────────────────────────── */}
-                <div className="flex flex-col">
-                    {DOCUMENTS.map(doc => (
-                        <a
-                            key={doc.href}
-                            href={doc.href}
-                            className="flex items-center justify-between border-b border-divider
-                                px-0.5 py-3 text-[13.5px] text-text hover:text-accent"
-                        >
-                            <span>{doc.label}</span>
-                            <span aria-hidden="true" className="text-[#a5b8de]">
-                                ›
-                            </span>
-                        </a>
-                    ))}
+                <section className="card p-4">
+                    <h3 className="mb-2 text-[15px] font-medium">Документы</h3>
+                    <ul className="flex flex-col">
+                        {DOCUMENTS.map(doc => (
+                            <li key={doc.href}>
+                                <a
+                                    href={doc.href}
+                                    className="flex items-center justify-between border-b border-divider
+                                        py-2.5 text-[13.5px] text-text hover:text-accent"
+                                >
+                                    {doc.label}
+                                    <span aria-hidden="true" className="text-text/45">
+                                        ›
+                                    </span>
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
 
                     <button
                         type="button"
                         onClick={() => setCookieOpen(o => !o)}
                         aria-expanded={cookieOpen}
-                        className="flex items-center justify-between px-0.5 pb-1 pt-[11px]"
+                        className="mt-3 flex w-full items-center justify-between text-[12px] text-text/50
+                            hover:text-accent"
                     >
-                        <span className="text-[12px] text-text/55">Настройки cookie</span>
+                        Настройки cookie
                         <span
                             aria-hidden="true"
-                            className={`text-text/55 transition-transform ${cookieOpen ? 'rotate-180' : ''}`}
+                            className={`transition-transform ${cookieOpen ? 'rotate-180' : ''}`}
                         >
                             ⌄
                         </span>
                     </button>
 
                     {cookieOpen && (
-                        <div className="flex items-center justify-between px-0.5 pb-0.5 pt-2.5">
-                            <span className="text-[12px] text-text/60">Аналитические cookie</span>
-                            <button
-                                type="button"
-                                role="switch"
-                                aria-checked={analytics}
-                                aria-label="Аналитические cookie"
-                                onClick={() => setAnalytics(a => !a)}
-                                className={`relative h-5 w-9 shrink-0 rounded-full transition-colors
-                                    ${analytics ? 'bg-accent' : 'bg-[#4f5e7b]'}`}
-                            >
-                                <span
-                                    aria-hidden="true"
-                                    className={`absolute top-0.5 h-4 w-4 rounded-full bg-bg
-                                        transition-[left] duration-200
-                                        ${analytics ? 'left-[18px]' : 'left-0.5'}`}
-                                />
-                            </button>
-                        </div>
+                        <label className="mt-2 flex items-center justify-between text-[13px] text-text/70">
+                            Аналитические cookie
+                            <input
+                                type="checkbox"
+                                checked={analytics}
+                                onChange={e => setAnalytics(e.target.checked)}
+                                className="h-4 w-4 accent-[#E5B84B]"
+                            />
+                        </label>
                     )}
-                </div>
+                </section>
             </div>
         </div>
     );
