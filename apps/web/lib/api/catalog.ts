@@ -1,5 +1,12 @@
 import { shopApi } from '../vendure';
-import { demoBundles, demoCategories, demoConfigurator, demoProduct, demoProducts } from '../demo-catalog';
+import {
+    demoBundles,
+    demoCategories,
+    demoConfigurator,
+    demoProduct,
+    demoProducts,
+    isDemoStorefront,
+} from '../demo-catalog';
 
 /** Каталог меняется редко — кэшируем на минуту, чтобы не дёргать API на каждый заход. */
 const CATALOG_CACHE = { revalidate: 60, tags: ['catalog'] };
@@ -9,6 +16,7 @@ export interface Subcategory {
     name: string;
     slug: string;
     description: string;
+    assetUrl: string | null;
 }
 
 export interface Category {
@@ -28,6 +36,8 @@ export interface ProductCard {
     /** Цены по весу, копейки. */
     prices: { '500': number; '1000': number };
     variantIds: { '500': string; '1000': string };
+    /** Дополнение без выбора веса: нажатие на карточку сразу кладёт его в корзину. */
+    isAddon?: boolean;
 }
 
 export interface OptionChoice {
@@ -78,6 +88,9 @@ const CATEGORIES_QUERY = /* GraphQL */ `
                     name
                     slug
                     description
+                    featuredAsset {
+                        preview
+                    }
                 }
             }
         }
@@ -85,6 +98,7 @@ const CATEGORIES_QUERY = /* GraphQL */ `
 `;
 
 export async function getCategories(): Promise<Category[]> {
+    if (isDemoStorefront) return demoCategories;
     try {
         const data = await shopApi<{
         collections: {
@@ -94,7 +108,13 @@ export async function getCategories(): Promise<Category[]> {
                 slug: string;
                 description: string;
                 featuredAsset: { preview: string } | null;
-                children: Subcategory[];
+                children: Array<{
+                    id: string;
+                    name: string;
+                    slug: string;
+                    description: string;
+                    featuredAsset: { preview: string } | null;
+                }>;
             }>;
         };
     }>(CATEGORIES_QUERY, {}, CATALOG_CACHE);
@@ -105,7 +125,13 @@ export async function getCategories(): Promise<Category[]> {
         slug: c.slug,
         description: c.description,
         assetUrl: c.featuredAsset?.preview ?? null,
-        children: c.children ?? [],
+        children: (c.children ?? []).map(child => ({
+            id: child.id,
+            name: child.name,
+            slug: child.slug,
+            description: child.description,
+            assetUrl: child.featuredAsset?.preview ?? null,
+        })),
         }));
     } catch {
         return demoCategories;
@@ -144,6 +170,7 @@ const PRODUCTS_QUERY = /* GraphQL */ `
  * по нему и различаем варианты.
  */
 export async function getCollectionProducts(slug: string): Promise<ProductCard[]> {
+    if (isDemoStorefront) return demoProducts(slug);
     try {
         const data = await shopApi<{
         collection: {
@@ -179,6 +206,7 @@ export async function getCollectionProducts(slug: string): Promise<ProductCard[]
                 assetUrl: p.featuredAsset?.preview ?? null,
                 prices: { '500': 0, '1000': 0 },
                 variantIds: { '500': '', '1000': '' },
+                isAddon: variant.sku.startsWith('addon-'),
             };
             byProduct.set(p.id, card);
         }
@@ -189,6 +217,7 @@ export async function getCollectionProducts(slug: string): Promise<ProductCard[]
 
         // Дополнения «Гастролавки» — без веса, одна цена на обе позиции.
         if (variant.sku.startsWith('addon-')) {
+            card.isAddon = true;
             card.prices['1000'] = variant.priceWithTax;
             card.variantIds['1000'] = variant.id;
         }
@@ -224,6 +253,7 @@ const PRODUCT_QUERY = /* GraphQL */ `
 `;
 
 export async function getProduct(slug: string): Promise<ProductDetail | null> {
+    if (isDemoStorefront) return demoProduct(slug);
     try {
         const data = await shopApi<{
         product: {
@@ -301,6 +331,7 @@ export interface ConfiguratorData {
 }
 
 export async function getConfigurator(productId?: string): Promise<ConfiguratorData> {
+    if (isDemoStorefront) return demoConfigurator;
     try {
         const data = await shopApi<{ productConfigurator: ConfiguratorData }>(
         CONFIGURATOR_QUERY,
@@ -339,6 +370,7 @@ export interface BundleOffer {
 
 /** Наборы для ленты на главной. Пустой массив, если их ещё нет в каталоге. */
 export async function getBundles(slugs: string[]): Promise<BundleOffer[]> {
+    if (isDemoStorefront) return demoBundles.filter(bundle => slugs.includes(bundle.slug));
     try {
         const data = await shopApi<{
         products: {

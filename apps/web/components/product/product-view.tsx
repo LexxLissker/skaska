@@ -41,9 +41,12 @@ export function ProductView({
     const [upsellOpen, setUpsellOpen] = useState(false);
 
     const addButtonRef = useRef<HTMLButtonElement>(null);
+    const isAddon = product.categoryCode === 'gastrolavka';
+    const productGroups = isAddon ? [] : configurator.groups;
+    const productAddons = isAddon ? [] : configurator.addons;
 
     // Предлагаем первое подходящее дополнение — так в прототипе.
-    const upsellAddon = configurator.addons.find(a => a.productVariantId) ?? null;
+    const upsellAddon = productAddons.find(a => a.productVariantId) ?? null;
 
     const variant = product.variants.find(v => v.weight === weight) ?? product.variants[0];
     const hasWeights = product.variants.length > 1;
@@ -56,18 +59,18 @@ export function ProductView({
     // Цена — предпросмотр из того же справочника наценок, что и на сервере.
     // Окончательную всё равно считает Vendure при добавлении в заказ.
     const unitPrice = useMemo(() => {
-        const surcharge = configurator.groups.reduce((sum, group) => {
+        const surcharge = productGroups.reduce((sum, group) => {
             const choice = group.choices.find(c => c.id === options[group.code]);
             return sum + (choice?.delta ?? 0);
         }, 0);
         return (variant?.price ?? 0) + surcharge;
-    }, [configurator.groups, options, variant]);
+    }, [options, productGroups, variant]);
 
     // БЖУ на 100 г: базовое для категории плюс поправки выбранных опций.
     const bju = useMemo(() => {
         if (!configurator.baseBju) return null;
         const total = { ...configurator.baseBju };
-        for (const group of configurator.groups) {
+        for (const group of productGroups) {
             const choice = group.choices.find(c => c.id === options[group.code]);
             if (!choice) continue;
             total.protein += choice.bju.protein;
@@ -76,7 +79,7 @@ export function ProductView({
             total.kcal += choice.bju.kcal;
         }
         return total;
-    }, [configurator, options]);
+    }, [configurator.baseBju, options, productGroups]);
 
     // Состав собирается из выбранных опций: мука, начинка, жир, краситель.
     const composition = useMemo(() => {
@@ -132,6 +135,7 @@ export function ProductView({
                     src={product.assetUrl}
                     alt={product.name}
                     className="h-full w-full"
+                    placeholder="Фото товара"
                 />
 
                 <button
@@ -161,7 +165,7 @@ export function ProductView({
                 </h1>
             </header>
 
-            <div className="px-4 pt-4">
+            <div className="px-[18px] pb-2 pt-[18px]">
                 {/* ── Вес · количество · добавить ───────────────────────────── */}
                 <div className="mb-3 flex items-center justify-between gap-2">
                     {hasWeights && (
@@ -225,7 +229,7 @@ export function ProductView({
                 {error && <p className="mb-2 text-[12.5px] text-red-400">{error}</p>}
 
                 {/* ── Б/Ж/У ─────────────────────────────────────────────────── */}
-                {bju && (
+                {bju && !isAddon && (
                     <p className="mb-[14px] text-[12px] text-text/60">
                         Б/Ж/У на 100 г: {Math.round(bju.protein)} / {Math.round(bju.fat)} /{' '}
                         {Math.round(bju.carbs)} г · {Math.round(bju.kcal)} ккал
@@ -234,7 +238,7 @@ export function ProductView({
             </div>
 
             {/* ── Группы опций ──────────────────────────────────────────────── */}
-            {configurator.groups.map(group => (
+            {productGroups.map(group => (
                 <OptionRow
                     key={group.code}
                     group={group}
@@ -246,11 +250,11 @@ export function ProductView({
             ))}
 
             {/* ── С чем подать ──────────────────────────────────────────────── */}
-            {configurator.addons.length > 0 && (
+            {productAddons.length > 0 && (
                 <section className="pb-2">
-                    <h2 className="px-4 pb-2 text-[15px] font-medium">С чем подать?</h2>
-                    <div className="noscroll flex gap-2 overflow-x-auto px-4 pb-1">
-                        {configurator.addons.map(addon => (
+                    <h2 className="px-[18px] pb-2 text-[15px] font-medium">С чем подать?</h2>
+                    <div className="noscroll flex gap-2 overflow-x-auto px-[18px] pb-1">
+                        {productAddons.map(addon => (
                             <AddonCard
                                 key={addon.id}
                                 addon={addon}
@@ -262,13 +266,13 @@ export function ProductView({
             )}
 
             {/* ── Описание и состав ─────────────────────────────────────────── */}
-            <section className="px-4 pb-10">
+            <section className="px-[18px] pb-10">
                 <h2 className="mb-1.5 mt-[14px] text-[16px] font-medium text-text/70">Описание</h2>
                 <p className="m-0 text-[14px] leading-relaxed opacity-80 text-pretty">
                     {DESCRIPTION}
                 </p>
 
-                {composition && (
+                {!isAddon && composition && (
                     <>
                         <h2 className="mb-1.5 mt-[14px] text-[16px] font-medium text-text/70">
                             Состав

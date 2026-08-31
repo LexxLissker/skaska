@@ -133,6 +133,7 @@ export function CatalogView({
                     src={category.assetUrl}
                     alt={category.name}
                     className="h-full w-full"
+                    placeholder="Фото/видео блюда"
                 />
                 <div
                     aria-hidden="true"
@@ -189,9 +190,10 @@ export function CatalogView({
                 {subcategory && (
                     <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden">
                         <ImagePlaceholder
-                            src={null}
+                            src={subcategory.assetUrl}
                             alt={subcategory.name}
                             className="h-full w-full"
+                            placeholder="Фото/видео подкатегории"
                         />
                         <div
                             aria-hidden="true"
@@ -199,7 +201,9 @@ export function CatalogView({
                                 [background:linear-gradient(to_bottom,transparent_40%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]"
                         />
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-5">
-                            <h3 className="mb-2 text-[19px] text-[#eef6ff]">{subcategory.name}</h3>
+                            <h3 className="mb-2 text-[19px] text-[#eef6ff]">
+                                {category.name}, {subcategory.name}
+                            </h3>
                             <p className="m-0 max-w-[88%] text-[13.5px] leading-[1.55] text-[#eef6ff] opacity-[0.82]">
                                 {subcategory.description}
                             </p>
@@ -242,18 +246,26 @@ export function CatalogView({
             <ReviewRail reviews={reviews} />
 
             {/* ── Почему выбирают нас ───────────────────────────────────────── */}
-            <section className="pt-8">
-                <h2 className="mb-3 px-4 text-[22px] font-medium">Почему выбирают нас</h2>
-                <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
+            <section className="px-4 pb-1 pt-[22px]">
+                <h2 className="mb-3 text-[22px] font-medium">Почему выбирают нас</h2>
+                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5">
                     {OFFERS.map(offer => (
                         <article
                             key={offer.title}
-                            className="panel w-[290px] shrink-0 bg-gradient-to-br from-surface
-                                to-surface-2 p-4"
+                            className="relative w-[78%] shrink-0 overflow-hidden rounded-lg border
+                                border-accent p-[18px]
+                                [background:linear-gradient(135deg,color-mix(in_srgb,var(--color-accent)_16%,var(--color-surface))_0%,var(--color-surface)_70%)]"
                         >
-                            <span className="tag tag-accent">{offer.tag}</span>
-                            <h3 className="mt-2 text-[16px] font-medium">{offer.title}</h3>
-                            <p className="mt-1.5 text-[12.5px] leading-relaxed text-text/60">
+                            <span
+                                aria-hidden="true"
+                                className="absolute -right-[22px] -top-[22px] h-[100px] w-[100px]
+                                    rounded-full bg-[color-mix(in_srgb,var(--color-accent)_20%,transparent)] blur-[2px]"
+                            />
+                            <span className="tag tag-accent relative inline-block">{offer.tag}</span>
+                            <h3 className="relative mb-1.5 mt-2.5 text-[16px] font-medium">
+                                {offer.title}
+                            </h3>
+                            <p className="relative m-0 text-[12.5px] leading-[1.5] text-text/80 text-pretty">
                                 {offer.desc}
                             </p>
                         </article>
@@ -262,20 +274,32 @@ export function CatalogView({
             </section>
 
             {/* ── Как мы готовим ────────────────────────────────────────────── */}
-            <section className="pt-8">
-                <h2 className="mb-3 px-4 text-[22px] font-medium">Как мы готовим</h2>
-                <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
+            <section className="px-4 pb-1 pt-[22px]">
+                <h2 className="mb-3 text-[22px] font-medium">Как мы готовим</h2>
+                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5">
                     {STEPS.map(step => (
-                        <article key={step.num} className="panel relative w-[220px] shrink-0 p-4">
+                        <article
+                            key={step.num}
+                            className="relative w-[78%] shrink-0 overflow-hidden rounded-lg border
+                                border-divider p-5
+                                [background:linear-gradient(155deg,color-mix(in_srgb,var(--color-accent)_14%,var(--color-surface))_0%,var(--color-surface)_65%)]"
+                        >
                             <span
                                 aria-hidden="true"
-                                className="absolute right-3 top-2 font-heading text-[40px]
-                                    font-medium leading-none text-text/10"
-                            >
-                                {String(step.num).padStart(2, '0')}
-                            </span>
-                            <h3 className="text-[15px] font-medium">{step.title}</h3>
-                            <p className="mt-1.5 text-[12.5px] leading-relaxed text-text/60">
+                                className="absolute -right-[18px] -top-[18px] h-[90px] w-[90px]
+                                    rounded-full bg-[color-mix(in_srgb,var(--color-accent)_20%,transparent)] blur-[2px]"
+                            />
+                            <div className="relative mb-4 flex items-center justify-between">
+                                <span className="flex h-11 w-11 items-center justify-center rounded-full
+                                    border border-accent bg-[color-mix(in_srgb,var(--color-accent)_18%,transparent)] text-accent">
+                                    <StepIcon number={step.num} />
+                                </span>
+                                <span className="font-heading text-[34px] font-medium text-text/20">
+                                    {String(step.num).padStart(2, '0')}
+                                </span>
+                            </div>
+                            <h3 className="relative mb-1.5 text-[15px] font-medium">{step.title}</h3>
+                            <p className="relative text-[12.5px] leading-[1.5] text-text/75">
                                 {step.desc}
                             </p>
                         </article>
@@ -289,5 +313,35 @@ export function CatalogView({
                 <FaqAccordion items={FAQS} />
             </section>
         </>
+    );
+}
+
+function StepIcon({ number }: { number: number }) {
+    if (number === 1) {
+        return (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M8 9V6a4 4 0 0 1 8 0v3M5 9h14v11H5z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+        );
+    }
+    if (number === 2) {
+        return (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 11a4 4 0 0 1 4-4h2l2-2 2 2h1a4 4 0 0 1 4 4c0 4-6 8-8 9-2-1-7-5-7-9z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+            </svg>
+        );
+    }
+    if (number === 3) {
+        return (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 3v18M5 6l14 12M5 18 19 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+        );
+    }
+    return (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="m12 3 8 3v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+            <path d="m8.5 12 2.2 2.2 4.8-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
     );
 }

@@ -9,10 +9,12 @@ export function ImagePlaceholder({
     src,
     alt,
     className = '',
+    placeholder = 'Фото товара',
 }: {
     src: string | null;
     alt: string;
     className?: string;
+    placeholder?: string;
 }) {
     if (src) {
         return (
@@ -44,7 +46,7 @@ export function ImagePlaceholder({
                 <circle cx="8.5" cy="10" r="1.5" />
                 <path d="M21 16l-5-5-4 4-2-2-4 4" />
             </svg>
-            <span className="text-center font-heading text-[12px] text-text/75">Фото товара</span>
+            <span className="text-center font-heading text-[12px] text-text/75">{placeholder}</span>
         </div>
     );
 }

@@ -1,7 +1,7 @@
 'use server';
 
 import { shopApi } from '@/lib/vendure';
-import { demoSearch } from '@/lib/demo-catalog';
+import { demoSearch, isDemoStorefront } from '@/lib/demo-catalog';
 
 export interface SearchHit {
     name: string;
@@ -30,6 +30,7 @@ const SEARCH_QUERY = /* GraphQL */ `
 `;
 
 export async function searchProducts(term: string): Promise<SearchHit[]> {
+    if (isDemoStorefront) return demoSearch(term);
     try {
         const data = await shopApi<{
         search: {

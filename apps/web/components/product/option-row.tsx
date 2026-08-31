@@ -19,11 +19,11 @@ export function OptionRow({
     const selected = group.choices.find(c => c.id === value) ?? group.choices[0];
 
     return (
-        <section className="px-4 pb-4">
+        <section className="px-[18px] pb-4">
             <div className="mb-2 text-[15px] font-medium text-text">{group.label}</div>
 
             <div
-                className="noscroll -mx-4 flex gap-2 overflow-x-auto px-4"
+                className="noscroll -mx-[18px] flex gap-1.5 overflow-x-auto px-[18px]"
                 role="radiogroup"
                 aria-label={group.label}
             >

@@ -94,6 +94,7 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
     const discount = cart.discounts.reduce((sum, d) => sum + d.amount, 0);
     const deliveryCost = options?.zone?.cost ?? null;
     const total = cart.subTotal + (deliveryCost ?? 0);
+    const positionCount = cart.lines.length;
 
     return (
         <>
@@ -177,8 +178,8 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                         className="flex w-full items-center justify-between"
                     >
                         <span className="text-[14.5px] font-medium text-text">
-                            Состав заказа · {cart.totalQuantity}{' '}
-                            {pluralRu(cart.totalQuantity, 'товар', 'товара', 'товаров')}
+                            Состав заказа · {positionCount}{' '}
+                            {pluralRu(positionCount, 'товар', 'товара', 'товаров')}
                         </span>
                         <span
                             aria-hidden="true"

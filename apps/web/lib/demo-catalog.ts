@@ -14,6 +14,16 @@ const fillings = [
     'С грибами',
     'Со шпинатом и сыром',
     'Бабушкин рецепт',
+    'Сибирские',
+    'Уральские',
+    'С бараниной',
+    'Классические',
+    'Домашние',
+    'Мини-формат',
+    'Большая упаковка XXL',
+    'Постные',
+    'Фермерские',
+    'С зеленью',
 ] as const;
 
 export const demoCategories: Category[] = [
@@ -24,9 +34,9 @@ export const demoCategories: Category[] = [
         description: 'Пельмени ручной лепки из охлаждённого мяса. Замораживаем в день лепки — готовим 7 минут, без разморозки.',
         assetUrl: null,
         children: [
-            { id: 'demo-pelmeni-classic', name: 'Классика', slug: 'pelmeni-classic', description: 'Классические пельмени ручной лепки: тонкое тесто, сочная начинка и домашний вкус.' },
-            { id: 'demo-pelmeni-bird', name: 'Птица', slug: 'pelmeni-bird', description: 'Нежная птица и тонкое тесто для лёгкого домашнего ужина.' },
-            { id: 'demo-pelmeni-lean', name: 'Рыба/Постное', slug: 'pelmeni-lean', description: 'Постные и рыбные варианты для разнообразного меню.' },
+            { id: 'demo-pelmeni-classic', name: 'Классика', slug: 'pelmeni-classic', description: 'Классические пельмени ручной лепки: тонкое тесто, сочная начинка и домашний вкус.', assetUrl: null },
+            { id: 'demo-pelmeni-bird', name: 'Птица', slug: 'pelmeni-bird', description: 'Нежная птица и тонкое тесто для лёгкого домашнего ужина.', assetUrl: null },
+            { id: 'demo-pelmeni-lean', name: 'Рыба/Постное', slug: 'pelmeni-lean', description: 'Постные и рыбные варианты для разнообразного меню.', assetUrl: null },
         ],
     },
     {
@@ -36,9 +46,9 @@ export const demoCategories: Category[] = [
         description: 'Тонкое тесто и щедрая начинка — для уютного завтрака, обеда или десерта.',
         assetUrl: null,
         children: [
-            { id: 'demo-vareniki-curd', name: 'С творогом', slug: 'vareniki-curd', description: 'Нежный творог и тонкое домашнее тесто.' },
-            { id: 'demo-vareniki-potato', name: 'С картофелем', slug: 'vareniki-potato', description: 'Картофель, жареный лук и домашнее тесто.' },
-            { id: 'demo-vareniki-cherry', name: 'С вишней', slug: 'vareniki-cherry', description: 'Сочная вишнёвая начинка для сладкого ужина.' },
+            { id: 'demo-vareniki-potato', name: 'С картофелем', slug: 'vareniki-potato', description: 'Картофель, жареный лук и домашнее тесто.', assetUrl: null },
+            { id: 'demo-vareniki-curd', name: 'С творогом', slug: 'vareniki-curd', description: 'Нежный творог и тонкое домашнее тесто.', assetUrl: null },
+            { id: 'demo-vareniki-cherry', name: 'С вишней', slug: 'vareniki-cherry', description: 'Сочная вишнёвая начинка для сладкого ужина.', assetUrl: null },
         ],
     },
     {
@@ -48,9 +58,9 @@ export const demoCategories: Category[] = [
         description: 'Сочные манты с тонким тестом и ароматной начинкой.',
         assetUrl: null,
         children: [
-            { id: 'demo-manty-classic', name: 'Классика', slug: 'manty-classic', description: 'Манты с рубленым мясом и пряным бульоном.' },
-            { id: 'demo-manty-bird', name: 'Птица', slug: 'manty-bird', description: 'Нежная птица, овощи и тонкое тесто.' },
-            { id: 'demo-manty-vegetable', name: 'Овощные', slug: 'manty-vegetable', description: 'Овощная начинка для лёгкого ужина.' },
+            { id: 'demo-manty-classic', name: 'Говядина/баранина', slug: 'manty-classic', description: 'Манты с рубленым мясом и пряным бульоном.', assetUrl: null },
+            { id: 'demo-manty-pumpkin', name: 'Тыква', slug: 'manty-pumpkin', description: 'Сладкая тыква, лук и ароматные специи.', assetUrl: null },
+            { id: 'demo-manty-bird', name: 'Курица', slug: 'manty-bird', description: 'Нежная птица, овощи и тонкое тесто.', assetUrl: null },
         ],
     },
     {
@@ -60,12 +70,67 @@ export const demoCategories: Category[] = [
         description: 'Крупные хинкали с бульоном внутри — готовятся из замороженного состояния.',
         assetUrl: null,
         children: [
-            { id: 'demo-hinkali-classic', name: 'Классика', slug: 'hinkali-classic', description: 'Хинкали с сочной мясной начинкой и бульоном внутри.' },
-            { id: 'demo-hinkali-cheese', name: 'Сыр', slug: 'hinkali-cheese', description: 'Нежная сырная начинка и плотное тесто.' },
-            { id: 'demo-hinkali-mushroom', name: 'Грибы', slug: 'hinkali-mushroom', description: 'Ароматные грибы и домашнее тесто.' },
+            { id: 'demo-hinkali-classic', name: 'Классика', slug: 'hinkali-classic', description: 'Хинкали с сочной мясной начинкой и бульоном внутри.', assetUrl: null },
+            { id: 'demo-hinkali-cheese', name: 'Сыр', slug: 'hinkali-cheese', description: 'Нежная сырная начинка и плотное тесто.', assetUrl: null },
+            { id: 'demo-hinkali-mushroom', name: 'Грибы', slug: 'hinkali-mushroom', description: 'Ароматные грибы и домашнее тесто.', assetUrl: null },
+        ],
+    },
+    {
+        id: 'demo-khanum',
+        name: 'Ханум',
+        slug: 'khanum',
+        description: 'Рулеты из тонкого теста с мясной или овощной начинкой, приготовленные на пару.',
+        assetUrl: null,
+        children: [
+            { id: 'demo-khanum-meat', name: 'С мясом', slug: 'khanum-meat', description: 'Тонкое тесто, рубленое мясо и лук.', assetUrl: null },
+            { id: 'demo-khanum-potato', name: 'С картофелем', slug: 'khanum-potato', description: 'Картофельная начинка с луком и специями.', assetUrl: null },
+            { id: 'demo-khanum-vegetable', name: 'Вегетарианские', slug: 'khanum-vegetable', description: 'Овощная начинка для лёгкого ужина.', assetUrl: null },
+        ],
+    },
+    {
+        id: 'demo-lapsha',
+        name: 'Лапша',
+        slug: 'lapsha',
+        description: 'Домашняя лапша быстро готовится и держит форму при варке.',
+        assetUrl: null,
+        children: [
+            { id: 'demo-lapsha-home', name: 'Домашняя', slug: 'lapsha-home', description: 'Классическая домашняя лапша из пшеничной муки.', assetUrl: null },
+            { id: 'demo-lapsha-buckwheat', name: 'Гречневая', slug: 'lapsha-buckwheat', description: 'Насыщенный вкус гречневой муки.', assetUrl: null },
+            { id: 'demo-lapsha-rice', name: 'Рисовая', slug: 'lapsha-rice', description: 'Лёгкая рисовая лапша для супов и вторых блюд.', assetUrl: null },
+        ],
+    },
+    {
+        id: 'demo-gastrolavka',
+        name: 'Гастролавка',
+        slug: 'gastrolavka',
+        description: 'Соусы, масло, бульонные концентраты и топпинги для домашней подачи.',
+        assetUrl: null,
+        children: [
+            { id: 'demo-gastrolavka-sauces', name: 'Соусы', slug: 'gastrolavka-sauces', description: 'Соусы к мясным, овощным и сладким блюдам.', assetUrl: null },
+            { id: 'demo-gastrolavka-butter', name: 'Масло и сливки', slug: 'gastrolavka-butter', description: 'Топлёное и зелёное масло, густые сливки.', assetUrl: null },
+            { id: 'demo-gastrolavka-broths', name: 'Бульоны', slug: 'gastrolavka-broths', description: 'Концентрированные бульоны для быстрой подачи.', assetUrl: null },
+            { id: 'demo-gastrolavka-toppings', name: 'Топпинги', slug: 'gastrolavka-toppings', description: 'Хрустящие и ароматные дополнения.', assetUrl: null },
         ],
     },
 ];
+
+const demoAddons = [
+    { id: 'sauce-mushroom', name: 'Сливочно-грибной соус', price: 14900 },
+    { id: 'sauce-satsebeli', name: 'Сацебели', price: 12900 },
+    { id: 'sauce-smetana', name: 'Сметанно-чесночный соус', price: 9900 },
+    { id: 'sauce-tkemali', name: 'Ткемали', price: 13900 },
+    { id: 'ghee', name: 'Топлёное масло Гхи с розмарином', price: 12900 },
+    { id: 'green-butter', name: 'Зелёное масло', price: 11900 },
+    { id: 'cream-farm', name: 'Густые фермерские сливки 30%', price: 14900 },
+    { id: 'broth-beef', name: 'Бульонный концентрат говяжий', price: 8900 },
+    { id: 'broth-chicken', name: 'Бульонный концентрат куриный', price: 7900 },
+    { id: 'broth-mushroom', name: 'Бульонный концентрат грибной', price: 8500 },
+    { id: 'fried-onion', name: 'Хрустящий жареный лук', price: 8900 },
+    { id: 'shkvarki', name: 'Копчёные шкварки', price: 10900 },
+    { id: 'boil-salt', name: 'Ароматная соль для варки', price: 9900 },
+    { id: 'berry-coulis', name: 'Бруснично-вишнёвый кули', price: 11900 },
+    { id: 'caramel', name: 'Домашняя карамель', price: 9900 },
+] as const;
 
 function collectionCategory(slug: string): Category {
     return demoCategories.find(category => category.slug === slug || category.children.some(child => child.slug === slug)) ?? demoCategories[0];
@@ -73,6 +138,17 @@ function collectionCategory(slug: string): Category {
 
 export function demoProducts(collectionSlug: string): ProductCard[] {
     const category = collectionCategory(collectionSlug);
+    if (category.slug === 'gastrolavka') {
+        return demoAddons.map(addon => ({
+            id: `demo-addon-${addon.id}`,
+            name: addon.name,
+            slug: `gastrolavka-${addon.id}`,
+            assetUrl: null,
+            prices: { '500': addon.price, '1000': addon.price },
+            variantIds: { '500': `demo-addon-${addon.id}`, '1000': `demo-addon-${addon.id}` },
+            isAddon: true,
+        }));
+    }
     return fillings.map((filling, index) => {
         const price500 = 350 + ((index * 67) % 900);
         return {
@@ -89,7 +165,13 @@ export function demoProducts(collectionSlug: string): ProductCard[] {
 export function demoProduct(slug: string): ProductDetail | null {
     const product = demoCategories.flatMap(category => demoProducts(category.slug)).find(item => item.slug === slug);
     if (!product) return null;
-    const category = collectionCategory(slug.split('-').slice(0, -1).join('-'));
+    const category = demoCategories.find(item => slug.startsWith(`${item.slug}-`)) ?? demoCategories[0];
+    const variants = product.isAddon
+        ? [{ id: product.variantIds['500'], name: '1 шт.', price: product.prices['500'], weight: '500' }]
+        : [
+            { id: product.variantIds['500'], name: '500 г', price: product.prices['500'], weight: '500' },
+            { id: product.variantIds['1000'], name: '1000 г', price: product.prices['1000'], weight: '1000' },
+        ];
     return {
         id: product.id,
         name: product.name,
@@ -97,11 +179,18 @@ export function demoProduct(slug: string): ProductDetail | null {
         description: 'Замороженный полуфабрикат ручной лепки. Готовить из морозильника, без разморозки.',
         assetUrl: null,
         categoryCode: category.slug,
-        variants: [
-            { id: product.variantIds['500'], name: '500 г', price: product.prices['500'], weight: '500' },
-            { id: product.variantIds['1000'], name: '1000 г', price: product.prices['1000'], weight: '1000' },
-        ],
+        variants,
     };
+}
+
+export function demoProductByVariant(variantId: string) {
+    for (const category of demoCategories) {
+        for (const product of demoProducts(category.slug)) {
+            const weight = product.variantIds['1000'] === variantId ? '1000' : '500';
+            if (product.variantIds[weight] === variantId) return { product, weight } as const;
+        }
+    }
+    return null;
 }
 
 const choice = (id: string, label: string, delta: number, hint: string, ingredient: string, bju = { protein: 0, fat: 0, carbs: 0, kcal: 0 }) => ({ id, label, delta: delta * 100, hint, ingredient, bju });
@@ -115,9 +204,9 @@ export const demoConfigurator: ConfiguratorData = {
         { code: 'texture', label: 'Текстура мяса', choices: [choice('fine', 'Мелкий помол', 0, 'Классический мягкий фарш.', 'фарш мелкого помола'), choice('chopped', 'Рубленое ножом', 30, 'Сочнее и текстурнее.', 'рубленое ножом мясо')] },
     ],
     addons: [
-        { id: 'demo-sauce', name: 'Сметанно-чесночный соус', price: 9900, productVariantId: 'demo-sauce' },
-        { id: 'demo-ghee', name: 'Топлёное масло с розмарином', price: 12900, productVariantId: 'demo-ghee' },
-        { id: 'demo-broth', name: 'Бульонный концентрат', price: 8900, productVariantId: 'demo-broth' },
+        { id: 'demo-sauce', name: 'Сметанно-чесночный соус', price: 9900, productVariantId: 'demo-addon-sauce-smetana' },
+        { id: 'demo-ghee', name: 'Топлёное масло с розмарином', price: 12900, productVariantId: 'demo-addon-ghee' },
+        { id: 'demo-broth', name: 'Бульонный концентрат', price: 8900, productVariantId: 'demo-addon-broth-beef' },
     ],
 };
 

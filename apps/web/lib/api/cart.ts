@@ -179,6 +179,7 @@ const ACTIVE_ORDER_QUERY = /* GraphQL */ `
 `;
 
 export async function getCart(): Promise<Cart | null> {
+    if (isDemoStorefront) return demoCart;
     // На этапе фронтенд-просмотра Shop API ещё не запущен. Пустая корзина
     // позволяет открыть экран и проверить дизайн, не маскируя его ошибкой сети.
     try {

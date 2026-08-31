@@ -3,7 +3,14 @@
 import { revalidatePath } from 'next/cache';
 
 import { NO_CACHE, ORDER_FRAGMENT, normalizeOrder, type Cart, type CartLine, type RawOrder } from '@/lib/api/cart';
-import { demoCart, demoProduct, isDemoStorefront } from '@/lib/demo-catalog';
+import { BUNDLES } from '@/lib/content';
+import {
+    demoBundles,
+    demoCart,
+    demoConfigurator,
+    demoProductByVariant,
+    isDemoStorefront,
+} from '@/lib/demo-catalog';
 import { shopApi } from '@/lib/vendure';
 
 export interface CartActionResult {
@@ -24,7 +31,18 @@ function toResult(payload: { __typename?: string; message?: string } & Partial<R
 
 function refreshDemoTotals() {
     demoCart.totalQuantity = demoCart.lines.reduce((sum, line) => sum + line.quantity, 0);
-    demoCart.subTotal = demoCart.lines.reduce((sum, line) => sum + line.linePrice, 0);
+    const itemTotal = demoCart.lines.reduce((sum, line) => sum + line.linePrice, 0);
+    const promoCode = demoCart.couponCodes[0];
+    const discount =
+        promoCode === 'FROST10'
+            ? -Math.round(itemTotal * 0.1)
+            : promoCode === 'WELCOME300'
+              ? -Math.min(30000, itemTotal)
+              : 0;
+    demoCart.discounts = discount
+        ? [{ description: `Промокод ${promoCode}`, amount: discount }]
+        : [];
+    demoCart.subTotal = itemTotal + discount;
     demoCart.total = demoCart.subTotal + demoCart.shipping;
 }
 
@@ -38,16 +56,47 @@ function demoVariantLabel(options: Record<string, string>) {
 }
 
 function demoAddItem(variantId: string, quantity: number, options: Record<string, string>): CartActionResult {
-    const match = /^demo-(.+)-(\d+)-(500|1000)$/.exec(variantId);
-    if (!match) return { cart: null, error: 'Этот товар появится после подключения каталога' };
+    const bundle = demoBundles.find(item => item.variantId === variantId);
+    if (bundle) {
+        const content = BUNDLES.find(item => item.slug === bundle.slug);
+        const existing = demoCart.lines.find(line => line.productSlug === bundle.slug);
+        if (existing) {
+            existing.quantity += quantity;
+            existing.linePrice = existing.unitPrice * existing.quantity;
+        } else {
+            demoCart.lines.push({
+                id: `demo-line-${crypto.randomUUID()}`,
+                quantity,
+                unitPrice: bundle.price,
+                linePrice: bundle.price * quantity,
+                productName: content?.title ?? 'Набор для дома',
+                productSlug: bundle.slug,
+                variantName: 'Набор',
+                weight: content?.meta ?? '',
+                assetUrl: bundle.assetUrl,
+                variantLabel: content?.desc ?? 'Готовый набор',
+                options: {},
+            });
+        }
+        refreshDemoTotals();
+        return { cart: demoCart, error: null };
+    }
 
-    const [, category, index, weight] = match;
-    const product = demoProduct(`${category}-${index}`);
-    const variant = product?.variants.find(item => item.weight === weight);
-    if (!product || !variant) return { cart: null, error: 'Не удалось найти товар' };
+    const found = demoProductByVariant(variantId);
+    if (!found) return { cart: null, error: 'Не удалось найти товар' };
+    const { product, weight } = found;
+    const optionSurcharge = demoConfigurator.groups.reduce((sum, group) => {
+        const selected = options[group.code];
+        return sum + (group.choices.find(choice => choice.id === selected)?.delta ?? 0);
+    }, 0);
+    const unitPrice = product.prices[weight] + optionSurcharge;
+    const weightLabel = product.isAddon ? '1 шт.' : `${weight === '500' ? '0.5' : '1'} кг`;
 
     const existing = demoCart.lines.find(
-        line => line.productSlug === product.slug && line.weight === `${weight === '500' ? '0.5' : '1'} кг` && line.variantLabel === demoVariantLabel(options),
+        line =>
+            line.productSlug === product.slug &&
+            line.weight === weightLabel &&
+            line.variantLabel === demoVariantLabel(options),
     );
     if (existing) {
         existing.quantity += quantity;
@@ -56,12 +105,12 @@ function demoAddItem(variantId: string, quantity: number, options: Record<string
         const line: CartLine = {
             id: `demo-line-${crypto.randomUUID()}`,
             quantity,
-            unitPrice: variant.price,
-            linePrice: variant.price * quantity,
+            unitPrice,
+            linePrice: unitPrice * quantity,
             productName: product.name,
             productSlug: product.slug,
-            variantName: variant.name,
-            weight: weight === '500' ? '0.5 кг' : '1 кг',
+            variantName: product.isAddon ? 'Дополнение' : `${weight} г`,
+            weight: weightLabel,
             assetUrl: product.assetUrl,
             variantLabel: demoVariantLabel(options),
             options,
@@ -159,7 +208,14 @@ export async function applyPromoCode(code: string): Promise<CartActionResult> {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) return { cart: null, error: 'Введите промокод' };
 
-    if (isDemoStorefront) return { cart: null, error: 'Промокоды подключим вместе с Vendure' };
+    if (isDemoStorefront) {
+        if (trimmed !== 'FROST10' && trimmed !== 'WELCOME300') {
+            return { cart: null, error: 'Промокод не найден' };
+        }
+        demoCart.couponCodes = [trimmed];
+        refreshDemoTotals();
+        return { cart: demoCart, error: null };
+    }
 
     const data = await shopApi<{ applyCouponCode: any }>(APPLY_COUPON, { code: trimmed }, NO_CACHE);
     const result = toResult(data.applyCouponCode);
@@ -182,7 +238,11 @@ const REMOVE_COUPON = /* GraphQL */ `
 `;
 
 export async function removePromoCode(code: string): Promise<CartActionResult> {
-    if (isDemoStorefront) return { cart: demoCart, error: null };
+    if (isDemoStorefront) {
+        demoCart.couponCodes = demoCart.couponCodes.filter(item => item !== code);
+        refreshDemoTotals();
+        return { cart: demoCart, error: null };
+    }
     const data = await shopApi<{ removeCouponCode: RawOrder | null }>(
         REMOVE_COUPON,
         { code },

@@ -21,6 +21,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
     const [promoError, setPromoError] = useState<string | null>(null);
 
     const isEmpty = !cart || cart.lines.length === 0;
+    const positionCount = cart?.lines.length ?? 0;
     const appliedCode = cart?.couponCodes[0] ?? null;
     const discount = cart?.discounts.reduce((sum, d) => sum + d.amount, 0) ?? 0;
 
@@ -92,8 +93,8 @@ export function CartView({ cart }: { cart: Cart | null }) {
                     ) : (
                         <>
                             <p className="mb-1 text-[14.5px] font-medium text-text">
-                                {cart.totalQuantity}{' '}
-                                {pluralRu(cart.totalQuantity, 'товар', 'товара', 'товаров')}
+                                {positionCount}{' '}
+                                {pluralRu(positionCount, 'товар', 'товара', 'товаров')}
                             </p>
                             <ul className="flex flex-col">
                                 {cart.lines.map(line => (
@@ -101,10 +102,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
                                         key={line.id}
                                         className="flex items-start gap-3 border-b border-divider py-[14px] last:border-0"
                                     >
-                                        <Link
-                                            href={`/product/${line.productSlug}`}
-                                            className="shrink-0"
-                                        >
+                                        <div className="shrink-0">
                                             {line.assetUrl ? (
                                                 <ImagePlaceholder
                                                     src={line.assetUrl}
@@ -122,14 +120,12 @@ export function CartView({ cart }: { cart: Cart | null }) {
                                                     Фото<br />товара
                                                 </div>
                                             )}
-                                        </Link>
+                                        </div>
 
                                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                                            <Link href={`/product/${line.productSlug}`}>
-                                                <span className="text-[13.5px] text-text">
-                                                    {line.productName}
-                                                </span>
-                                            </Link>
+                                            <span className="text-[13.5px] text-text">
+                                                {line.productName}
+                                            </span>
                                             <span className="text-[11.5px] text-text/55">
                                                 {line.variantLabel}
                                             </span>
@@ -266,7 +262,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
                     aria-disabled={isEmpty}
                     className={`btn-cta flex items-center justify-center ${isEmpty ? 'is-disabled' : ''}`}
                 >
-                    {isEmpty ? 'Оформить заказ' : `Оформить заказ · ${formatPrice(cart.subTotal)}`}
+                    {isEmpty ? 'Корзина пуста' : `Оформить заказ · ${formatPrice(cart.subTotal)}`}
                 </Link>
             </div>
 

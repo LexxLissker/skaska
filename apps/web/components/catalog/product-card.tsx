@@ -38,20 +38,38 @@ export function ProductCard({ product }: { product: ProductCardType }) {
 
     return (
         <article className="panel flex flex-col overflow-hidden">
-            <Link href={`/product/${product.slug}`} className="block">
-                <ImagePlaceholder
-                    src={product.assetUrl}
-                    alt={product.name}
-                    className="aspect-square w-full"
-                />
-            </Link>
+            {product.isAddon ? (
+                <button type="button" onClick={add} className="block w-full text-left">
+                    <ImagePlaceholder
+                        src={product.assetUrl}
+                        alt={product.name}
+                        className="aspect-square w-full"
+                    />
+                </button>
+            ) : (
+                <Link href={`/product/${product.slug}`} className="block">
+                    <ImagePlaceholder
+                        src={product.assetUrl}
+                        alt={product.name}
+                        className="aspect-square w-full"
+                    />
+                </Link>
+            )}
 
             <div className="flex flex-col gap-2 px-3 pb-3 pt-2.5">
-                <Link href={`/product/${product.slug}`}>
-                    <h3 className="min-h-[35px] text-[13.5px] font-normal leading-[1.3] text-text">
-                        {product.name}
-                    </h3>
-                </Link>
+                {product.isAddon ? (
+                    <button type="button" onClick={add} className="text-left">
+                        <h3 className="min-h-[35px] text-[13.5px] font-normal leading-[1.3] text-text">
+                            {product.name}
+                        </h3>
+                    </button>
+                ) : (
+                    <Link href={`/product/${product.slug}`}>
+                        <h3 className="min-h-[35px] text-[13.5px] font-normal leading-[1.3] text-text">
+                            {product.name}
+                        </h3>
+                    </Link>
+                )}
 
                 <div className="flex items-center gap-[7px]">
                     {hasWeights && <WeightToggle value={weight} onChange={setWeight} />}

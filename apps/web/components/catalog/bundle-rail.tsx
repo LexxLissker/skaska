@@ -15,7 +15,7 @@ export function BundleRail({ offers }: { offers: BundleOffer[] }) {
     if (!offers.length) return null;
 
     return (
-        <section className="pt-8">
+        <section className="pt-[22px]">
             <h2 className="mb-3 px-4 font-heading text-[22px] font-medium">Наборы для дома</h2>
             <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
                 {BUNDLES.map(bundle => {
@@ -50,7 +50,12 @@ function BundleCard({
     return (
         <article className="panel flex w-60 shrink-0 flex-col overflow-hidden">
             <div className="relative h-[120px] w-full">
-                <ImagePlaceholder src={offer.assetUrl} alt={bundle.title} className="h-full w-full" />
+                <ImagePlaceholder
+                    src={offer.assetUrl}
+                    alt={bundle.title}
+                    className="h-full w-full"
+                    placeholder="Фото набора"
+                />
                 <span className="tag tag-accent absolute left-2.5 top-2.5">{bundle.tag}</span>
             </div>
 

@@ -1,6 +1,7 @@
 'use server';
 
 import { NO_CACHE, ORDER_FRAGMENT, normalizeOrder, type Cart, type RawOrder } from '@/lib/api/cart';
+import { demoCart, isDemoStorefront } from '@/lib/demo-catalog';
 import { shopApi } from '@/lib/vendure';
 
 export interface DeliveryRunOption {
@@ -24,6 +25,154 @@ export interface DeliveryOptions {
     runs: DeliveryRunOption[];
 }
 
+const DEMO_ADDRESSES = [
+    'ул. Тверская, 12',
+    'ул. Тверская, 18, корп. 1',
+    'ул. Арбат, 25',
+    'Ленинский проспект, 45',
+    'Ленинский проспект, 90, корп. 2',
+    'ул. Профсоюзная, 3',
+    'Кутузовский проспект, 30',
+    'ул. Пятницкая, 20',
+    'Ленинградское шоссе, 16',
+    'ул. Новослободская, 8',
+] as const;
+
+interface DemoZone {
+    code: string;
+    name: string;
+    days: number[];
+    window: string;
+    cost: number;
+    freeThreshold: number;
+    deadlineDaysBefore: number;
+    deadlineHour: number;
+}
+
+const DEMO_ZONES: Record<string, DemoZone> = {
+    center: {
+        code: 'center',
+        name: 'Центр',
+        days: [2, 5],
+        window: '18:00–21:00',
+        cost: 20000,
+        freeThreshold: 250000,
+        deadlineDaysBefore: 1,
+        deadlineHour: 15,
+    },
+    south: {
+        code: 'south',
+        name: 'Юг',
+        days: [3, 6],
+        window: '17:00–20:00',
+        cost: 30000,
+        freeThreshold: 300000,
+        deadlineDaysBefore: 1,
+        deadlineHour: 15,
+    },
+    west: {
+        code: 'west',
+        name: 'Запад',
+        days: [2, 5],
+        window: '19:00–21:00',
+        cost: 30000,
+        freeThreshold: 300000,
+        deadlineDaysBefore: 1,
+        deadlineHour: 15,
+    },
+    north: {
+        code: 'north',
+        name: 'Север',
+        days: [4, 0],
+        window: '18:00–20:00',
+        cost: 35000,
+        freeThreshold: 350000,
+        deadlineDaysBefore: 1,
+        deadlineHour: 15,
+    },
+};
+
+const DEMO_ADDRESS_ZONES: Record<(typeof DEMO_ADDRESSES)[number], keyof typeof DEMO_ZONES> = {
+    'ул. Тверская, 12': 'center',
+    'ул. Тверская, 18, корп. 1': 'center',
+    'ул. Арбат, 25': 'center',
+    'ул. Пятницкая, 20': 'center',
+    'ул. Новослободская, 8': 'center',
+    'Ленинский проспект, 45': 'south',
+    'Ленинский проспект, 90, корп. 2': 'south',
+    'ул. Профсоюзная, 3': 'south',
+    'Кутузовский проспект, 30': 'west',
+    'Ленинградское шоссе, 16': 'north',
+};
+
+const WEEKDAYS_NOM = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+const WEEKDAYS_GEN = ['воскресенья', 'понедельника', 'вторника', 'среды', 'четверга', 'пятницы', 'субботы'];
+const WEEKDAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+const MONTHS_GEN = [
+    'января',
+    'февраля',
+    'марта',
+    'апреля',
+    'мая',
+    'июня',
+    'июля',
+    'августа',
+    'сентября',
+    'октября',
+    'ноября',
+    'декабря',
+];
+
+function demoRuns(zone: DemoZone, count = 4): DeliveryRunOption[] {
+    const now = new Date();
+    const base = new Date(now);
+    base.setHours(0, 0, 0, 0);
+    const runs: DeliveryRunOption[] = [];
+
+    for (let offset = 0; offset < 45 && runs.length < count; offset += 1) {
+        const date = new Date(base);
+        date.setDate(base.getDate() + offset);
+        if (!zone.days.includes(date.getDay())) continue;
+
+        const deadline = new Date(date);
+        deadline.setDate(date.getDate() - zone.deadlineDaysBefore);
+        deadline.setHours(zone.deadlineHour, 0, 0, 0);
+        if (deadline.getTime() <= now.getTime()) continue;
+
+        const dateLabel = `${date.getDate()} ${MONTHS_GEN[date.getMonth()]}`;
+        runs.push({
+            id: `${zone.code}-${date.toISOString().slice(0, 10)}`,
+            label: `${WEEKDAYS_NOM[date.getDay()]}, ${dateLabel}`,
+            shortLabel: `${WEEKDAYS_SHORT[date.getDay()]}, ${dateLabel}`,
+            window: zone.window,
+            deadlineLabel: `до ${WEEKDAYS_GEN[deadline.getDay()]}, ${String(deadline.getHours()).padStart(2, '0')}:00`,
+            placesLeft: Math.max(2, 8 - runs.length),
+        });
+    }
+
+    return runs;
+}
+
+function demoDeliveryOptions(address: string): DeliveryOptions {
+    const zoneKey = DEMO_ADDRESS_ZONES[address as keyof typeof DEMO_ADDRESS_ZONES];
+    const definition = zoneKey ? DEMO_ZONES[zoneKey] : null;
+    if (!definition) return { zone: null, runs: [] };
+
+    const remainingForFree = Math.max(0, definition.freeThreshold - demoCart.subTotal);
+    const cost = remainingForFree === 0 ? 0 : definition.cost;
+    return {
+        zone: {
+            code: definition.code,
+            name: definition.name,
+            window: definition.window,
+            cost,
+            freeThreshold: definition.freeThreshold,
+            remainingForFree,
+        },
+        runs: demoRuns(definition),
+    };
+}
+
 const SUGGESTIONS_QUERY = /* GraphQL */ `
     query AddressSuggestions($query: String!) {
         deliveryAddressSuggestions(query: $query, limit: 6) {
@@ -34,6 +183,12 @@ const SUGGESTIONS_QUERY = /* GraphQL */ `
 
 export async function suggestAddresses(query: string): Promise<string[]> {
     if (query.trim().length < 2) return [];
+    if (isDemoStorefront) {
+        const normalized = query.trim().toLocaleLowerCase('ru-RU');
+        return DEMO_ADDRESSES.filter(address =>
+            address.toLocaleLowerCase('ru-RU').includes(normalized),
+        ).slice(0, 4);
+    }
     const data = await shopApi<{ deliveryAddressSuggestions: Array<{ value: string }> }>(
         SUGGESTIONS_QUERY,
         { query },
@@ -87,6 +242,14 @@ const SET_SHIPPING_ADDRESS = /* GraphQL */ `
 export async function setAddressAndGetOptions(
     address: string,
 ): Promise<{ cart: Cart | null; options: DeliveryOptions }> {
+    if (isDemoStorefront) {
+        demoCart.shippingAddress = { streetLine1: address };
+        const options = demoDeliveryOptions(address);
+        demoCart.shipping = options.zone?.cost ?? 0;
+        demoCart.total = demoCart.subTotal + demoCart.shipping;
+        return { cart: demoCart, options };
+    }
+
     await shopApi<{ setOrderShippingAddress: any }>(
         SET_SHIPPING_ADDRESS,
         {
@@ -141,6 +304,11 @@ const SET_CUSTOMER = /* GraphQL */ `
  * не отправляется и заменится настоящим, когда появится авторизация.
  */
 export async function setContactPhone(phoneDigits: string): Promise<string | null> {
+    if (isDemoStorefront) {
+        demoCart.customer = { phoneNumber: `+${phoneDigits}` };
+        return null;
+    }
+
     const data = await shopApi<{ setCustomerForOrder: { __typename: string; message?: string } }>(
         SET_CUSTOMER,
         {
@@ -198,6 +366,8 @@ export async function chooseDeliveryRun(
     zoneCode: string,
     window: string,
 ): Promise<Cart | null> {
+    if (isDemoStorefront) return demoCart;
+
     const methods = await shopApi<{
         eligibleShippingMethods: Array<{ id: string; priceWithTax: number }>;
     }>(ELIGIBLE_SHIPPING, {}, NO_CACHE);
@@ -261,6 +431,11 @@ export interface PaymentResult {
  * платёж проведённым; реальный провайдер подставляется на его место.
  */
 export async function payOrder(): Promise<PaymentResult> {
+    if (isDemoStorefront) {
+        demoCart.state = 'PaymentSettled';
+        return { orderCode: `DEMO-${String(Date.now()).slice(-6)}`, error: null };
+    }
+
     const transition = await shopApi<{
         transitionOrderToState: { __typename: string; message?: string };
     }>(TRANSITION, { state: 'ArrangingPayment' }, NO_CACHE);
