@@ -56,22 +56,22 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                 </Link>
             )}
 
-            <div className="flex flex-col gap-2 px-3 pb-3 pt-2.5">
+            <div className="flex min-w-0 flex-col gap-2 px-2 pb-3 pt-2.5">
                 {product.isAddon ? (
                     <button type="button" onClick={add} className="text-left">
-                        <h3 className="min-h-[35px] text-[13.5px] font-normal leading-[1.3] text-text">
+                        <h3 className="min-h-[34px] text-[13px] font-normal leading-[1.3] text-text">
                             {product.name}
                         </h3>
                     </button>
                 ) : (
                     <Link href={`/product/${product.slug}`}>
-                        <h3 className="min-h-[35px] text-[13.5px] font-normal leading-[1.3] text-text">
+                        <h3 className="min-h-[34px] text-[13px] font-normal leading-[1.3] text-text">
                             {product.name}
                         </h3>
                     </Link>
                 )}
 
-                <div className="flex items-center gap-[7px]">
+                <div className="flex min-w-0 items-center gap-1">
                     {hasWeights && <WeightToggle value={weight} onChange={setWeight} />}
 
                     <button
@@ -80,9 +80,9 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                         onClick={add}
                         disabled={pending || !variantId}
                         aria-label={`Добавить в корзину: ${product.name}`}
-                        className={`btn btn-primary h-9 shrink-0 whitespace-nowrap rounded-full px-3
-                            text-[12.5px] font-semibold disabled:is-disabled
-                            ${hasWeights ? '' : 'flex-1'}`}
+                        className="btn btn-primary h-8 min-w-0 flex-1 overflow-hidden whitespace-nowrap
+                            rounded-full px-1 text-[clamp(9.5px,2.8vw,11.5px)] font-semibold
+                            tracking-[-0.02em] tabular-nums disabled:is-disabled"
                     >
                         + {formatAmount(price)} ₽
                     </button>

@@ -167,9 +167,9 @@ export function ProductView({
 
             <div className="px-[18px] pb-2 pt-[18px]">
                 {/* ── Вес · количество · добавить ───────────────────────────── */}
-                <div className="mb-3 flex items-center justify-between gap-2">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 min-[390px]:flex-nowrap">
                     {hasWeights && (
-                        <div className="flex gap-2" role="radiogroup" aria-label="Вес">
+                        <div className="flex min-w-0 gap-1.5 min-[390px]:gap-2" role="radiogroup" aria-label="Вес">
                             {(['500', '1000'] as const).map(option => {
                                 const active = weight === option;
                                 return (
@@ -179,8 +179,9 @@ export function ProductView({
                                         role="radio"
                                         aria-checked={active}
                                         onClick={() => setWeight(option)}
-                                        className={`rounded-full border px-4 py-[7px] text-[13.5px]
-                                            font-medium transition-colors
+                                        className={`shrink-0 whitespace-nowrap rounded-full border px-3
+                                            py-[7px] text-[12.5px] font-medium transition-colors
+                                            min-[390px]:px-4 min-[390px]:text-[13.5px]
                                             ${
                                                 active
                                                     ? 'border-accent bg-[color-mix(in_srgb,var(--color-accent)_16%,transparent)] text-accent'
@@ -219,8 +220,9 @@ export function ProductView({
                         type="button"
                         onClick={handleAdd}
                         disabled={pending || !variant}
-                        className="btn btn-primary h-[34px] shrink-0 whitespace-nowrap px-[14px]
-                            text-[14px] disabled:is-disabled"
+                        className="btn btn-primary h-10 basis-full whitespace-nowrap px-[14px]
+                            text-[13.5px] disabled:is-disabled min-[390px]:h-[34px]
+                            min-[390px]:basis-auto min-[390px]:text-[14px]"
                     >
                         {pending ? 'Добавляем…' : `+ ${formatAmount(unitPrice * quantity)} ₽`}
                     </button>
