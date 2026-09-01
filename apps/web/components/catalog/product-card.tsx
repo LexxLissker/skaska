@@ -71,7 +71,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                     </Link>
                 )}
 
-                <div className="flex min-w-0 items-center gap-1">
+                <div className="-mr-1 flex min-w-0 items-center gap-1">
                     {hasWeights && <WeightToggle value={weight} onChange={setWeight} />}
 
                     <button
