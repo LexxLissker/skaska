@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { AccountSheet } from './account-sheet';
@@ -20,8 +20,10 @@ export function BottomNav({
     accountPhone: string | null;
 }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [panel, setPanel] = useState<'search' | 'contact' | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
+    const cartOpen = pathname === '/cart';
 
     const toggle = (next: 'search' | 'contact') => setPanel(cur => (cur === next ? null : next));
 
@@ -57,8 +59,13 @@ export function BottomNav({
 
                 <button
                     type="button"
-                    onClick={() => router.push('/cart')}
-                    aria-label={`Корзина, товаров: ${cartQuantity}`}
+                    onClick={() => (cartOpen ? router.back() : router.push('/cart'))}
+                    aria-label={
+                        cartOpen
+                            ? 'Закрыть корзину'
+                            : `Открыть корзину, товаров: ${cartQuantity}`
+                    }
+                    aria-pressed={cartOpen}
                     data-cart-icon
                     className="relative flex p-1"
                 >
