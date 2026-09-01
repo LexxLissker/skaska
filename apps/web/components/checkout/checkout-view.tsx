@@ -254,11 +254,11 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
 
                 <p className="px-2 pb-1 pt-0.5 text-center text-[11.5px] leading-[1.5] text-text/45">
                     Нажимая «Оплатить», вы соглашаетесь с{' '}
-                    <a href="/docs/oferta" className="text-accent-300">
+                    <a href="/docs#oferta" className="text-accent-300">
                         условиями оферты
                     </a>{' '}
                     и{' '}
-                    <a href="/docs/privacy" className="text-accent-300">
+                    <a href="/docs#privacy" className="text-accent-300">
                         политикой конфиденциальности
                     </a>
                 </p>

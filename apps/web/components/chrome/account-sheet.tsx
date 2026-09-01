@@ -1,17 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 
 import { confirmPhoneCode, requestPhoneCode } from '@/app/actions/account';
 import { formatPhone, isPhoneComplete } from '@/lib/format';
-
-const DOCUMENTS = [
-    { label: 'Публичная оферта', href: '/docs/oferta' },
-    { label: 'Политика конфиденциальности', href: '/docs/privacy' },
-    { label: 'Согласие на обработку персональных данных', href: '/docs/consent' },
-    { label: 'Условия доставки и возврата', href: '/docs/delivery' },
-];
 
 type View = 'menu' | 'phone' | 'code';
 
@@ -107,8 +101,8 @@ export function AccountSheet({
                         <button
                             type="button"
                             onClick={openOrders}
-                            className="card mb-3 flex w-full items-center gap-3 p-4 text-left
-                                transition-colors hover:border-accent"
+                            className="panel mb-2.5 flex min-h-[72px] w-full flex-row items-center gap-3
+                                px-3.5 py-3 text-left transition-colors hover:border-accent"
                         >
                             <span
                                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
@@ -140,31 +134,38 @@ export function AccountSheet({
                             </span>
                         </button>
 
-                        <section className="card p-4">
-                            <h3 className="mb-2 text-[15px] font-medium">Документы</h3>
-                            <ul className="flex flex-col">
-                                {DOCUMENTS.map(doc => (
-                                    <li key={doc.href}>
-                                        <a
-                                            href={doc.href}
-                                            className="flex items-center justify-between border-b border-divider
-                                                py-2.5 text-[13.5px] text-text hover:text-accent"
-                                        >
-                                            {doc.label}
-                                            <span aria-hidden="true" className="text-text/45">
-                                                ›
-                                            </span>
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
+                        <div className="overflow-hidden rounded-[14px] border border-divider bg-surface-2/35">
+                            <Link
+                                href="/docs"
+                                onClick={onClose}
+                                className="flex min-h-[58px] items-center gap-3 px-3.5 py-2.5
+                                    text-left hover:bg-surface-2"
+                            >
+                                <span
+                                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full
+                                        border border-divider text-text/65"
+                                    aria-hidden="true"
+                                >
+                                    <DocumentIcon />
+                                </span>
+                                <span className="min-w-0 flex-1">
+                                    <strong className="block text-[14px] font-medium">Документы</strong>
+                                    <span className="mt-0.5 block truncate text-[11.5px] text-text/45">
+                                        Оферта, политика и условия доставки
+                                    </span>
+                                </span>
+                                <span className="text-[20px] text-text/35" aria-hidden="true">
+                                    ›
+                                </span>
+                            </Link>
 
+                            <div className="mx-3.5 border-t border-divider" />
                             <button
                                 type="button"
                                 onClick={() => setCookieOpen(open => !open)}
                                 aria-expanded={cookieOpen}
-                                className="mt-3 flex w-full items-center justify-between text-[12px]
-                                    text-text/50 hover:text-accent"
+                                className="flex min-h-[48px] w-full items-center justify-between px-3.5
+                                    text-[12px] text-text/50 hover:text-accent"
                             >
                                 Настройки cookie
                                 <span
@@ -176,7 +177,10 @@ export function AccountSheet({
                             </button>
 
                             {cookieOpen && (
-                                <label className="mt-2 flex items-center justify-between text-[13px] text-text/70">
+                                <label
+                                    className="mx-3.5 flex min-h-[44px] items-center justify-between border-t
+                                        border-divider text-[12.5px] text-text/65"
+                                >
                                     Аналитические cookie
                                     <input
                                         type="checkbox"
@@ -186,7 +190,7 @@ export function AccountSheet({
                                     />
                                 </label>
                             )}
-                        </section>
+                        </div>
                     </>
                 )}
 
@@ -279,6 +283,25 @@ export function AccountSheet({
         </div>
     );
 }
+
+function DocumentIcon() {
+    return (
+        <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M7 3h7l4 4v14H7z" />
+            <path d="M14 3v5h5M10 13h5M10 17h5" />
+        </svg>
+    );
+}
+
 function SheetHeader({
     view,
     onBack,
