@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 import './globals.css';
 import { BottomNav } from '@/components/chrome/bottom-nav';
+import { getAccountSession } from '@/lib/account';
 import { getCart } from '@/lib/api/cart';
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-    const cart = await getCart();
+    const [cart, account] = await Promise.all([getCart(), getAccountSession()]);
 
     return (
         <html lang="ru" className="h-full antialiased">
@@ -33,7 +34,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                     десктопной раскладки в дизайне нет, выдумывать её не будем. */}
                 <div className="relative mx-auto flex min-h-dvh w-full max-w-[412px] flex-col">
                     <main className="flex-1 pb-16">{children}</main>
-                    <BottomNav cartQuantity={cart?.totalQuantity ?? 0} />
+                    <BottomNav
+                        cartQuantity={cart?.totalQuantity ?? 0}
+                        accountPhone={account?.phoneDisplay ?? null}
+                    />
                 </div>
             </body>
         </html>

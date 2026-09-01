@@ -12,7 +12,13 @@ import { SearchPanel } from './search-panel';
  * Постоянная нижняя панель из макета: золотой бренд-кружок, поиск, корзина,
  * контакты и меню. Поиск и контакты взаимоисключающие.
  */
-export function BottomNav({ cartQuantity }: { cartQuantity: number }) {
+export function BottomNav({
+    cartQuantity,
+    accountPhone,
+}: {
+    cartQuantity: number;
+    accountPhone: string | null;
+}) {
     const router = useRouter();
     const [panel, setPanel] = useState<'search' | 'contact' | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -23,7 +29,12 @@ export function BottomNav({ cartQuantity }: { cartQuantity: number }) {
         <>
             {panel === 'search' && <SearchPanel onClose={() => setPanel(null)} />}
             {panel === 'contact' && <ContactPopover onClose={() => setPanel(null)} />}
-            {menuOpen && <AccountSheet onClose={() => setMenuOpen(false)} />}
+            {menuOpen && (
+                <AccountSheet
+                    accountPhone={accountPhone}
+                    onClose={() => setMenuOpen(false)}
+                />
+            )}
 
             <nav
                 className="fixed bottom-0 z-40 flex h-16 w-full max-w-[412px] items-center
