@@ -81,7 +81,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                         disabled={pending || !variantId}
                         aria-label={`Добавить в корзину: ${product.name}`}
                         className="btn btn-primary h-8 min-w-0 flex-1 overflow-hidden whitespace-nowrap
-                            rounded-full px-1 text-[clamp(9.5px,2.8vw,11.5px)] font-semibold
+                            rounded-full px-1 text-[clamp(11px,3.25vw,13px)] font-semibold
                             tracking-[-0.02em] tabular-nums disabled:is-disabled"
                     >
                         + {formatAmount(price)} ₽

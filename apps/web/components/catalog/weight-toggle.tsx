@@ -5,7 +5,7 @@
  * золотая шайба. Активная сторона показывает вес внутри шайбы, неактивная —
  * только цифру приглушённым цветом.
  *
- * Обе половины по 31px. Золотая шайба — 38px: она намеренно выше дорожки
+ * Обе половины по 34px. Золотая шайба — 40px: она намеренно выше дорожки
  * (32px) и немного заходит на соседнюю неактивную половину.
  */
 export function WeightToggle({
@@ -17,7 +17,7 @@ export function WeightToggle({
 }) {
     return (
         <div
-            className="relative flex h-8 w-[62px] shrink-0 rounded-full border border-divider bg-surface-2"
+            className="relative flex h-8 w-[68px] shrink-0 rounded-full border border-divider bg-surface-2"
             role="radiogroup"
             aria-label="Вес"
         >
@@ -39,17 +39,17 @@ export function WeightToggle({
                             <span
                                 aria-hidden="true"
                                 className="pointer-events-none absolute left-1/2 top-1/2 z-[2] flex
-                                    h-[38px] w-[38px] -translate-x-1/2 -translate-y-1/2 flex-col items-center
+                                    h-10 w-10 -translate-x-1/2 -translate-y-1/2 flex-col items-center
                                     justify-center rounded-full border-2 border-surface bg-accent
                                     text-bg shadow-[0_4px_14px_rgba(0,0,0,0.45)]"
                             >
-                                <span className="text-[10.5px] font-bold leading-[1.1]">{label}</span>
-                                <span className="text-[7px] font-medium leading-none opacity-70">
+                                <span className="text-[11px] font-bold leading-[1.1]">{label}</span>
+                                <span className="text-[7.5px] font-medium leading-none opacity-70">
                                     кг
                                 </span>
                             </span>
                         ) : (
-                            <span className="pointer-events-none text-[10.5px] text-[#a5b8de]">
+                            <span className="pointer-events-none text-[11px] text-[#a5b8de]">
                                 {label}
                             </span>
                         )}
