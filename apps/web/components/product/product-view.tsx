@@ -167,9 +167,9 @@ export function ProductView({
 
             <div className="px-[18px] pb-2 pt-[18px]">
                 {/* ── Вес · количество · добавить ───────────────────────────── */}
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 min-[390px]:flex-nowrap">
+                <div className="mb-3 flex min-w-0 items-center gap-1.5">
                     {hasWeights && (
-                        <div className="flex min-w-0 gap-1.5 min-[390px]:gap-2" role="radiogroup" aria-label="Вес">
+                        <div className="flex shrink-0 gap-1" role="radiogroup" aria-label="Вес">
                             {(['500', '1000'] as const).map(option => {
                                 const active = weight === option;
                                 return (
@@ -179,9 +179,8 @@ export function ProductView({
                                         role="radio"
                                         aria-checked={active}
                                         onClick={() => setWeight(option)}
-                                        className={`shrink-0 whitespace-nowrap rounded-full border px-3
-                                            py-[7px] text-[12.5px] font-medium transition-colors
-                                            min-[390px]:px-4 min-[390px]:text-[13.5px]
+                                        className={`shrink-0 whitespace-nowrap rounded-full border px-2.5
+                                            py-[6px] text-[12px] font-medium transition-colors
                                             ${
                                                 active
                                                     ? 'border-accent bg-[color-mix(in_srgb,var(--color-accent)_16%,transparent)] text-accent'
@@ -195,21 +194,21 @@ export function ProductView({
                         </div>
                     )}
 
-                    <div className="flex items-center gap-2 rounded-md border border-divider px-2 py-[5px]">
+                    <div className="flex shrink-0 items-center gap-1 rounded-md border border-divider px-1.5 py-[5px]">
                         <button
                             type="button"
                             aria-label="Убрать один"
                             onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                            className="h-[22px] w-[22px] text-[16px] leading-none text-text"
+                            className="h-5 w-5 text-[15px] leading-none text-text"
                         >
                             −
                         </button>
-                        <span className="min-w-[14px] text-center text-[14px]">{quantity}</span>
+                        <span className="min-w-3 text-center text-[13px]">{quantity}</span>
                         <button
                             type="button"
                             aria-label="Добавить один"
                             onClick={() => setQuantity(q => q + 1)}
-                            className="h-[22px] w-[22px] text-[16px] leading-none text-text"
+                            className="h-5 w-5 text-[15px] leading-none text-text"
                         >
                             +
                         </button>
@@ -220,9 +219,9 @@ export function ProductView({
                         type="button"
                         onClick={handleAdd}
                         disabled={pending || !variant}
-                        className="btn btn-primary h-10 basis-full whitespace-nowrap px-[14px]
-                            text-[13.5px] disabled:is-disabled min-[390px]:h-[34px]
-                            min-[390px]:basis-auto min-[390px]:text-[14px]"
+                        className="btn btn-primary h-[34px] min-w-0 flex-1 overflow-hidden
+                            whitespace-nowrap px-2 text-[clamp(11px,3.2vw,13px)]
+                            font-semibold tabular-nums disabled:is-disabled"
                     >
                         {pending ? 'Добавляем…' : `+ ${formatAmount(unitPrice * quantity)} ₽`}
                     </button>
