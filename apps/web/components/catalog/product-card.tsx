@@ -71,8 +71,12 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                     </Link>
                 )}
 
-                <div className="-mr-1 flex min-w-0 items-center gap-1 lg:mr-0 lg:gap-2">
-                    {hasWeights && <WeightToggle value={weight} onChange={setWeight} />}
+                <div className="-mr-1 flex min-w-0 items-center gap-1 lg:mr-0 lg:grid lg:grid-cols-2 lg:gap-2">
+                    {hasWeights && (
+                        <div className="shrink-0 lg:min-w-0 lg:w-full">
+                            <WeightToggle value={weight} onChange={setWeight} />
+                        </div>
+                    )}
 
                     <button
                         ref={buttonRef}
@@ -81,8 +85,8 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                         disabled={pending || !variantId}
                         aria-label={`Добавить в корзину: ${product.name}`}
                         className="btn btn-primary h-8 min-w-0 flex-1 overflow-hidden whitespace-nowrap
-                            rounded-full px-1 text-[clamp(11px,3.25vw,13px)] font-semibold lg:h-9
-                            lg:px-3 lg:text-[14px]
+                            rounded-full px-1 text-[clamp(11px,3.25vw,13px)] font-semibold lg:h-10
+                            lg:w-full lg:px-3 lg:text-[14px]
                             tracking-[-0.02em] tabular-nums disabled:is-disabled"
                     >
                         + {formatAmount(price)} ₽
