@@ -101,7 +101,12 @@ export const config: VendureConfig = {
             route: 'admin',
             port: serverPort + 2,
             adminUiConfig: {
-                apiPort: serverPort,
+                // Админка открывается через тот же публичный адрес, что и витрина.
+                // Жёсткий порт 3000 заставлял браузер обходить Caddy и обращаться
+                // к закрытому внутреннему порту сервера напрямую.
+                apiHost: 'auto',
+                apiPort: 'auto',
+                adminApiPath: 'admin-api',
                 defaultLanguage: LanguageCode.ru,
                 availableLanguages: [LanguageCode.ru, LanguageCode.en],
             },
