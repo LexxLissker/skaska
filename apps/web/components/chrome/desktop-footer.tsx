@@ -16,7 +16,7 @@ const customerLinks = [
 
 export function DesktopFooter() {
     return (
-        <footer className="hidden bg-[linear-gradient(180deg,var(--color-bg)_0%,#0d1422_100%)] lg:block">
+        <footer className="hidden bg-[linear-gradient(180deg,var(--color-bg)_0%,color-mix(in_srgb,var(--color-surface)_80%,var(--color-bg))_100%)] lg:block">
             <div className="mx-auto grid max-w-[1280px] grid-cols-[1.4fr_1fr_1fr] gap-16 px-8 pb-10 pt-14">
                 <div className="max-w-[410px]">
                     <Link href="/" className="inline-flex items-center gap-3 text-text no-underline">

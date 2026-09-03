@@ -40,6 +40,47 @@
   color-scheme: dark;
 }
 
+/* Полноразмерные палитры для сравнения на /palette/*. Золотой акцент во всех
+   версиях одинаковый, поэтому оцениваем только характер тёмной основы. */
+[data-palette='ink'] {
+  --color-bg: #05080e;
+  --color-surface: #0d1420;
+  --color-surface-2: #141e2d;
+  --color-text: #f5f2ea;
+  --color-neutral-100: #f5f2ea;
+  --color-neutral-400: #aeb8c8;
+  --color-neutral-700: #465165;
+  --color-neutral-800: #303a49;
+  --color-neutral-900: #202733;
+  --color-divider: color-mix(in srgb, #f5f2ea 14%, transparent);
+}
+
+[data-palette='graphite'] {
+  --color-bg: #0a0a0b;
+  --color-surface: #151517;
+  --color-surface-2: #1e1e21;
+  --color-text: #f4f0e8;
+  --color-neutral-100: #f4f0e8;
+  --color-neutral-400: #b5b0a7;
+  --color-neutral-700: #555257;
+  --color-neutral-800: #3b393d;
+  --color-neutral-900: #29282b;
+  --color-divider: color-mix(in srgb, #f4f0e8 14%, transparent);
+}
+
+[data-palette='espresso'] {
+  --color-bg: #0d0a08;
+  --color-surface: #18120f;
+  --color-surface-2: #241a15;
+  --color-text: #f7f0e5;
+  --color-neutral-100: #f7f0e5;
+  --color-neutral-400: #bbaea0;
+  --color-neutral-700: #5d4e45;
+  --color-neutral-800: #41372f;
+  --color-neutral-900: #2d2621;
+  --color-divider: color-mix(in srgb, #f7f0e5 14%, transparent);
+}
+
 body {
   /* Витрина мобильная: в макете это экран 412px. */
   overscroll-behavior-y: none;

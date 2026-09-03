@@ -28,14 +28,15 @@ export function BottomNav({
     const [panel, setPanel] = useState<'search' | 'contact' | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState<DesktopSection | null>(
-        pathname === '/' ? 'catalog' : null,
+        pathname === '/' || pathname.startsWith('/palette/') ? 'catalog' : null,
     );
     const cartOpen = pathname === '/cart';
+    const catalogPagePath = pathname.startsWith('/palette/') ? pathname : '/';
 
     const toggle = (next: 'search' | 'contact') => setPanel(cur => (cur === next ? null : next));
 
     useEffect(() => {
-        if (pathname !== '/') {
+        if (pathname !== '/' && !pathname.startsWith('/palette/')) {
             setActiveSection(null);
             return;
         }
@@ -77,7 +78,7 @@ export function BottomNav({
 
             <header
                 className="fixed inset-x-0 top-0 z-40 hidden h-[72px] border-b border-divider
-                    bg-[rgba(9,13,22,.86)] backdrop-blur-xl lg:block"
+                    bg-[color-mix(in_srgb,var(--color-bg)_86%,transparent)] backdrop-blur-xl lg:block"
             >
                 <div className="mx-auto flex h-full max-w-[1280px] items-center gap-8 px-8">
                     <Link href="/" className="flex shrink-0 items-center gap-3 text-text no-underline">
@@ -91,28 +92,28 @@ export function BottomNav({
 
                     <nav className="flex items-center gap-7" aria-label="Разделы магазина">
                         <Link
-                            href="/#catalog"
+                            href={`${catalogPagePath}#catalog`}
                             className={desktopLinkClass('catalog')}
                             onClick={() => setActiveSection('catalog')}
                         >
                             Каталог
                         </Link>
                         <Link
-                            href="/#bundles"
+                            href={`${catalogPagePath}#bundles`}
                             className={desktopLinkClass('bundles')}
                             onClick={() => setActiveSection('bundles')}
                         >
                             Наборы
                         </Link>
                         <Link
-                            href="/#how-we-cook"
+                            href={`${catalogPagePath}#how-we-cook`}
                             className={desktopLinkClass('how-we-cook')}
                             onClick={() => setActiveSection('how-we-cook')}
                         >
                             Как готовим
                         </Link>
                         <Link
-                            href="/#delivery"
+                            href={`${catalogPagePath}#delivery`}
                             className={desktopLinkClass('delivery')}
                             onClick={() => setActiveSection('delivery')}
                         >

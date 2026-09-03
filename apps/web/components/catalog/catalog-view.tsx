@@ -150,7 +150,7 @@ export function CatalogView({
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-0
                         [background:linear-gradient(to_bottom,transparent_58%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]
-                        lg:[background:linear-gradient(to_right,rgba(9,13,22,.96)_0%,rgba(9,13,22,.72)_42%,rgba(9,13,22,.08)_78%)]"
+                        lg:[background:linear-gradient(to_right,color-mix(in_srgb,var(--color-bg)_96%,transparent)_0%,color-mix(in_srgb,var(--color-bg)_72%,transparent)_42%,color-mix(in_srgb,var(--color-bg)_8%,transparent)_78%)]"
                 />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-[22px]
                     lg:bottom-auto lg:left-0 lg:right-auto lg:top-1/2 lg:w-[52%] lg:-translate-y-1/2
@@ -199,7 +199,7 @@ export function CatalogView({
                     className="relative z-[2] -mt-4 pt-10
                         [background:linear-gradient(to_bottom,transparent_0,var(--color-bg)_50px,var(--color-bg)_100%)]
                         lg:sticky lg:top-[72px] lg:z-30 lg:mt-0
-                        lg:bg-[rgba(9,13,22,.94)] lg:px-4 lg:pb-1 lg:pt-4 lg:backdrop-blur-xl"
+                        lg:bg-[color-mix(in_srgb,var(--color-bg)_94%,transparent)] lg:px-4 lg:pb-1 lg:pt-4 lg:backdrop-blur-xl"
                 >
                     <CatalogNav
                         categories={categories}
@@ -284,14 +284,9 @@ export function CatalogView({
                         <article
                             key={offer.title}
                             className="relative w-[78%] shrink-0 overflow-hidden rounded-lg border
-                                border-accent p-[18px] lg:w-auto lg:min-h-[190px] lg:p-7
-                                [background:linear-gradient(135deg,color-mix(in_srgb,var(--color-accent)_16%,var(--color-surface))_0%,var(--color-surface)_70%)]"
+                                border-divider bg-surface p-[18px] transition-colors hover:border-accent/60
+                                lg:w-auto lg:min-h-[190px] lg:p-7"
                         >
-                            <span
-                                aria-hidden="true"
-                                className="absolute -right-[22px] -top-[22px] h-[100px] w-[100px]
-                                    rounded-full bg-[color-mix(in_srgb,var(--color-accent)_20%,transparent)] blur-[2px]"
-                            />
                             <span className="tag tag-accent relative inline-block">{offer.tag}</span>
                             <h3 className="relative mb-1.5 mt-2.5 text-[16px] font-medium lg:text-[21px]">
                                 {offer.title}
@@ -312,14 +307,9 @@ export function CatalogView({
                         <article
                             key={step.num}
                             className="relative w-[78%] shrink-0 overflow-hidden rounded-lg border
-                                border-divider p-5 lg:w-auto lg:min-h-[230px] lg:p-6
-                                [background:linear-gradient(155deg,color-mix(in_srgb,var(--color-accent)_14%,var(--color-surface))_0%,var(--color-surface)_65%)]"
+                                border-divider bg-surface p-5 transition-colors hover:border-accent/50
+                                lg:w-auto lg:min-h-[230px] lg:p-6"
                         >
-                            <span
-                                aria-hidden="true"
-                                className="absolute -right-[18px] -top-[18px] h-[90px] w-[90px]
-                                    rounded-full bg-[color-mix(in_srgb,var(--color-accent)_20%,transparent)] blur-[2px]"
-                            />
                             <div className="relative mb-4 flex items-center justify-between">
                                 <span className="flex h-11 w-11 items-center justify-center rounded-full
                                     border border-accent bg-[color-mix(in_srgb,var(--color-accent)_18%,transparent)] text-accent">
