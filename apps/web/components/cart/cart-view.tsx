@@ -55,7 +55,8 @@ export function CartView({ cart }: { cart: Cart | null }) {
 
     return (
         <>
-            <header className="flex items-center gap-3 px-[18px] pb-[18px] pt-4">
+            <header className="flex items-center gap-3 px-[18px] pb-[18px] pt-4 lg:mx-auto lg:w-full
+                lg:max-w-[1200px] lg:px-8 lg:pb-6 lg:pt-8">
                 <button
                     type="button"
                     onClick={() => router.back()}
@@ -77,12 +78,14 @@ export function CartView({ cart }: { cart: Cart | null }) {
                         <path d="M15 5l-7 7 7 7" />
                     </svg>
                 </button>
-                <h2 className="m-0 text-[21px] font-medium text-text">Корзина</h2>
+                <h2 className="m-0 text-[21px] font-medium text-text lg:text-[32px]">Корзина</h2>
             </header>
 
-            <div className={`flex flex-col gap-[14px] px-[18px] pb-[18px] ${pending ? 'opacity-60' : ''}`}>
+            <div className={`flex flex-col gap-[14px] px-[18px] pb-[18px]
+                lg:mx-auto lg:grid lg:w-full lg:max-w-[1200px] lg:grid-cols-[minmax(0,1fr)_380px]
+                lg:items-start lg:gap-6 lg:px-8 lg:pb-16 ${pending ? 'opacity-60' : ''}`}>
                 {/* ── Позиции ───────────────────────────────────────────────── */}
-                <section className="panel p-4">
+                <section className={`panel p-4 lg:p-6 ${isEmpty ? 'lg:col-span-2' : ''}`}>
                     {isEmpty ? (
                         <>
                             <p className="mb-1.5 text-[14.5px] font-medium text-text">Корзина пуста</p>
@@ -100,20 +103,20 @@ export function CartView({ cart }: { cart: Cart | null }) {
                                 {cart.lines.map(line => (
                                     <li
                                         key={line.id}
-                                        className="flex items-start gap-3 border-b border-divider py-[14px] last:border-0"
+                                        className="flex items-start gap-3 border-b border-divider py-[14px] last:border-0 lg:gap-4 lg:py-5"
                                     >
                                         <div className="shrink-0">
                                             {line.assetUrl ? (
                                                 <ImagePlaceholder
                                                     src={line.assetUrl}
                                                     alt={line.productName}
-                                                    className="h-16 w-16 rounded-md"
+                                                    className="h-16 w-16 rounded-md lg:h-24 lg:w-24"
                                                 />
                                             ) : (
                                                 <div
                                                     className="flex h-16 w-16 items-center justify-center rounded-md
                                                         border border-dashed border-text/35 bg-surface-2 px-1 text-center
-                                                        text-[11px] font-medium leading-[1.2] text-text/55"
+                                                        text-[11px] font-medium leading-[1.2] text-text/55 lg:h-24 lg:w-24"
                                                     role="img"
                                                     aria-label={`Фото товара: ${line.productName}`}
                                                 >
@@ -123,7 +126,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
                                         </div>
 
                                         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                                            <span className="text-[13.5px] text-text">
+                                            <span className="text-[13.5px] text-text lg:text-[16px]">
                                                 {line.productName}
                                             </span>
                                             <span className="text-[11.5px] text-text/55">
@@ -173,7 +176,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
                 </section>
 
                 {!isEmpty && (
-                    <>
+                    <aside className="flex flex-col gap-[14px] lg:sticky lg:top-[104px] lg:self-start">
                         {/* ── Промокод ──────────────────────────────────────── */}
                         <section className="panel p-4">
                             <p className="mb-3 text-[15px] font-medium text-text">Промокод</p>
@@ -251,12 +254,21 @@ export function CartView({ cart }: { cart: Cart | null }) {
                                 </div>
                             </div>
                         </section>
-                    </>
+                        <Link
+                            href="/checkout"
+                            className="btn-cta hidden items-center justify-center lg:flex"
+                        >
+                            Оформить заказ · {formatPrice(cart.subTotal)}
+                        </Link>
+                        <p className="hidden text-center text-[11.5px] leading-relaxed text-text/40 lg:block">
+                            Стоимость доставки рассчитаем после выбора адреса
+                        </p>
+                    </aside>
                 )}
             </div>
 
             {/* ── Липкий подвал ─────────────────────────────────────────────── */}
-            <div className="fixed bottom-16 z-30 w-full max-w-[412px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px]">
+            <div className="fixed bottom-16 z-30 w-full max-w-[412px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px] lg:hidden">
                 <Link
                     href="/checkout"
                     aria-disabled={isEmpty}
@@ -267,7 +279,7 @@ export function CartView({ cart }: { cart: Cart | null }) {
             </div>
 
             {/* Компенсируем высоту липкого подвала. */}
-            <div className="h-[104px]" />
+            <div className="h-[104px] lg:hidden" />
         </>
     );
 }

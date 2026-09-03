@@ -30,7 +30,7 @@ export default async function AccountOrdersPage() {
 
     if (!account) {
         return (
-            <div className="px-4 pb-10 pt-6">
+            <div className="px-4 pb-10 pt-6 lg:mx-auto lg:w-full lg:max-w-[900px] lg:px-8 lg:pb-20 lg:pt-10">
                 <PageHeader />
                 <section className="card mt-6 p-5 text-center">
                     <div
@@ -53,13 +53,13 @@ export default async function AccountOrdersPage() {
     }
 
     return (
-        <div className="px-4 pb-10 pt-6">
+        <div className="px-4 pb-10 pt-6 lg:mx-auto lg:w-full lg:max-w-[1000px] lg:px-8 lg:pb-20 lg:pt-10">
             <PageHeader />
             <p className="mt-1 text-[12.5px] text-text/50">{account.phoneDisplay}</p>
 
-            <section className="mt-5 flex flex-col gap-3" aria-label="История заказов">
+            <section className="mt-5 flex flex-col gap-3 lg:mt-8 lg:grid lg:grid-cols-2 lg:gap-5" aria-label="История заказов">
                 {DEMO_ORDERS.map(order => (
-                    <article key={order.code} className="card p-4">
+                    <article key={order.code} className="card p-4 lg:p-6">
                         <div className="flex items-start justify-between gap-3">
                             <div>
                                 <h2 className="font-heading text-[16px] font-medium">
@@ -122,7 +122,7 @@ function PageHeader() {
             >
                 ‹
             </Link>
-            <h1 className="font-heading text-[24px] font-medium">Мои заказы</h1>
+            <h1 className="font-heading text-[24px] font-medium lg:text-[34px]">Мои заказы</h1>
         </header>
     );
 }
@@ -142,4 +142,3 @@ function AccountIcon() {
         </svg>
     );
 }
-

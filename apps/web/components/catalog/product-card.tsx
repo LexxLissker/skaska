@@ -56,22 +56,22 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                 </Link>
             )}
 
-            <div className="flex min-w-0 flex-col gap-2 px-2 pb-3 pt-2.5">
+            <div className="flex min-w-0 flex-col gap-2 px-2 pb-3 pt-2.5 lg:gap-3 lg:px-4 lg:pb-4 lg:pt-3.5">
                 {product.isAddon ? (
                     <button type="button" onClick={add} className="text-left">
-                        <h3 className="min-h-[34px] text-[13px] font-normal leading-[1.3] text-text">
+                        <h3 className="min-h-[34px] text-[13px] font-normal leading-[1.3] text-text lg:min-h-[42px] lg:text-[16px]">
                             {product.name}
                         </h3>
                     </button>
                 ) : (
                     <Link href={`/product/${product.slug}`}>
-                        <h3 className="min-h-[34px] text-[13px] font-normal leading-[1.3] text-text">
+                        <h3 className="min-h-[34px] text-[13px] font-normal leading-[1.3] text-text lg:min-h-[42px] lg:text-[16px]">
                             {product.name}
                         </h3>
                     </Link>
                 )}
 
-                <div className="-mr-1 flex min-w-0 items-center gap-1">
+                <div className="-mr-1 flex min-w-0 items-center gap-1 lg:mr-0 lg:gap-2">
                     {hasWeights && <WeightToggle value={weight} onChange={setWeight} />}
 
                     <button
@@ -81,7 +81,8 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                         disabled={pending || !variantId}
                         aria-label={`Добавить в корзину: ${product.name}`}
                         className="btn btn-primary h-8 min-w-0 flex-1 overflow-hidden whitespace-nowrap
-                            rounded-full px-1 text-[clamp(11px,3.25vw,13px)] font-semibold
+                            rounded-full px-1 text-[clamp(11px,3.25vw,13px)] font-semibold lg:h-9
+                            lg:px-3 lg:text-[14px]
                             tracking-[-0.02em] tabular-nums disabled:is-disabled"
                     >
                         + {formatAmount(price)} ₽

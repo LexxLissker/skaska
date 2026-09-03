@@ -38,10 +38,93 @@ export function BottomNav({
                 />
             )}
 
+            <header
+                className="fixed inset-x-0 top-0 z-40 hidden h-[72px] border-b border-divider
+                    bg-[rgba(9,13,22,.86)] backdrop-blur-xl lg:block"
+            >
+                <div className="mx-auto flex h-full max-w-[1280px] items-center gap-8 px-8">
+                    <Link href="/" className="flex shrink-0 items-center gap-3 text-text no-underline">
+                        <span className="gold-circle h-10 w-10 text-[17px]">С</span>
+                        <span className="font-heading text-[20px] font-semibold tracking-[0.01em]">
+                            Скаска
+                        </span>
+                    </Link>
+
+                    <div className="h-7 w-px bg-divider" aria-hidden="true" />
+
+                    <nav className="flex items-center gap-7" aria-label="Разделы магазина">
+                        <Link href="/#catalog" className="text-[14px] text-text/75 no-underline hover:text-accent">
+                            Каталог
+                        </Link>
+                        <Link href="/#bundles" className="text-[14px] text-text/75 no-underline hover:text-accent">
+                            Наборы
+                        </Link>
+                        <Link href="/#how-we-cook" className="text-[14px] text-text/75 no-underline hover:text-accent">
+                            Как готовим
+                        </Link>
+                        <Link href="/docs#delivery" className="text-[14px] text-text/75 no-underline hover:text-accent">
+                            Доставка
+                        </Link>
+                    </nav>
+
+                    <div className="ml-auto flex items-center gap-2">
+                        <DesktopAction
+                            label="Поиск"
+                            active={panel === 'search'}
+                            onClick={() => toggle('search')}
+                        >
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
+                        </DesktopAction>
+
+                        <DesktopAction
+                            label="Связаться"
+                            active={panel === 'contact'}
+                            onClick={() => toggle('contact')}
+                        >
+                            <path d="M4 5h16v12H7l-3 3z" strokeLinejoin="round" />
+                        </DesktopAction>
+
+                        <button
+                            type="button"
+                            onClick={() => setMenuOpen(true)}
+                            className="flex h-10 items-center gap-2 rounded-full border border-divider px-3.5
+                                text-[13px] text-text/75 hover:border-accent hover:text-accent"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                                <circle cx="12" cy="8" r="3.5" />
+                                <path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6" strokeLinecap="round" />
+                            </svg>
+                            {accountPhone ?? 'Кабинет'}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => (cartOpen ? router.back() : router.push('/cart'))}
+                            aria-label={cartOpen ? 'Закрыть корзину' : `Открыть корзину, товаров: ${cartQuantity}`}
+                            className="relative flex h-10 items-center gap-2 rounded-full border border-accent
+                                bg-[color-mix(in_srgb,var(--color-accent)_10%,transparent)] px-4
+                                text-[13px] text-accent hover:bg-[color-mix(in_srgb,var(--color-accent)_17%,transparent)]"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M6 8h12l-1.2 11a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 8z" />
+                                <path d="M9 8V6a3 3 0 016 0v2" />
+                            </svg>
+                            Корзина
+                            {cartQuantity > 0 && (
+                                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-bold text-bg">
+                                    {cartQuantity}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </header>
+
             <nav
                 className="fixed bottom-0 z-40 flex h-16 w-full max-w-[412px] items-center
                     justify-around border-t border-divider px-2
-                    [background:rgba(17,24,39,.85)] [backdrop-filter:blur(12px)]"
+                    [background:rgba(17,24,39,.85)] [backdrop-filter:blur(12px)] lg:hidden"
                 aria-label="Основная навигация"
             >
                 <Link
@@ -106,6 +189,33 @@ export function BottomNav({
                 </IconButton>
             </nav>
         </>
+    );
+}
+
+function DesktopAction({
+    label,
+    active,
+    onClick,
+    children,
+}: {
+    label: string;
+    active: boolean;
+    onClick: () => void;
+    children: React.ReactNode;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            aria-label={label}
+            aria-pressed={active}
+            className={`flex h-10 w-10 items-center justify-center rounded-full border transition-colors
+                ${active ? 'border-accent bg-accent/10 text-accent' : 'border-divider text-text/65 hover:border-accent hover:text-accent'}`}
+        >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                {children}
+            </svg>
+        </button>
     );
 }
 

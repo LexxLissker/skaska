@@ -27,7 +27,7 @@ const DOCUMENTS = [
 
 export default function DocumentsPage() {
     return (
-        <div className="px-4 pb-10 pt-5">
+        <div className="px-4 pb-10 pt-5 lg:mx-auto lg:w-full lg:max-w-[960px] lg:px-8 lg:pb-20 lg:pt-10">
             <header className="flex items-center gap-3">
                 <Link
                     href="/"
@@ -37,27 +37,27 @@ export default function DocumentsPage() {
                 >
                     ‹
                 </Link>
-                <h1 className="font-heading text-[24px] font-medium">Документы</h1>
+                <h1 className="font-heading text-[24px] font-medium lg:text-[34px]">Документы</h1>
             </header>
 
-            <p className="mt-4 text-[13px] leading-relaxed text-text/55">
+            <p className="mt-4 text-[13px] leading-relaxed text-text/55 lg:max-w-[640px] lg:text-[15px]">
                 Все правила магазина собраны здесь, чтобы их не приходилось искать по меню и
                 оформлению заказа.
             </p>
 
-            <section className="mt-5 overflow-hidden rounded-[14px] border border-divider bg-surface">
+            <section className="mt-5 overflow-hidden rounded-[14px] border border-divider bg-surface lg:mt-8 lg:rounded-[20px]">
                 {DOCUMENTS.map((document, index) => (
                     <article
                         id={document.id}
                         key={document.id}
-                        className={`scroll-mt-4 px-4 py-4 ${index ? 'border-t border-divider' : ''}`}
+                        className={`scroll-mt-24 px-4 py-4 lg:px-7 lg:py-6 ${index ? 'border-t border-divider' : ''}`}
                     >
                         <div className="flex items-start justify-between gap-3">
                             <div>
-                                <h2 className="text-[14px] font-medium text-text">
+                                <h2 className="text-[14px] font-medium text-text lg:text-[17px]">
                                     {document.title}
                                 </h2>
-                                <p className="mt-1 text-[12px] leading-relaxed text-text/50">
+                                <p className="mt-1 text-[12px] leading-relaxed text-text/50 lg:text-[14px]">
                                     {document.description}
                                 </p>
                             </div>
@@ -79,4 +79,3 @@ export default function DocumentsPage() {
         </div>
     );
 }
-

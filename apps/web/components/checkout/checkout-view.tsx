@@ -98,7 +98,8 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
 
     return (
         <>
-            <header className="flex items-center gap-3 px-[18px] pb-[18px] pt-4">
+            <header className="flex items-center gap-3 px-[18px] pb-[18px] pt-4 lg:mx-auto lg:w-full
+                lg:max-w-[1200px] lg:px-8 lg:pb-6 lg:pt-8">
                 <button
                     type="button"
                     onClick={() => router.back()}
@@ -120,10 +121,13 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                         <path d="M15 5l-7 7 7 7" />
                     </svg>
                 </button>
-                <h2 className="m-0 text-[21px] font-medium text-text">Оформление</h2>
+                <h2 className="m-0 text-[21px] font-medium text-text lg:text-[32px]">Оформление заказа</h2>
             </header>
 
-            <div className="flex flex-col gap-[14px] px-[18px] pb-[18px]">
+            <div className="flex flex-col gap-[14px] px-[18px] pb-[18px] lg:mx-auto lg:grid
+                lg:w-full lg:max-w-[1200px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start
+                lg:gap-6 lg:px-8 lg:pb-16">
+                <div className="flex flex-col gap-[14px]">
                 <DeliverySection
                     address={address}
                     onAddressChange={setAddress}
@@ -168,9 +172,11 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                         />
                     </div>
                 </section>
+                </div>
 
                 {/* ── Состав заказа ─────────────────────────────────────────── */}
-                <section className="panel p-4">
+                <aside className="flex flex-col gap-[14px] lg:sticky lg:top-[104px] lg:self-start">
+                <section className="panel p-4 lg:p-5">
                     <button
                         type="button"
                         onClick={() => setOrderExpanded(o => !o)}
@@ -183,14 +189,13 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                         </span>
                         <span
                             aria-hidden="true"
-                            className={`text-text/50 transition-transform ${orderExpanded ? 'rotate-180' : ''}`}
+                            className={`text-text/50 transition-transform lg:hidden ${orderExpanded ? 'rotate-180' : ''}`}
                         >
                             ⌄
                         </span>
                     </button>
 
-                    {orderExpanded && (
-                        <div className="mt-2.5 flex flex-col gap-2 border-t border-divider pt-2.5">
+                    <div className={`${orderExpanded ? 'flex' : 'hidden lg:flex'} mt-2.5 flex-col gap-2 border-t border-divider pt-2.5`}>
                             {cart.lines.map(line => (
                                 <div
                                     key={line.id}
@@ -215,8 +220,7 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                                     </span>
                                 </div>
                             ))}
-                        </div>
-                    )}
+                    </div>
 
                     <div className="mt-3.5 flex flex-col gap-2 border-t border-divider pt-3.5">
                         <SummaryRow
@@ -262,10 +266,19 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                         политикой конфиденциальности
                     </a>
                 </p>
+                <button
+                    type="button"
+                    onClick={startPayment}
+                    disabled={!ready || pending}
+                    className="btn-cta hidden disabled:is-disabled lg:block"
+                >
+                    Оплатить {formatPrice(total)}
+                </button>
+                </aside>
             </div>
 
             {/* ── Липкий подвал ─────────────────────────────────────────────── */}
-            <div className="fixed bottom-16 z-30 w-full max-w-[412px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px]">
+            <div className="fixed bottom-16 z-30 w-full max-w-[412px] border-t border-divider bg-bg px-[18px] pb-[18px] pt-[14px] lg:hidden">
                 <button
                     type="button"
                     onClick={startPayment}
@@ -276,7 +289,7 @@ export function CheckoutView({ initialCart }: { initialCart: Cart }) {
                 </button>
             </div>
 
-            <div className="h-[104px]" />
+            <div className="h-[104px] lg:hidden" />
 
             {sheetOpen && (
                 <PaymentSheet

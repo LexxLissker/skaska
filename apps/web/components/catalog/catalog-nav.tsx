@@ -26,7 +26,7 @@ export function CatalogNav({
     return (
         <>
             <div
-                className="noscroll flex gap-2 overflow-x-auto px-4 pb-2"
+                className="noscroll flex gap-2 overflow-x-auto px-4 pb-2 lg:justify-center lg:gap-3"
                 role="tablist"
                 aria-label="Категории"
             >
@@ -40,7 +40,7 @@ export function CatalogNav({
                             aria-selected={active}
                             onClick={() => onCategory(item.slug)}
                             className={`shrink-0 whitespace-nowrap rounded-full border px-[14px] py-[7px]
-                                font-heading text-[14px] font-medium
+                                font-heading text-[14px] font-medium lg:px-[18px] lg:py-[8px] lg:text-[15px]
                                 ${
                                     active
                                         ? 'border-accent bg-surface-2 text-accent shadow-[0_0_12px_rgba(229,184,75,0.18)]'
@@ -55,7 +55,7 @@ export function CatalogNav({
 
             {category.children.length > 0 && (
                 <div
-                    className="noscroll flex gap-4 overflow-x-auto px-4 pb-3"
+                    className="noscroll flex gap-4 overflow-x-auto px-4 pb-3 lg:justify-center lg:gap-7 lg:pt-1"
                     role="tablist"
                     aria-label="Подкатегории"
                 >
@@ -69,7 +69,7 @@ export function CatalogNav({
                                 aria-selected={active}
                                 onClick={() => onSub(sub.slug)}
                                 className={`shrink-0 whitespace-nowrap border-b-2 py-0.5 font-heading
-                                    text-[13px] font-medium
+                                    text-[13px] font-medium lg:text-[14px]
                                     ${
                                         active
                                             ? 'border-accent text-accent'

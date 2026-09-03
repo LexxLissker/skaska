@@ -79,7 +79,7 @@ export function AccountSheet({
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
+        <div className="fixed inset-0 z-50 flex items-end justify-center lg:items-center lg:p-6">
             <button
                 type="button"
                 aria-label="Закрыть меню"
@@ -89,7 +89,8 @@ export function AccountSheet({
 
             <div
                 className="relative max-h-[82dvh] w-full max-w-[412px] overflow-y-auto rounded-t-[16px]
-                    border-t border-divider bg-surface px-4 pb-6 pt-4"
+                    border-t border-divider bg-surface px-4 pb-6 pt-4 lg:max-w-[460px]
+                    lg:rounded-[18px] lg:border lg:p-6 lg:shadow-[0_24px_80px_rgba(0,0,0,.6)]"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="account-sheet-title"

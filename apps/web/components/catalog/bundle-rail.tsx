@@ -15,9 +15,11 @@ export function BundleRail({ offers }: { offers: BundleOffer[] }) {
     if (!offers.length) return null;
 
     return (
-        <section className="pt-[22px]">
-            <h2 className="mb-3 px-4 font-heading text-[22px] font-medium">Наборы для дома</h2>
-            <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1">
+        <section id="bundles" className="scroll-mt-24 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-12">
+            <h2 className="mb-3 px-4 font-heading text-[22px] font-medium lg:mb-5 lg:px-0 lg:text-[30px]">
+                Наборы для дома
+            </h2>
+            <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:px-0">
                 {BUNDLES.map(bundle => {
                     const offer = offers.find(o => o.slug === bundle.slug);
                     if (!offer) return null;
@@ -48,8 +50,8 @@ function BundleCard({
     }
 
     return (
-        <article className="panel flex w-60 shrink-0 flex-col overflow-hidden">
-            <div className="relative h-[120px] w-full">
+        <article className="panel flex w-60 shrink-0 flex-col overflow-hidden lg:w-auto">
+            <div className="relative h-[120px] w-full lg:h-[190px]">
                 <ImagePlaceholder
                     src={offer.assetUrl}
                     alt={bundle.title}
@@ -59,8 +61,8 @@ function BundleCard({
                 <span className="tag tag-accent absolute left-2.5 top-2.5">{bundle.tag}</span>
             </div>
 
-            <div className="flex flex-1 flex-col gap-1.5 px-3.5 pb-3.5 pt-3">
-                <h3 className="text-[15.5px] font-medium text-text">{bundle.title}</h3>
+            <div className="flex flex-1 flex-col gap-1.5 px-3.5 pb-3.5 pt-3 lg:p-5">
+                <h3 className="text-[15.5px] font-medium text-text lg:text-[20px]">{bundle.title}</h3>
                 <p className="text-[12.5px] text-text/65">{bundle.meta}</p>
                 <p className="text-[12px] leading-relaxed text-text/50">{bundle.desc}</p>
 

@@ -45,11 +45,20 @@ export function CatalogView({
     const catalogRef = useRef<HTMLDivElement>(null);
     const touchStart = useRef<{ x: number; y: number } | null>(null);
 
+    const initialVisibleForViewport = () =>
+        typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches
+            ? 8
+            : INITIAL_VISIBLE;
+
     const category = categories.find(c => c.slug === activeCategory) ?? categories[0];
     const subcategory = category.children.find(s => s.slug === activeSub) ?? null;
 
     // Панель показывается, пока каталог в поле зрения: после порога прокрутки
     // и до того, как блок с товарами уйдёт вверх целиком.
+    useEffect(() => {
+        setVisibleCount(initialVisibleForViewport());
+    }, []);
+
     useEffect(() => {
         const updateDock = () => {
             const node = catalogRef.current;
@@ -87,7 +96,7 @@ export function CatalogView({
     function switchTo(categorySlug: string, subSlug: string | null) {
         setActiveCategory(categorySlug);
         setActiveSub(subSlug);
-        setVisibleCount(INITIAL_VISIBLE);
+        setVisibleCount(initialVisibleForViewport());
 
         startTransition(async () => {
             setProducts(await loadProducts(subSlug ?? categorySlug));
@@ -128,7 +137,9 @@ export function CatalogView({
     return (
         <>
             {/* ── Герой категории: 580px с затемнением к низу ────────────────── */}
-            <header className="relative h-[580px] w-full">
+            <header className="relative h-[580px] w-full lg:mx-auto lg:mt-6 lg:h-[520px]
+                lg:w-[calc(100%_-_64px)] lg:max-w-[1216px] lg:overflow-hidden lg:rounded-[24px]
+                lg:border lg:border-divider">
                 <ImagePlaceholder
                     src={category.assetUrl}
                     alt={category.name}
@@ -138,37 +149,32 @@ export function CatalogView({
                 <div
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-0
-                        [background:linear-gradient(to_bottom,transparent_58%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]"
+                        [background:linear-gradient(to_bottom,transparent_58%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]
+                        lg:[background:linear-gradient(to_right,rgba(9,13,22,.96)_0%,rgba(9,13,22,.72)_42%,rgba(9,13,22,.08)_78%)]"
                 />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-[22px]">
-                    <h1 className="mb-2 text-center text-[24px] text-[#eef6ff] text-pretty">
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-[22px]
+                    lg:bottom-auto lg:left-0 lg:right-auto lg:top-1/2 lg:w-[52%] lg:-translate-y-1/2
+                    lg:px-14 lg:pb-0">
+                    <p className="mb-3 hidden text-[12px] font-medium uppercase tracking-[0.18em] text-accent lg:block">
+                        Ручная лепка · доставка по расписанию
+                    </p>
+                    <h1 className="mb-2 text-center text-[24px] text-[#eef6ff] text-pretty
+                        lg:mb-5 lg:text-left lg:text-[48px] lg:leading-[1.05]">
                         {category.name}
                     </h1>
-                    <p className="m-0 text-center text-[13.5px] leading-[1.5] text-[#eef6ff] opacity-[0.82] text-pretty">
+                    <p className="m-0 text-center text-[13.5px] leading-[1.5] text-[#eef6ff] opacity-[0.82] text-pretty
+                        lg:max-w-[520px] lg:text-left lg:text-[17px] lg:leading-[1.65]">
                         {category.description}
                     </p>
                 </div>
             </header>
-
-            {/* Навигация наезжает на герой и растворяется в фоне. */}
-            <div
-                className="relative z-[2] -mt-4 pt-10
-                    [background:linear-gradient(to_bottom,transparent_0,var(--color-bg)_50px,var(--color-bg)_100%)]"
-            >
-                <CatalogNav
-                    categories={categories}
-                    activeCategory={activeCategory}
-                    activeSub={activeSub}
-                    onCategory={selectCategory}
-                    onSub={slug => switchTo(activeCategory, slug)}
-                />
-            </div>
 
             {/* ── Липкая панель: внизу, над навигацией ───────────────────────── */}
             <div
                 className={`fixed inset-x-0 bottom-16 z-20 mx-auto w-full max-w-[412px] bg-bg pt-2.5
                     shadow-[0_-1px_0_var(--color-divider)]
                     [transition:transform_.32s_cubic-bezier(0.22,1,0.36,1),opacity_.28s_ease]
+                    lg:hidden
                     ${docked ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-[14px] opacity-0'}`}
                 aria-hidden={!docked}
             >
@@ -183,12 +189,32 @@ export function CatalogView({
 
             <div
                 ref={catalogRef}
+                id="catalog"
                 onTouchStart={onCatalogTouchStart}
                 onTouchEnd={onCatalogTouchEnd}
+                className="scroll-mt-24 lg:mx-auto lg:max-w-[1280px]"
             >
+                {/* Навигация на телефоне наезжает на герой, на ПК закрепляется под шапкой. */}
+                <div
+                    className="relative z-[2] -mt-4 pt-10
+                        [background:linear-gradient(to_bottom,transparent_0,var(--color-bg)_50px,var(--color-bg)_100%)]
+                        lg:sticky lg:top-[72px] lg:z-30 lg:mt-0 lg:border-b lg:border-divider
+                        lg:bg-[rgba(9,13,22,.94)] lg:px-4 lg:pb-1 lg:pt-4 lg:backdrop-blur-xl"
+                >
+                    <CatalogNav
+                        categories={categories}
+                        activeCategory={activeCategory}
+                        activeSub={activeSub}
+                        onCategory={selectCategory}
+                        onSub={slug => switchTo(activeCategory, slug)}
+                    />
+                </div>
+
                 {/* ── Баннер подкатегории: 414px ─────────────────────────────── */}
                 {subcategory && (
-                    <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden">
+                    <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden
+                        lg:mx-8 lg:mb-6 lg:mt-6 lg:h-[340px] lg:w-auto lg:rounded-[20px]
+                        lg:border lg:border-divider">
                         <ImagePlaceholder
                             src={subcategory.assetUrl}
                             alt={subcategory.name}
@@ -200,11 +226,12 @@ export function CatalogView({
                             className="pointer-events-none absolute inset-0
                                 [background:linear-gradient(to_bottom,transparent_40%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]"
                         />
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-5">
-                            <h3 className="mb-2 text-[19px] text-[#eef6ff]">
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-5 lg:px-9 lg:pb-8">
+                            <h3 className="mb-2 text-[19px] text-[#eef6ff] lg:text-[28px]">
                                 {category.name}, {subcategory.name}
                             </h3>
-                            <p className="m-0 max-w-[88%] text-[13.5px] leading-[1.55] text-[#eef6ff] opacity-[0.82]">
+                            <p className="m-0 max-w-[88%] text-[13.5px] leading-[1.55] text-[#eef6ff] opacity-[0.82]
+                                lg:max-w-[680px] lg:text-[15px]">
                                 {subcategory.description}
                             </p>
                         </div>
@@ -212,14 +239,14 @@ export function CatalogView({
                 )}
 
                 {/* ── Сетка товаров ──────────────────────────────────────────── */}
-                <section className="px-4" aria-busy={pending}>
+                <section className="px-4 lg:px-8 lg:pb-4" aria-busy={pending}>
                     {products.length === 0 ? (
                         <p className="py-10 text-center text-[13px] text-text/45">
                             В этой подкатегории пока нет товаров
                         </p>
                     ) : (
                         <>
-                            <div className={`grid grid-cols-2 gap-3 ${pending ? 'opacity-60' : ''}`}>
+                            <div className={`grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5 ${pending ? 'opacity-60' : ''}`}>
                                 {visible.map(product => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}
@@ -228,8 +255,12 @@ export function CatalogView({
                             {visibleCount < products.length && (
                                 <button
                                     type="button"
-                                    onClick={() => setVisibleCount(c => c + VISIBLE_STEP)}
-                                    className="btn btn-secondary btn-block mt-4 h-11"
+                                    onClick={() =>
+                                        setVisibleCount(c =>
+                                            c + (window.matchMedia('(min-width: 1024px)').matches ? 4 : VISIBLE_STEP),
+                                        )
+                                    }
+                                    className="btn btn-secondary btn-block mt-4 h-11 lg:mx-auto lg:mt-6 lg:max-w-[360px]"
                                 >
                                     Показать ещё
                                 </button>
@@ -246,14 +277,14 @@ export function CatalogView({
             <ReviewRail reviews={reviews} />
 
             {/* ── Почему выбирают нас ───────────────────────────────────────── */}
-            <section className="px-4 pb-1 pt-[22px]">
-                <h2 className="mb-3 text-[22px] font-medium">Почему выбирают нас</h2>
-                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5">
+            <section className="px-4 pb-1 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-12">
+                <h2 className="mb-3 text-[22px] font-medium lg:mb-5 lg:text-[30px]">Почему выбирают нас</h2>
+                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5 lg:grid lg:grid-cols-2 lg:overflow-visible">
                     {OFFERS.map(offer => (
                         <article
                             key={offer.title}
                             className="relative w-[78%] shrink-0 overflow-hidden rounded-lg border
-                                border-accent p-[18px]
+                                border-accent p-[18px] lg:w-auto lg:min-h-[190px] lg:p-7
                                 [background:linear-gradient(135deg,color-mix(in_srgb,var(--color-accent)_16%,var(--color-surface))_0%,var(--color-surface)_70%)]"
                         >
                             <span
@@ -262,10 +293,10 @@ export function CatalogView({
                                     rounded-full bg-[color-mix(in_srgb,var(--color-accent)_20%,transparent)] blur-[2px]"
                             />
                             <span className="tag tag-accent relative inline-block">{offer.tag}</span>
-                            <h3 className="relative mb-1.5 mt-2.5 text-[16px] font-medium">
+                            <h3 className="relative mb-1.5 mt-2.5 text-[16px] font-medium lg:text-[21px]">
                                 {offer.title}
                             </h3>
-                            <p className="relative m-0 text-[12.5px] leading-[1.5] text-text/80 text-pretty">
+                            <p className="relative m-0 text-[12.5px] leading-[1.5] text-text/80 text-pretty lg:max-w-[470px] lg:text-[14px] lg:leading-[1.65]">
                                 {offer.desc}
                             </p>
                         </article>
@@ -274,14 +305,14 @@ export function CatalogView({
             </section>
 
             {/* ── Как мы готовим ────────────────────────────────────────────── */}
-            <section className="px-4 pb-1 pt-[22px]">
-                <h2 className="mb-3 text-[22px] font-medium">Как мы готовим</h2>
-                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5">
+            <section id="how-we-cook" className="scroll-mt-24 px-4 pb-1 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-12">
+                <h2 className="mb-3 text-[22px] font-medium lg:mb-5 lg:text-[30px]">Как мы готовим</h2>
+                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5 lg:grid lg:grid-cols-4 lg:overflow-visible">
                     {STEPS.map(step => (
                         <article
                             key={step.num}
                             className="relative w-[78%] shrink-0 overflow-hidden rounded-lg border
-                                border-divider p-5
+                                border-divider p-5 lg:w-auto lg:min-h-[230px] lg:p-6
                                 [background:linear-gradient(155deg,color-mix(in_srgb,var(--color-accent)_14%,var(--color-surface))_0%,var(--color-surface)_65%)]"
                         >
                             <span
@@ -308,8 +339,8 @@ export function CatalogView({
             </section>
 
             {/* ── Вопросы и ответы ──────────────────────────────────────────── */}
-            <section className="px-4 pb-10 pt-8">
-                <h2 className="mb-3 text-[22px] font-medium">Вопросы и ответы</h2>
+            <section className="px-4 pb-10 pt-8 lg:mx-auto lg:max-w-[900px] lg:px-8 lg:pb-20 lg:pt-16">
+                <h2 className="mb-3 text-[22px] font-medium lg:mb-5 lg:text-center lg:text-[30px]">Вопросы и ответы</h2>
                 <FaqAccordion items={FAQS} />
             </section>
         </>

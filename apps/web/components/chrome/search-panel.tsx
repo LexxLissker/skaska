@@ -37,7 +37,10 @@ export function SearchPanel({ onClose }: { onClose: () => void }) {
     }, [query]);
 
     return (
-        <div className="fixed bottom-16 z-40 w-full max-w-[412px] border-t border-divider bg-surface px-4 py-3">
+        <div className="fixed bottom-16 z-40 w-full max-w-[412px] border-t border-divider bg-surface px-4 py-3
+            lg:bottom-auto lg:left-1/2 lg:top-[72px] lg:w-[620px] lg:max-w-[calc(100vw-48px)]
+            lg:-translate-x-1/2 lg:rounded-b-[16px] lg:border lg:border-t-0 lg:px-5 lg:py-4
+            lg:shadow-[0_18px_50px_rgba(0,0,0,.5)]">
             <div className="flex items-center gap-2">
                 <input
                     ref={inputRef}

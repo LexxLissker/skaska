@@ -53,8 +53,8 @@ export function DeliverySection({
     const activeRun = runs.find(r => r.id === selectedRunId) ?? runs[0] ?? null;
 
     return (
-        <section className="panel p-4">
-            <p className="mb-3 text-[15px] font-medium text-text">Доставка</p>
+        <section className="panel p-4 lg:p-6">
+            <p className="mb-3 text-[15px] font-medium text-text lg:text-[18px]">Доставка</p>
 
             <div className="field relative mb-3">
                 <label htmlFor="address">Улица и дом</label>

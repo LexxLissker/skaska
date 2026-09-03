@@ -129,8 +129,11 @@ export function ProductView({
 
     return (
         <>
+            <div className="lg:mx-auto lg:grid lg:max-w-[1280px] lg:grid-cols-[minmax(0,1.05fr)_minmax(440px,.95fr)] lg:gap-8 lg:px-8 lg:py-8">
             {/* ── Фото 4:3 с названием поверх ───────────────────────────────── */}
-            <header className="relative aspect-[4/3] w-full">
+            <header className="relative aspect-[4/3] w-full lg:sticky lg:top-[104px] lg:aspect-[4/5]
+                lg:max-h-[calc(100vh-136px)] lg:self-start lg:overflow-hidden lg:rounded-[22px]
+                lg:border lg:border-divider">
                 <ImagePlaceholder
                     src={product.assetUrl}
                     alt={product.name}
@@ -160,14 +163,21 @@ export function ProductView({
                     </svg>
                 </button>
 
-                <h1 className="absolute inset-x-[18px] bottom-[14px] m-0 text-[20px] font-medium text-[#eef6ff] text-pretty">
+                <h1 className="absolute inset-x-[18px] bottom-[14px] m-0 text-[20px] font-medium text-[#eef6ff] text-pretty lg:hidden">
                     {product.name}
                 </h1>
             </header>
 
-            <div className="px-[18px] pb-2 pt-[18px]">
+            <div className="lg:overflow-hidden lg:rounded-[22px] lg:border lg:border-divider lg:bg-surface/45 lg:pb-2">
+            <div className="px-[18px] pb-2 pt-[18px] lg:px-7 lg:pb-3 lg:pt-7">
+                <p className="mb-2 hidden text-[11px] font-medium uppercase tracking-[0.16em] text-accent lg:block">
+                    Ручная лепка · готовим без разморозки
+                </p>
+                <h1 className="mb-6 hidden font-heading text-[32px] font-medium leading-[1.12] text-text lg:block">
+                    {product.name}
+                </h1>
                 {/* ── Вес · количество · добавить ───────────────────────────── */}
-                <div className="mb-3 flex min-w-0 items-center gap-1.5">
+                <div className="mb-3 flex min-w-0 items-center gap-1.5 lg:gap-3">
                     {hasWeights && (
                         <div className="flex shrink-0 gap-1" role="radiogroup" aria-label="Вес">
                             {(['500', '1000'] as const).map(option => {
@@ -180,7 +190,7 @@ export function ProductView({
                                         aria-checked={active}
                                         onClick={() => setWeight(option)}
                                         className={`shrink-0 whitespace-nowrap rounded-full border px-2.5
-                                            py-[6px] text-[12px] font-medium transition-colors
+                                            py-[6px] text-[12px] font-medium transition-colors lg:px-4 lg:py-2 lg:text-[14px]
                                             ${
                                                 active
                                                     ? 'border-accent bg-[color-mix(in_srgb,var(--color-accent)_16%,transparent)] text-accent'
@@ -194,7 +204,7 @@ export function ProductView({
                         </div>
                     )}
 
-                    <div className="flex shrink-0 items-center gap-1 rounded-md border border-divider px-1.5 py-[5px]">
+                    <div className="flex shrink-0 items-center gap-1 rounded-md border border-divider px-1.5 py-[5px] lg:px-2 lg:py-2">
                         <button
                             type="button"
                             aria-label="Убрать один"
@@ -221,7 +231,7 @@ export function ProductView({
                         disabled={pending || !variant}
                         className="btn btn-primary h-[34px] min-w-0 flex-1 overflow-hidden
                             whitespace-nowrap px-2 text-[clamp(11px,3.2vw,13px)]
-                            font-semibold tabular-nums disabled:is-disabled"
+                            font-semibold tabular-nums disabled:is-disabled lg:h-11 lg:text-[15px]"
                     >
                         {pending ? 'Добавляем…' : `+ ${formatAmount(unitPrice * quantity)} ₽`}
                     </button>
@@ -252,9 +262,9 @@ export function ProductView({
 
             {/* ── С чем подать ──────────────────────────────────────────────── */}
             {productAddons.length > 0 && (
-                <section className="pb-2">
-                    <h2 className="px-[18px] pb-2 text-[15px] font-medium">С чем подать?</h2>
-                    <div className="noscroll flex gap-2 overflow-x-auto px-[18px] pb-1">
+                <section className="pb-2 lg:pb-4">
+                    <h2 className="px-[18px] pb-2 text-[15px] font-medium lg:px-7 lg:text-[16px]">С чем подать?</h2>
+                    <div className="noscroll flex gap-2 overflow-x-auto px-[18px] pb-1 lg:flex-wrap lg:px-7">
                         {productAddons.map(addon => (
                             <AddonCard
                                 key={addon.id}
@@ -267,7 +277,7 @@ export function ProductView({
             )}
 
             {/* ── Описание и состав ─────────────────────────────────────────── */}
-            <section className="px-[18px] pb-10">
+            <section className="px-[18px] pb-10 lg:px-7 lg:pb-7">
                 <h2 className="mb-1.5 mt-[14px] text-[16px] font-medium text-text/70">Описание</h2>
                 <p className="m-0 text-[14px] leading-relaxed opacity-80 text-pretty">
                     {DESCRIPTION}
@@ -282,6 +292,8 @@ export function ProductView({
                     </>
                 )}
             </section>
+            </div>
+            </div>
 
             {upsellOpen && upsellAddon && (
                 <UpsellSheet
@@ -316,7 +328,7 @@ function AddonCard({
     }
 
     return (
-        <article className="flex h-[98px] w-[120px] shrink-0 flex-col rounded-md bg-surface p-2.5">
+        <article className="flex h-[98px] w-[120px] shrink-0 flex-col rounded-md bg-surface p-2.5 lg:w-[136px] lg:border lg:border-divider">
             <p className="line-clamp-3 text-[11.5px] leading-[1.3] text-text">{addon.name}</p>
 
             <div className="mt-auto flex items-center justify-between gap-1">

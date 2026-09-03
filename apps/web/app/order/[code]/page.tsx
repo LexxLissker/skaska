@@ -6,7 +6,8 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
     const { code } = await params;
 
     return (
-        <div className="px-4 py-16 text-center">
+        <div className="px-4 py-16 text-center lg:mx-auto lg:my-16 lg:max-w-[640px]
+            lg:rounded-[22px] lg:border lg:border-divider lg:bg-surface/45 lg:px-12 lg:py-14">
             <div
                 aria-hidden="true"
                 className="mx-auto flex h-14 w-14 items-center justify-center rounded-full
@@ -15,7 +16,7 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
                 ✓
             </div>
 
-            <h1 className="pt-5 font-heading text-[24px] font-medium">Заказ оформлен</h1>
+            <h1 className="pt-5 font-heading text-[24px] font-medium lg:text-[34px]">Заказ оформлен</h1>
             <p className="pt-2 text-[13.5px] leading-relaxed text-text/60">
                 Номер заказа{' '}
                 <span className="font-heading font-semibold text-accent-300">{code}</span>.

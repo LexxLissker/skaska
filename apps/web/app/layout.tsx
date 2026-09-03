@@ -30,10 +30,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     return (
         <html lang="ru" className="h-full antialiased">
             <body className="min-h-full">
-                {/* Макет мобильный (412px). На широком экране держим ту же колонку —
-                    десктопной раскладки в дизайне нет, выдумывать её не будем. */}
-                <div className="relative mx-auto flex min-h-dvh w-full max-w-[412px] flex-col">
-                    <main className="flex-1 pb-16">{children}</main>
+                <div className="relative mx-auto flex min-h-dvh w-full max-w-[412px] flex-col lg:max-w-none">
+                    <main className="flex-1 pb-16 lg:pb-0 lg:pt-[72px]">{children}</main>
                     <BottomNav
                         cartQuantity={cart?.totalQuantity ?? 0}
                         accountPhone={account?.phoneDisplay ?? null}
