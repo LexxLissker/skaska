@@ -2,11 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { AccountSheet } from './account-sheet';
 import { ContactPopover } from './contact-popover';
 import { SearchPanel } from './search-panel';
+
+type DesktopSection = 'catalog' | 'bundles' | 'delivery' | 'how-we-cook';
+
+const desktopSections: DesktopSection[] = ['catalog', 'bundles', 'delivery', 'how-we-cook'];
 
 /**
  * Постоянная нижняя панель из макета: золотой бренд-кружок, поиск, корзина,
@@ -23,9 +27,42 @@ export function BottomNav({
     const pathname = usePathname();
     const [panel, setPanel] = useState<'search' | 'contact' | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [activeSection, setActiveSection] = useState<DesktopSection | null>(
+        pathname === '/' ? 'catalog' : null,
+    );
     const cartOpen = pathname === '/cart';
 
     const toggle = (next: 'search' | 'contact') => setPanel(cur => (cur === next ? null : next));
+
+    useEffect(() => {
+        if (pathname !== '/') {
+            setActiveSection(null);
+            return;
+        }
+
+        const updateActiveSection = () => {
+            const marker = window.scrollY + 160;
+            let current: DesktopSection = 'catalog';
+
+            for (const section of desktopSections) {
+                const element = document.getElementById(section);
+                if (element && element.offsetTop <= marker) current = section;
+            }
+
+            setActiveSection(current);
+        };
+
+        updateActiveSection();
+        window.addEventListener('scroll', updateActiveSection, { passive: true });
+        return () => window.removeEventListener('scroll', updateActiveSection);
+    }, [pathname]);
+
+    const desktopLinkClass = (section: DesktopSection) =>
+        `border-b-2 py-2 text-[14px] no-underline transition-colors ${
+            activeSection === section
+                ? 'border-accent text-accent'
+                : 'border-transparent text-text/65 hover:text-accent'
+        }`;
 
     return (
         <>
@@ -53,16 +90,32 @@ export function BottomNav({
                     <div className="h-7 w-px bg-divider" aria-hidden="true" />
 
                     <nav className="flex items-center gap-7" aria-label="Разделы магазина">
-                        <Link href="/#catalog" className="text-[14px] text-text/75 no-underline hover:text-accent">
+                        <Link
+                            href="/#catalog"
+                            className={desktopLinkClass('catalog')}
+                            onClick={() => setActiveSection('catalog')}
+                        >
                             Каталог
                         </Link>
-                        <Link href="/#bundles" className="text-[14px] text-text/75 no-underline hover:text-accent">
+                        <Link
+                            href="/#bundles"
+                            className={desktopLinkClass('bundles')}
+                            onClick={() => setActiveSection('bundles')}
+                        >
                             Наборы
                         </Link>
-                        <Link href="/#how-we-cook" className="text-[14px] text-text/75 no-underline hover:text-accent">
+                        <Link
+                            href="/#how-we-cook"
+                            className={desktopLinkClass('how-we-cook')}
+                            onClick={() => setActiveSection('how-we-cook')}
+                        >
                             Как готовим
                         </Link>
-                        <Link href="/docs#delivery" className="text-[14px] text-text/75 no-underline hover:text-accent">
+                        <Link
+                            href="/#delivery"
+                            className={desktopLinkClass('delivery')}
+                            onClick={() => setActiveSection('delivery')}
+                        >
                             Доставка
                         </Link>
                     </nav>

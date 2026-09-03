@@ -198,7 +198,7 @@ export function CatalogView({
                 <div
                     className="relative z-[2] -mt-4 pt-10
                         [background:linear-gradient(to_bottom,transparent_0,var(--color-bg)_50px,var(--color-bg)_100%)]
-                        lg:sticky lg:top-[72px] lg:z-30 lg:mt-0 lg:border-b lg:border-divider
+                        lg:sticky lg:top-[72px] lg:z-30 lg:mt-0
                         lg:bg-[rgba(9,13,22,.94)] lg:px-4 lg:pb-1 lg:pt-4 lg:backdrop-blur-xl"
                 >
                     <CatalogNav
@@ -277,7 +277,7 @@ export function CatalogView({
             <ReviewRail reviews={reviews} />
 
             {/* ── Почему выбирают нас ───────────────────────────────────────── */}
-            <section className="px-4 pb-1 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-12">
+            <section id="delivery" className="scroll-mt-24 px-4 pb-1 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-12">
                 <h2 className="mb-3 text-[22px] font-medium lg:mb-5 lg:text-[30px]">Почему выбирают нас</h2>
                 <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5 lg:grid lg:grid-cols-2 lg:overflow-visible">
                     {OFFERS.map(offer => (
