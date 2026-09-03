@@ -1,17 +1,18 @@
 import Link from 'next/link';
 
 const catalogLinks = [
-    { label: 'Пельмени', href: '/#catalog' },
-    { label: 'Вареники', href: '/#catalog' },
-    { label: 'Манты и хинкали', href: '/#catalog' },
-    { label: 'Наборы для дома', href: '/#bundles' },
+    { label: 'Пельмени', href: '/pelmeni' },
+    { label: 'Вареники', href: '/vareniki' },
+    { label: 'Манты', href: '/manty' },
+    { label: 'Хинкали', href: '/hinkali' },
+    { label: 'Наборы для дома', href: '/pelmeni#bundles' },
 ];
 
 const customerLinks = [
-    { label: 'Доставка и оплата', href: '/#delivery' },
+    { label: 'Доставка и оплата', href: '/pelmeni#delivery' },
     { label: 'Мои заказы', href: '/account/orders' },
     { label: 'Документы', href: '/docs' },
-    { label: 'Как мы готовим', href: '/#how-we-cook' },
+    { label: 'Как мы готовим', href: '/pelmeni#how-we-cook' },
 ];
 
 export function DesktopFooter() {

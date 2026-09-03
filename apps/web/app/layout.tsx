@@ -6,6 +6,7 @@ import { BottomNav } from '@/components/chrome/bottom-nav';
 import { DesktopFooter } from '@/components/chrome/desktop-footer';
 import { PaletteShell } from '@/components/theme/palette-shell';
 import { getAccountSession } from '@/lib/account';
+import { getCategories } from '@/lib/api/catalog';
 import { getCart } from '@/lib/api/cart';
 
 export const metadata: Metadata = {
@@ -27,7 +28,11 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-    const [cart, account] = await Promise.all([getCart(), getAccountSession()]);
+    const [cart, account, categories] = await Promise.all([
+        getCart(),
+        getAccountSession(),
+        getCategories(),
+    ]);
 
     return (
         <html lang="ru" className="h-full antialiased">
@@ -38,6 +43,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                     <BottomNav
                         cartQuantity={cart?.totalQuantity ?? 0}
                         accountPhone={account?.phoneDisplay ?? null}
+                        catalogSlugs={categories.map(category => category.slug)}
                     />
                 </PaletteShell>
             </body>

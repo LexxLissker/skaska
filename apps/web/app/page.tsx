@@ -1,12 +1,16 @@
+import { redirect } from 'next/navigation';
+
 import { CatalogPageContent } from '@/components/catalog/catalog-page-content';
+import { getCategories } from '@/lib/api/catalog';
+import { categoryHref } from '@/lib/catalog-routes';
 
 /**
- * Главная — каталог.
- *
- * Категории и товары стартовой категории приходят с сервера, дальнейшее
- * переключение подгружается на клиенте: так первый экран рендерится сразу,
- * без ожидания гидрации.
+ * У каталога нет дублирующей «безымянной» категории на `/`: главная ведёт на
+ * первую самостоятельную страницу коллекции, например `/pelmeni`.
  */
 export default async function CatalogPage() {
-    return <CatalogPageContent />;
+    const categories = await getCategories();
+    if (!categories.length) return <CatalogPageContent />;
+
+    redirect(categoryHref(categories[0].slug));
 }

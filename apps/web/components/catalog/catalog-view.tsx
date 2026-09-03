@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition, type TouchEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState, type TouchEvent } from 'react';
 
-import { loadProducts } from '@/app/actions/catalog';
 import type { BundleOffer, Category, ProductCard as ProductCardType } from '@/lib/api/catalog';
+import { categoryHref } from '@/lib/catalog-routes';
 import { FAQS, OFFERS, REVIEWS, STEPS } from '@/lib/content';
 import { BundleRail } from './bundle-rail';
 import { CatalogNav } from './catalog-nav';
@@ -22,25 +23,22 @@ const SWIPE_DISTANCE = 55;
 
 interface Props {
     categories: Category[];
-    initialCategorySlug: string;
-    initialSubSlug: string | null;
-    initialProducts: ProductCardType[];
+    activeCategorySlug: string;
+    activeSubSlug: string | null;
+    products: ProductCardType[];
     bundles: BundleOffer[];
 }
 
 export function CatalogView({
     categories,
-    initialCategorySlug,
-    initialSubSlug,
-    initialProducts,
+    activeCategorySlug,
+    activeSubSlug,
+    products,
     bundles,
 }: Props) {
-    const [activeCategory, setActiveCategory] = useState(initialCategorySlug);
-    const [activeSub, setActiveSub] = useState<string | null>(initialSubSlug);
-    const [products, setProducts] = useState(initialProducts);
+    const router = useRouter();
     const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
     const [docked, setDocked] = useState(false);
-    const [pending, startTransition] = useTransition();
 
     const catalogRef = useRef<HTMLDivElement>(null);
     const touchStart = useRef<{ x: number; y: number } | null>(null);
@@ -50,14 +48,14 @@ export function CatalogView({
             ? 8
             : INITIAL_VISIBLE;
 
-    const category = categories.find(c => c.slug === activeCategory) ?? categories[0];
-    const subcategory = category.children.find(s => s.slug === activeSub) ?? null;
+    const category = categories.find(c => c.slug === activeCategorySlug) ?? categories[0];
+    const subcategory = category.children.find(s => s.slug === activeSubSlug) ?? null;
 
     // Панель показывается, пока каталог в поле зрения: после порога прокрутки
     // и до того, как блок с товарами уйдёт вверх целиком.
     useEffect(() => {
         setVisibleCount(initialVisibleForViewport());
-    }, []);
+    }, [activeCategorySlug, activeSubSlug]);
 
     useEffect(() => {
         const updateDock = () => {
@@ -87,25 +85,9 @@ export function CatalogView({
         };
     }, []);
 
-    /** Смена категории открывает её первую подкатегорию и сбрасывает сетку. */
-    function selectCategory(categorySlug: string) {
-        const next = categories.find(c => c.slug === categorySlug);
-        switchTo(categorySlug, next?.children[0]?.slug ?? null);
-    }
-
-    function switchTo(categorySlug: string, subSlug: string | null) {
-        setActiveCategory(categorySlug);
-        setActiveSub(subSlug);
-        setVisibleCount(initialVisibleForViewport());
-
-        startTransition(async () => {
-            setProducts(await loadProducts(subSlug ?? categorySlug));
-        });
-    }
-
     /**
      * Свайп внутри блока каталога листает только главные категории. Это не
-     * карусель подкатегорий: их, как и в оригинальном прототипе, выбирают табом.
+     * карусель подкатегорий: каждая категория открывается по своему URL.
      */
     function onCatalogTouchStart(event: TouchEvent<HTMLDivElement>) {
         const point = event.touches[0];
@@ -122,13 +104,15 @@ export function CatalogView({
         const dy = point.clientY - start.y;
         if (Math.abs(dx) <= SWIPE_DISTANCE || Math.abs(dx) <= Math.abs(dy) * 1.4) return;
 
-        const currentIndex = categories.findIndex(item => item.slug === activeCategory);
+        const currentIndex = categories.findIndex(item => item.slug === activeCategorySlug);
         const nextIndex = Math.max(
             0,
             Math.min(categories.length - 1, currentIndex + (dx < 0 ? 1 : -1)),
         );
         const next = categories[nextIndex];
-        if (next && next.slug !== activeCategory) selectCategory(next.slug);
+        if (next && next.slug !== activeCategorySlug) {
+            router.push(categoryHref(next.slug), { scroll: false });
+        }
     }
 
     const visible = products.slice(0, visibleCount);
@@ -177,13 +161,12 @@ export function CatalogView({
                     lg:hidden
                     ${docked ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-[14px] opacity-0'}`}
                 aria-hidden={!docked}
+                inert={!docked}
             >
                 <CatalogNav
                     categories={categories}
-                    activeCategory={activeCategory}
-                    activeSub={activeSub}
-                    onCategory={selectCategory}
-                    onSub={slug => switchTo(activeCategory, slug)}
+                    activeCategory={activeCategorySlug}
+                    activeSub={activeSubSlug}
                 />
             </div>
 
@@ -203,10 +186,8 @@ export function CatalogView({
                 >
                     <CatalogNav
                         categories={categories}
-                        activeCategory={activeCategory}
-                        activeSub={activeSub}
-                        onCategory={selectCategory}
-                        onSub={slug => switchTo(activeCategory, slug)}
+                        activeCategory={activeCategorySlug}
+                        activeSub={activeSubSlug}
                     />
                 </div>
 
@@ -239,14 +220,14 @@ export function CatalogView({
                 )}
 
                 {/* ── Сетка товаров ──────────────────────────────────────────── */}
-                <section className="px-4 lg:px-8 lg:pb-4" aria-busy={pending}>
+                <section className="px-4 lg:px-8 lg:pb-4">
                     {products.length === 0 ? (
                         <p className="py-10 text-center text-[13px] text-text/45">
                             В этой подкатегории пока нет товаров
                         </p>
                     ) : (
                         <>
-                            <div className={`grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5 ${pending ? 'opacity-60' : ''}`}>
+                            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
                                 {visible.map(product => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}

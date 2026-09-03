@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { categoryHref } from '@/lib/catalog-routes';
 import { AccountSheet } from './account-sheet';
 import { ContactPopover } from './contact-popover';
 import { SearchPanel } from './search-panel';
@@ -19,24 +20,30 @@ const desktopSections: DesktopSection[] = ['catalog', 'bundles', 'delivery', 'ho
 export function BottomNav({
     cartQuantity,
     accountPhone,
+    catalogSlugs,
 }: {
     cartQuantity: number;
     accountPhone: string | null;
+    catalogSlugs: string[];
 }) {
     const router = useRouter();
     const pathname = usePathname();
+    const firstPathSegment = pathname.split('/')[1] ?? '';
+    const isCatalogPage =
+        pathname.startsWith('/palette/') || catalogSlugs.includes(firstPathSegment);
+    const catalogHome = categoryHref(catalogSlugs[0] ?? 'pelmeni');
     const [panel, setPanel] = useState<'search' | 'contact' | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState<DesktopSection | null>(
-        pathname === '/' || pathname.startsWith('/palette/') ? 'catalog' : null,
+        isCatalogPage ? 'catalog' : null,
     );
     const cartOpen = pathname === '/cart';
-    const catalogPagePath = pathname.startsWith('/palette/') ? pathname : '/';
+    const catalogPagePath = isCatalogPage ? pathname : catalogHome;
 
     const toggle = (next: 'search' | 'contact') => setPanel(cur => (cur === next ? null : next));
 
     useEffect(() => {
-        if (pathname !== '/' && !pathname.startsWith('/palette/')) {
+        if (!isCatalogPage) {
             setActiveSection(null);
             return;
         }
@@ -56,7 +63,7 @@ export function BottomNav({
         updateActiveSection();
         window.addEventListener('scroll', updateActiveSection, { passive: true });
         return () => window.removeEventListener('scroll', updateActiveSection);
-    }, [pathname]);
+    }, [isCatalogPage, pathname]);
 
     const desktopLinkClass = (section: DesktopSection) =>
         `border-b-2 py-2 text-[14px] no-underline transition-colors ${
@@ -81,7 +88,7 @@ export function BottomNav({
                     bg-[color-mix(in_srgb,var(--color-bg)_86%,transparent)] backdrop-blur-xl lg:block"
             >
                 <div className="mx-auto flex h-full max-w-[1280px] items-center gap-8 px-8">
-                    <Link href="/" className="flex shrink-0 items-center gap-3 text-text no-underline">
+                    <Link href={catalogHome} className="flex shrink-0 items-center gap-3 text-text no-underline">
                         <span className="gold-circle h-10 w-10 text-[17px]">С</span>
                         <span className="font-heading text-[20px] font-semibold tracking-[0.01em]">
                             Скаска
@@ -182,7 +189,7 @@ export function BottomNav({
                 aria-label="Основная навигация"
             >
                 <Link
-                    href="/"
+                    href={catalogHome}
                     aria-label="На главную"
                     className="gold-circle h-[34px] w-[34px] text-[13px]"
                 >
