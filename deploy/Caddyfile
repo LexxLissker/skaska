@@ -14,6 +14,11 @@
 		reverse_proxy api:3000
 	}
 
+	# Проверка состояния Vendure, которую использует Admin UI.
+	handle /health {
+		reverse_proxy api:3000
+	}
+
 	# Админка и Admin API. Ограничить доступ по IP можно так:
 	#   @office remote_ip 203.0.113.0/24
 	#   handle @office { reverse_proxy api:3000 }
