@@ -24,6 +24,17 @@ export function subcategoryHref(
     return `/${categorySlug}/${subcategorySegment(categorySlug, subcategorySlug)}`;
 }
 
+/**
+ * Категория всегда открывается с активной подкатегорией. Если дочерних
+ * коллекций нет, остаётся обычная страница самой категории.
+ */
+export function categoryLandingHref(category: Category): string {
+    const firstSubcategory = category.children[0];
+    return firstSubcategory
+        ? subcategoryHref(category.slug, firstSubcategory.slug)
+        : categoryHref(category.slug);
+}
+
 /** Находит дочернюю коллекцию как по короткому URL-сегменту, так и по полному slug. */
 export function findSubcategory(
     category: Category,

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 
 import type { Category } from '@/lib/api/catalog';
-import { categoryHref, subcategoryHref } from '@/lib/catalog-routes';
+import { categoryLandingHref, subcategoryHref } from '@/lib/catalog-routes';
 
 /**
  * Два ряда навигации каталога: ссылки на категории и подкатегории.
@@ -33,7 +33,7 @@ export function CatalogNav({
                     return (
                         <Link
                             key={item.slug}
-                            href={categoryHref(item.slug)}
+                            href={categoryLandingHref(item)}
                             scroll={false}
                             aria-current={active ? 'page' : undefined}
                             className={`shrink-0 whitespace-nowrap rounded-full border px-[14px] py-[7px]

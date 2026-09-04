@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
 
 import type { BundleOffer, Category, ProductCard as ProductCardType } from '@/lib/api/catalog';
-import { categoryHref } from '@/lib/catalog-routes';
+import { categoryLandingHref } from '@/lib/catalog-routes';
 import { FAQS, OFFERS, REVIEWS, STEPS } from '@/lib/content';
 import { BundleRail } from './bundle-rail';
 import { CatalogNav } from './catalog-nav';
@@ -111,7 +111,7 @@ export function CatalogView({
         );
         const next = categories[nextIndex];
         if (next && next.slug !== activeCategorySlug) {
-            router.push(categoryHref(next.slug), { scroll: false });
+            router.push(categoryLandingHref(next), { scroll: false });
         }
     }
 

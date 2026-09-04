@@ -34,7 +34,7 @@ export async function CatalogPageContent({
 
     const subcategory = subcategoryUrlSegment
         ? findSubcategory(category, subcategoryUrlSegment)
-        : null;
+        : category.children[0] ?? null;
 
     if (subcategoryUrlSegment && !subcategory) notFound();
 
