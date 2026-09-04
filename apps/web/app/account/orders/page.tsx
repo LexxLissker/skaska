@@ -4,7 +4,10 @@ import { signOutAccount } from '@/app/actions/account';
 import { getAccountSession } from '@/lib/account';
 import { formatPrice } from '@/lib/format';
 
-export const metadata = { title: 'Мои заказы — Заморозка' };
+export const metadata = {
+    title: 'Мои заказы',
+    robots: { index: false, follow: false },
+};
 
 const DEMO_ORDERS = [
     {

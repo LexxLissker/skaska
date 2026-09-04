@@ -7,7 +7,7 @@ import { PaletteSwitcher, type PaletteKey } from '@/components/theme/palette-swi
 const palettes = new Set<PaletteKey>(['ink', 'graphite', 'espresso']);
 
 export const metadata: Metadata = {
-    title: 'Сравнение палитр — Скаска',
+    title: 'Сравнение палитр',
     robots: { index: false, follow: false },
 };
 

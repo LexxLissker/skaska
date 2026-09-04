@@ -1,6 +1,9 @@
 import Link from 'next/link';
 
-export const metadata = { title: 'Заказ оформлен — Заморозка' };
+export const metadata = {
+    title: 'Заказ оформлен',
+    robots: { index: false, follow: false },
+};
 
 export default async function OrderPage({ params }: { params: Promise<{ code: string }> }) {
     const { code } = await params;

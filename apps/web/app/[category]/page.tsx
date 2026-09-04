@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { CatalogPageContent } from '@/components/catalog/catalog-page-content';
 import { getCategories } from '@/lib/api/catalog';
 import { subcategoryHref } from '@/lib/catalog-routes';
+import { catalogMetadata } from '@/lib/seo';
 
 interface PageProps {
     params: Promise<{ category: string }>;
@@ -16,10 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (!category) return {};
 
-    return {
-        title: `${category.name} ручной лепки — Скаска`,
-        description: category.description,
-    };
+    return catalogMetadata(category);
 }
 
 export default async function CategoryPage({ params }: PageProps) {

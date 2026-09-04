@@ -8,14 +8,33 @@ import { PaletteShell } from '@/components/theme/palette-shell';
 import { getAccountSession } from '@/lib/account';
 import { getCategories } from '@/lib/api/catalog';
 import { getCart } from '@/lib/api/cart';
+import { SITE_NAME, SITE_URL } from '@/lib/seo';
 
 export const metadata: Metadata = {
-    title: 'Заморозка — пельмени и вареники ручной лепки',
+    metadataBase: new URL(SITE_URL),
+    applicationName: SITE_NAME,
+    title: {
+        default: 'Скаска — домашние полуфабрикаты ручной лепки',
+        template: `%s | ${SITE_NAME}`,
+    },
     description:
         'Пельмени, вареники, манты и хинкали ручной лепки. Замораживаем в день лепки, ' +
-        'привозим по расписанию в термосумке.',
+        'доставляем по Санкт-Петербургу по расписанию в термосумке.',
     manifest: '/manifest.webmanifest',
-    appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Заморозка' },
+    openGraph: {
+        type: 'website',
+        locale: 'ru_RU',
+        siteName: SITE_NAME,
+        title: 'Скаска — домашние полуфабрикаты ручной лепки',
+        description: 'Пельмени, вареники, манты и хинкали ручной лепки с доставкой по Санкт-Петербургу.',
+        url: '/',
+    },
+    twitter: {
+        card: 'summary',
+        title: 'Скаска — домашние полуфабрикаты ручной лепки',
+        description: 'Пельмени, вареники, манты и хинкали ручной лепки с доставкой по Санкт-Петербургу.',
+    },
+    appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: SITE_NAME },
 };
 
 export const viewport: Viewport = {

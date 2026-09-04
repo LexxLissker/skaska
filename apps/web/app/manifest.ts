@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: 'Заморозка — пельмени и вареники ручной лепки',
-        short_name: 'Заморозка',
+        name: 'Скаска — домашние полуфабрикаты ручной лепки',
+        short_name: 'Скаска',
         description:
             'Пельмени, вареники, манты и хинкали ручной лепки с доставкой по расписанию.',
         start_url: '/',

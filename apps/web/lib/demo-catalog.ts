@@ -34,9 +34,9 @@ export const demoCategories: Category[] = [
         description: 'Пельмени ручной лепки из охлаждённого мяса. Замораживаем в день лепки — готовим 7 минут, без разморозки.',
         assetUrl: null,
         children: [
-            { id: 'demo-pelmeni-classic', name: 'Классика', slug: 'pelmeni-classic', description: 'Классические пельмени ручной лепки: тонкое тесто, сочная начинка и домашний вкус.', assetUrl: null },
-            { id: 'demo-pelmeni-bird', name: 'Птица', slug: 'pelmeni-bird', description: 'Нежная птица и тонкое тесто для лёгкого домашнего ужина.', assetUrl: null },
-            { id: 'demo-pelmeni-lean', name: 'Рыба/Постное', slug: 'pelmeni-lean', description: 'Постные и рыбные варианты для разнообразного меню.', assetUrl: null },
+            { id: 'demo-pelmeni-classic', name: 'Классика', slug: 'pelmeni-classic', description: 'Классические пельмени ручной лепки с мясными начинками: тонкое тесто, сочный фарш и насыщенный бульон внутри. Варятся прямо из морозильника за 7 минут.', assetUrl: null },
+            { id: 'demo-pelmeni-bird', name: 'Птица', slug: 'pelmeni-bird', description: 'Пельмени ручной лепки с курицей и индейкой — более лёгкий вариант с нежной начинкой и тонким тестом. Подходят для быстрого семейного ужина.', assetUrl: null },
+            { id: 'demo-pelmeni-lean', name: 'Рыба/Постное', slug: 'pelmeni-lean', description: 'Пельмени с рыбными и постными начинками для разнообразного домашнего меню. Лепим небольшими партиями и замораживаем сразу после лепки.', assetUrl: null },
         ],
     },
     {
@@ -46,9 +46,9 @@ export const demoCategories: Category[] = [
         description: 'Тонкое тесто и щедрая начинка — для уютного завтрака, обеда или десерта.',
         assetUrl: null,
         children: [
-            { id: 'demo-vareniki-potato', name: 'С картофелем', slug: 'vareniki-potato', description: 'Картофель, жареный лук и домашнее тесто.', assetUrl: null },
-            { id: 'demo-vareniki-curd', name: 'С творогом', slug: 'vareniki-curd', description: 'Нежный творог и тонкое домашнее тесто.', assetUrl: null },
-            { id: 'demo-vareniki-cherry', name: 'С вишней', slug: 'vareniki-cherry', description: 'Сочная вишнёвая начинка для сладкого ужина.', assetUrl: null },
+            { id: 'demo-vareniki-potato', name: 'С картофелем', slug: 'vareniki-potato', description: 'Домашние вареники с картофелем и жареным луком в тонком тесте. Сытный вариант для обеда или ужина, который можно сварить прямо из морозильника.', assetUrl: null },
+            { id: 'demo-vareniki-curd', name: 'С творогом', slug: 'vareniki-curd', description: 'Вареники с нежной творожной начинкой и тонким домашним тестом. Подавайте со сметаной, сливочным маслом или ягодным соусом.', assetUrl: null },
+            { id: 'demo-vareniki-cherry', name: 'С вишней', slug: 'vareniki-cherry', description: 'Сладкие вареники с сочной вишнёвой начинкой и тонким тестом. Быстрый десерт или завтрак со сливками, сметаной либо ягодным кули.', assetUrl: null },
         ],
     },
     {
@@ -58,9 +58,9 @@ export const demoCategories: Category[] = [
         description: 'Сочные манты с тонким тестом и ароматной начинкой.',
         assetUrl: null,
         children: [
-            { id: 'demo-manty-classic', name: 'Говядина/баранина', slug: 'manty-classic', description: 'Манты с рубленым мясом и пряным бульоном.', assetUrl: null },
-            { id: 'demo-manty-pumpkin', name: 'Тыква', slug: 'manty-pumpkin', description: 'Сладкая тыква, лук и ароматные специи.', assetUrl: null },
-            { id: 'demo-manty-bird', name: 'Курица', slug: 'manty-bird', description: 'Нежная птица, овощи и тонкое тесто.', assetUrl: null },
+            { id: 'demo-manty-classic', name: 'Говядина/баранина', slug: 'manty-classic', description: 'Крупные манты с рубленой говядиной и бараниной, луком и ароматными специями. Готовятся на пару, сохраняя мясной сок внутри.', assetUrl: null },
+            { id: 'demo-manty-pumpkin', name: 'Тыква', slug: 'manty-pumpkin', description: 'Манты с тыквой и луком — ароматная овощная начинка в тонком тесте. Подойдут для лёгкого домашнего обеда или ужина.', assetUrl: null },
+            { id: 'demo-manty-bird', name: 'Курица', slug: 'manty-bird', description: 'Манты с курицей: нежная начинка, лук и сбалансированные специи в тонком тесте. Готовятся на пару прямо из замороженного состояния.', assetUrl: null },
         ],
     },
     {
@@ -70,9 +70,9 @@ export const demoCategories: Category[] = [
         description: 'Крупные хинкали с бульоном внутри — готовятся из замороженного состояния.',
         assetUrl: null,
         children: [
-            { id: 'demo-hinkali-classic', name: 'Классика', slug: 'hinkali-classic', description: 'Хинкали с сочной мясной начинкой и бульоном внутри.', assetUrl: null },
-            { id: 'demo-hinkali-cheese', name: 'Сыр', slug: 'hinkali-cheese', description: 'Нежная сырная начинка и плотное тесто.', assetUrl: null },
-            { id: 'demo-hinkali-mushroom', name: 'Грибы', slug: 'hinkali-mushroom', description: 'Ароматные грибы и домашнее тесто.', assetUrl: null },
+            { id: 'demo-hinkali-classic', name: 'Классика', slug: 'hinkali-classic', description: 'Классические хинкали с мясной начинкой, зеленью и бульоном внутри. Плотное тесто сохраняет форму и сочность во время варки.', assetUrl: null },
+            { id: 'demo-hinkali-cheese', name: 'Сыр', slug: 'hinkali-cheese', description: 'Хинкали с сырной начинкой — мягкий сливочный вкус и упругое тесто. Самостоятельное блюдо, которое удобно приготовить прямо из морозильника.', assetUrl: null },
+            { id: 'demo-hinkali-mushroom', name: 'Грибы', slug: 'hinkali-mushroom', description: 'Хинкали с грибами и ароматными специями в плотном тесте. Сочный вариант без мясной начинки для домашнего обеда или ужина.', assetUrl: null },
         ],
     },
     {
@@ -82,9 +82,9 @@ export const demoCategories: Category[] = [
         description: 'Рулеты из тонкого теста с мясной или овощной начинкой, приготовленные на пару.',
         assetUrl: null,
         children: [
-            { id: 'demo-khanum-meat', name: 'С мясом', slug: 'khanum-meat', description: 'Тонкое тесто, рубленое мясо и лук.', assetUrl: null },
-            { id: 'demo-khanum-potato', name: 'С картофелем', slug: 'khanum-potato', description: 'Картофельная начинка с луком и специями.', assetUrl: null },
-            { id: 'demo-khanum-vegetable', name: 'Вегетарианские', slug: 'khanum-vegetable', description: 'Овощная начинка для лёгкого ужина.', assetUrl: null },
+            { id: 'demo-khanum-meat', name: 'С мясом', slug: 'khanum-meat', description: 'Ханум с мясом — рулет из тонкого теста с рубленой начинкой, луком и специями. Сочный и сытный вариант семейного ужина, приготовленный на пару.', assetUrl: null },
+            { id: 'demo-khanum-potato', name: 'С картофелем', slug: 'khanum-potato', description: 'Ханум с картофелем и луком: мягкая овощная начинка, специи и тонкое тесто. Готовится на пару и хорошо сочетается со сметанным соусом.', assetUrl: null },
+            { id: 'demo-khanum-vegetable', name: 'Вегетарианские', slug: 'khanum-vegetable', description: 'Вегетарианский ханум с овощами, луком и специями в тонком тесте. Лёгкое, но сытное блюдо для приготовления на пару.', assetUrl: null },
         ],
     },
     {
@@ -94,9 +94,9 @@ export const demoCategories: Category[] = [
         description: 'Домашняя лапша быстро готовится и держит форму при варке.',
         assetUrl: null,
         children: [
-            { id: 'demo-lapsha-home', name: 'Домашняя', slug: 'lapsha-home', description: 'Классическая домашняя лапша из пшеничной муки.', assetUrl: null },
-            { id: 'demo-lapsha-buckwheat', name: 'Гречневая', slug: 'lapsha-buckwheat', description: 'Насыщенный вкус гречневой муки.', assetUrl: null },
-            { id: 'demo-lapsha-rice', name: 'Рисовая', slug: 'lapsha-rice', description: 'Лёгкая рисовая лапша для супов и вторых блюд.', assetUrl: null },
+            { id: 'demo-lapsha-home', name: 'Домашняя', slug: 'lapsha-home', description: 'Домашняя пшеничная лапша с ровной текстурой и хорошей упругостью. Подходит для супов, бульонов и горячих блюд, быстро варится и держит форму.', assetUrl: null },
+            { id: 'demo-lapsha-buckwheat', name: 'Гречневая', slug: 'lapsha-buckwheat', description: 'Гречневая лапша с выразительным ореховым вкусом. Подходит для горячих блюд с овощами, мясом или грибами и не теряет форму при варке.', assetUrl: null },
+            { id: 'demo-lapsha-rice', name: 'Рисовая', slug: 'lapsha-rice', description: 'Рисовая лапша для супов, воков и лёгких горячих блюд. Быстро готовится и хорошо сочетается с овощами, птицей, морепродуктами и соусами.', assetUrl: null },
         ],
     },
     {
@@ -106,10 +106,10 @@ export const demoCategories: Category[] = [
         description: 'Соусы, масло, бульонные концентраты и топпинги для домашней подачи.',
         assetUrl: null,
         children: [
-            { id: 'demo-gastrolavka-sauces', name: 'Соусы', slug: 'gastrolavka-sauces', description: 'Соусы к мясным, овощным и сладким блюдам.', assetUrl: null },
-            { id: 'demo-gastrolavka-butter', name: 'Масло и сливки', slug: 'gastrolavka-butter', description: 'Топлёное и зелёное масло, густые сливки.', assetUrl: null },
-            { id: 'demo-gastrolavka-broths', name: 'Бульоны', slug: 'gastrolavka-broths', description: 'Концентрированные бульоны для быстрой подачи.', assetUrl: null },
-            { id: 'demo-gastrolavka-toppings', name: 'Топпинги', slug: 'gastrolavka-toppings', description: 'Хрустящие и ароматные дополнения.', assetUrl: null },
+            { id: 'demo-gastrolavka-sauces', name: 'Соусы', slug: 'gastrolavka-sauces', description: 'Соусы к пельменям, вареникам, мантам и другим домашним блюдам: от сметанно-чесночного до сацебели и ткемали. Добавьте к заказу готовую подачу.', assetUrl: null },
+            { id: 'demo-gastrolavka-butter', name: 'Масло и сливки', slug: 'gastrolavka-butter', description: 'Топлёное и зелёное масло, а также густые сливки для подачи горячих блюд. Дополняют мясные, овощные и сладкие начинки.', assetUrl: null },
+            { id: 'demo-gastrolavka-broths', name: 'Бульоны', slug: 'gastrolavka-broths', description: 'Концентрированные говяжьи, куриные и грибные бульоны для варки и подачи. Помогают быстро сделать вкус блюда насыщеннее.', assetUrl: null },
+            { id: 'demo-gastrolavka-toppings', name: 'Топпинги', slug: 'gastrolavka-toppings', description: 'Хрустящий жареный лук, копчёные шкварки, ароматная соль и сладкие топпинги. Небольшие дополнения, которые меняют вкус и подачу блюда.', assetUrl: null },
         ],
     },
 ];

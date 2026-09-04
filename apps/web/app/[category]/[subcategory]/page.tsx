@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { CatalogPageContent } from '@/components/catalog/catalog-page-content';
 import { getCategories } from '@/lib/api/catalog';
 import { findSubcategory } from '@/lib/catalog-routes';
+import { catalogMetadata } from '@/lib/seo';
 
 interface PageProps {
     params: Promise<{ category: string; subcategory: string }>;
@@ -19,10 +20,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (!category || !subcategory) return {};
 
-    return {
-        title: `${category.name}, ${subcategory.name} — Скаска`,
-        description: subcategory.description,
-    };
+    return catalogMetadata(category, subcategory);
 }
 
 export default async function SubcategoryPage({ params }: PageProps) {

@@ -69,6 +69,7 @@ services:
       args:
         NEXT_PUBLIC_SHOP_API_URL: ${PUBLIC_URL}/shop-api
         NEXT_PUBLIC_USE_VENDURE: 'true'
+        NEXT_PUBLIC_SITE_URL: ${PUBLIC_URL}
     restart: unless-stopped
     depends_on: [api]
     environment:
@@ -77,6 +78,7 @@ services:
       SHOP_API_URL_INTERNAL: http://api:3000/shop-api
       NEXT_PUBLIC_SHOP_API_URL: ${PUBLIC_URL}/shop-api
       NEXT_PUBLIC_USE_VENDURE: 'true'
+      NEXT_PUBLIC_SITE_URL: ${PUBLIC_URL}
     networks: [internal]
 
   caddy:

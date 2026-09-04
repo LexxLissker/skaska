@@ -1,6 +1,9 @@
 import Link from 'next/link';
 
-export const metadata = { title: 'Документы — Заморозка' };
+export const metadata = {
+    title: 'Документы',
+    robots: { index: false, follow: false },
+};
 
 const DOCUMENTS = [
     {

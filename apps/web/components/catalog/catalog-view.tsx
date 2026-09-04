@@ -142,10 +142,17 @@ export function CatalogView({
                     <p className="mb-3 hidden text-[12px] font-medium uppercase tracking-[0.18em] text-accent lg:block">
                         Ручная лепка · доставка по расписанию
                     </p>
-                    <h1 className="mb-2 text-center text-[24px] text-[#eef6ff] text-pretty
-                        lg:mb-5 lg:text-left lg:text-[48px] lg:leading-[1.05]">
-                        {category.name}
-                    </h1>
+                    {subcategory ? (
+                        <p className="mb-2 text-center font-heading text-[24px] text-[#eef6ff] text-pretty
+                            lg:mb-5 lg:text-left lg:text-[48px] lg:font-medium lg:leading-[1.05]">
+                            {category.name}
+                        </p>
+                    ) : (
+                        <h1 className="mb-2 text-center text-[24px] text-[#eef6ff] text-pretty
+                            lg:mb-5 lg:text-left lg:text-[48px] lg:leading-[1.05]">
+                            {category.name}
+                        </h1>
+                    )}
                     <p className="m-0 text-center text-[13.5px] leading-[1.5] text-[#eef6ff] opacity-[0.82] text-pretty
                         lg:max-w-[520px] lg:text-left lg:text-[17px] lg:leading-[1.65]">
                         {category.description}
@@ -198,7 +205,7 @@ export function CatalogView({
                         lg:border lg:border-divider">
                         <ImagePlaceholder
                             src={subcategory.assetUrl}
-                            alt={subcategory.name}
+                            alt={`${category.name}: ${subcategory.name}`}
                             className="h-full w-full"
                             placeholder="Фото/видео подкатегории"
                         />
@@ -208,9 +215,9 @@ export function CatalogView({
                                 [background:linear-gradient(to_bottom,transparent_40%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]"
                         />
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-5 lg:px-9 lg:pb-8">
-                            <h3 className="mb-2 text-[19px] text-[#eef6ff] lg:text-[28px]">
+                            <h1 className="mb-2 text-[19px] text-[#eef6ff] lg:text-[28px]">
                                 {category.name}, {subcategory.name}
-                            </h3>
+                            </h1>
                             <p className="m-0 max-w-[88%] text-[13.5px] leading-[1.55] text-[#eef6ff] opacity-[0.82]
                                 lg:max-w-[680px] lg:text-[15px]">
                                 {subcategory.description}
