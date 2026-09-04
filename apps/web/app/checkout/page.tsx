@@ -5,6 +5,7 @@ import { getCart } from '@/lib/api/cart';
 
 export const metadata = {
     title: 'Оформление заказа',
+    description: 'Укажите адрес, выберите доступную дату доставки и способ оплаты заказа в магазине «Скаска».',
     robots: { index: false, follow: false },
 };
 

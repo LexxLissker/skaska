@@ -6,6 +6,7 @@ import { formatPrice } from '@/lib/format';
 
 export const metadata = {
     title: 'Мои заказы',
+    description: 'История и текущие статусы заказов покупателя магазина «Скаска».',
     robots: { index: false, follow: false },
 };
 

@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
     title: 'Документы',
+    description: 'Публичная оферта, политика конфиденциальности, согласие на обработку данных и условия доставки магазина «Скаска».',
     robots: { index: false, follow: false },
 };
 

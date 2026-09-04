@@ -8,6 +8,7 @@ const palettes = new Set<PaletteKey>(['ink', 'graphite', 'espresso']);
 
 export const metadata: Metadata = {
     title: 'Сравнение палитр',
+    description: 'Служебная страница сравнения цветовых палитр интерфейса магазина «Скаска».',
     robots: { index: false, follow: false },
 };
 

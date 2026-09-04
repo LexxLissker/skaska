@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
     title: 'Заказ оформлен',
+    description: 'Подтверждение оформления заказа и информация о его дальнейшей доставке.',
     robots: { index: false, follow: false },
 };
 

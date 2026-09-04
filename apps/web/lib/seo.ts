@@ -53,6 +53,15 @@ export function plainText(value: string): string {
     return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function conciseDescription(value: string, maxLength = 180): string {
+    const normalized = plainText(value);
+    if (normalized.length <= maxLength) return normalized;
+
+    const clipped = normalized.slice(0, maxLength - 1);
+    const lastSpace = clipped.lastIndexOf(' ');
+    return `${clipped.slice(0, lastSpace > 120 ? lastSpace : clipped.length).trimEnd()}…`;
+}
+
 function socialImages(assetUrl: string | null, alt: string) {
     return assetUrl ? [{ url: assetUrl, alt }] : undefined;
 }
@@ -64,8 +73,7 @@ export function catalogMetadata(category: Category, subcategory?: Subcategory): 
     const title = subcategory
         ? SUBCATEGORY_TITLES[category.slug]?.[subcategory.name] ?? `${category.name}: ${subcategory.name}`
         : `${category.name} ручной лепки в Санкт-Петербурге`;
-    const sourceDescription = plainText(subcategory?.description || category.description);
-    const description = `${sourceDescription} Заказ с доставкой по Санкт-Петербургу по расписанию.`;
+    const description = conciseDescription(subcategory?.description || category.description);
     const imageAlt = subcategory
         ? `${category.name}: ${subcategory.name}`
         : category.name;
@@ -99,9 +107,9 @@ export function productMetadata(product: ProductDetail): Metadata {
     const productName = plainText(product.name);
     const sourceDescription = plainText(product.description);
     const description = sourceDescription
-        ? `${productName}. ${sourceDescription}`
+        ? conciseDescription(`${productName}. ${sourceDescription}`)
         : `${productName} в магазине домашних полуфабрикатов «${SITE_NAME}».`;
-    const title = `${productName} — купить с доставкой по СПб`;
+    const title = `${productName} — заказать в СПб`;
     const images = socialImages(product.assetUrl, productName);
 
     return {
