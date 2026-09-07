@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 import { CatalogPageContent } from '@/components/catalog/catalog-page-content';
 import { getCategories } from '@/lib/api/catalog';
-import { subcategoryHref } from '@/lib/catalog-routes';
 import { catalogMetadata } from '@/lib/seo';
 
 interface PageProps {
@@ -26,11 +25,6 @@ export default async function CategoryPage({ params }: PageProps) {
     const category = categories.find(item => item.slug === categorySlug);
 
     if (!category) notFound();
-
-    const firstSubcategory = category.children[0];
-    if (firstSubcategory) {
-        redirect(subcategoryHref(category.slug, firstSubcategory.slug));
-    }
 
     return <CatalogPageContent categorySlug={categorySlug} />;
 }

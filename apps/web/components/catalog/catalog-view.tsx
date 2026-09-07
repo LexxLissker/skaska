@@ -5,8 +5,10 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react';
 
 import type { BundleOffer, Category, ProductCard as ProductCardType } from '@/lib/api/catalog';
 import { categoryLandingHref } from '@/lib/catalog-routes';
-import { FAQS, OFFERS, REVIEWS, STEPS } from '@/lib/content';
+import { FAQS, HERO_SLIDES, OFFERS, REVIEWS, STEPS } from '@/lib/content';
+import { plainText } from '@/lib/seo';
 import { BundleRail } from './bundle-rail';
+import { CatalogHeroCarousel, type CatalogHeroSlide } from './catalog-hero-carousel';
 import { CatalogNav } from './catalog-nav';
 import { FaqAccordion } from './faq-accordion';
 import { ImagePlaceholder } from './image-placeholder';
@@ -117,48 +119,25 @@ export function CatalogView({
 
     const visible = products.slice(0, visibleCount);
     const reviews = REVIEWS[category.slug] ?? REVIEWS.pelmeni;
+    const heroAssets = [
+        categories[0]?.assetUrl ?? category.assetUrl,
+        bundles[0]?.assetUrl ?? categories[1]?.assetUrl ?? null,
+        categories[2]?.assetUrl ?? categories[1]?.assetUrl ?? category.assetUrl,
+    ];
+    const heroSlides: CatalogHeroSlide[] = HERO_SLIDES.map((slide, index) => ({
+        ...slide,
+        assetUrl: heroAssets[index] ?? null,
+    }));
+    const contextTitle = subcategory
+        ? `${category.name}, ${subcategory.name}`
+        : category.name;
+    const contextDescription = plainText(subcategory?.description || category.description);
+    const contextAssetUrl = subcategory?.assetUrl || category.assetUrl;
 
     return (
         <>
-            {/* ── Герой категории: 580px с затемнением к низу ────────────────── */}
-            <header className="relative h-[580px] w-full lg:mx-auto lg:mt-6 lg:h-[520px]
-                lg:w-[calc(100%_-_64px)] lg:max-w-[1216px] lg:overflow-hidden lg:rounded-[24px]
-                lg:border lg:border-divider">
-                <ImagePlaceholder
-                    src={category.assetUrl}
-                    alt={category.name}
-                    className="h-full w-full"
-                    placeholder="Фото/видео блюда"
-                />
-                <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0
-                        [background:linear-gradient(to_bottom,transparent_58%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]
-                        lg:[background:linear-gradient(to_right,color-mix(in_srgb,var(--color-bg)_96%,transparent)_0%,color-mix(in_srgb,var(--color-bg)_72%,transparent)_42%,color-mix(in_srgb,var(--color-bg)_8%,transparent)_78%)]"
-                />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-[22px]
-                    lg:bottom-auto lg:left-0 lg:right-auto lg:top-1/2 lg:w-[52%] lg:-translate-y-1/2
-                    lg:px-14 lg:pb-0">
-                    <p className="mb-3 hidden text-[12px] font-medium uppercase tracking-[0.18em] text-accent lg:block">
-                        Ручная лепка · доставка по расписанию
-                    </p>
-                    {subcategory ? (
-                        <p className="mb-2 text-center font-heading text-[24px] text-[#eef6ff] text-pretty
-                            lg:mb-5 lg:text-left lg:text-[48px] lg:font-medium lg:leading-[1.05]">
-                            {category.name}
-                        </p>
-                    ) : (
-                        <h1 className="mb-2 text-center text-[24px] text-[#eef6ff] text-pretty
-                            lg:mb-5 lg:text-left lg:text-[48px] lg:leading-[1.05]">
-                            {category.name}
-                        </h1>
-                    )}
-                    <p className="m-0 text-center text-[13.5px] leading-[1.5] text-[#eef6ff] opacity-[0.82] text-pretty
-                        lg:max-w-[520px] lg:text-left lg:text-[17px] lg:leading-[1.65]">
-                        {category.description}
-                    </p>
-                </div>
-            </header>
+            {/* ── Независимая витрина-карусель ──────────────────────────────── */}
+            <CatalogHeroCarousel slides={heroSlides} />
 
             {/* ── Липкая панель: внизу, над навигацией ───────────────────────── */}
             <div
@@ -198,33 +177,33 @@ export function CatalogView({
                     />
                 </div>
 
-                {/* ── Баннер подкатегории: 414px ─────────────────────────────── */}
-                {subcategory && (
-                    <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden
-                        lg:mx-8 lg:mb-6 lg:mt-6 lg:h-[340px] lg:w-auto lg:rounded-[20px]
-                        lg:border lg:border-divider">
-                        <ImagePlaceholder
-                            src={subcategory.assetUrl}
-                            alt={`${category.name}: ${subcategory.name}`}
-                            className="h-full w-full"
-                            placeholder="Фото/видео подкатегории"
-                        />
-                        <div
-                            aria-hidden="true"
-                            className="pointer-events-none absolute inset-0
-                                [background:linear-gradient(to_bottom,transparent_40%,color-mix(in_srgb,var(--color-bg)_92%,transparent)_100%)]"
-                        />
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-5 lg:px-9 lg:pb-8">
-                            <h1 className="mb-2 text-[19px] text-[#eef6ff] lg:text-[28px]">
-                                {category.name}, {subcategory.name}
-                            </h1>
-                            <p className="m-0 max-w-[88%] text-[13.5px] leading-[1.55] text-[#eef6ff] opacity-[0.82]
-                                lg:max-w-[680px] lg:text-[15px]">
-                                {subcategory.description}
-                            </p>
-                        </div>
-                    </section>
-                )}
+                {/* ── Контекстный баннер категории/подкатегории: всегда видим ── */}
+                <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden
+                    lg:mx-8 lg:mb-6 lg:mt-6 lg:h-[340px] lg:w-auto lg:rounded-[20px]
+                    lg:border lg:border-divider">
+                    <ImagePlaceholder
+                        src={contextAssetUrl}
+                        alt={contextTitle}
+                        className="h-full w-full"
+                        placeholder={subcategory ? 'Фото/видео подкатегории' : 'Фото/видео категории'}
+                    />
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0
+                            [background:linear-gradient(to_bottom,transparent_38%,color-mix(in_srgb,var(--color-bg)_94%,transparent)_100%)]
+                            lg:[background:linear-gradient(to_right,color-mix(in_srgb,var(--color-bg)_88%,transparent)_0%,color-mix(in_srgb,var(--color-bg)_62%,transparent)_48%,color-mix(in_srgb,var(--color-bg)_20%,transparent)_100%)]"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-5
+                        lg:bottom-1/2 lg:w-[62%] lg:translate-y-1/2 lg:px-9 lg:pb-0">
+                        <h1 className="mb-2 text-[19px] text-[#eef6ff] text-pretty lg:text-[28px]">
+                            {contextTitle}
+                        </h1>
+                        <p className="m-0 max-w-[92%] text-[13.5px] leading-[1.55] text-[#eef6ff]/80 text-pretty
+                            lg:max-w-[720px] lg:text-[15px] lg:leading-[1.65]">
+                            {contextDescription}
+                        </p>
+                    </div>
+                </section>
 
                 {/* ── Сетка товаров ──────────────────────────────────────────── */}
                 <section className="px-4 lg:px-8 lg:pb-4">

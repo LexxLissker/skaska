@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 import { getCategories, getCollectionProducts } from '@/lib/api/catalog';
-import { subcategoryHref } from '@/lib/catalog-routes';
+import { categoryHref, subcategoryHref } from '@/lib/catalog-routes';
 import { absoluteUrl } from '@/lib/seo';
 
 // Во время Docker-сборки Vendure ещё недоступен. Генерируем sitemap по запросу,
@@ -17,8 +17,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         productGroups.flat().map(product => [product.slug, product] as const),
     );
 
-    const categoryPages: MetadataRoute.Sitemap = categories.flatMap(category =>
-        category.children.map(subcategory => ({
+    const categoryPages: MetadataRoute.Sitemap = categories.flatMap(category => [
+        {
+            url: absoluteUrl(categoryHref(category.slug)),
+            changeFrequency: 'weekly' as const,
+            priority: 0.9,
+            images: category.assetUrl ? [category.assetUrl] : undefined,
+        },
+        ...category.children.map(subcategory => ({
             url: absoluteUrl(subcategoryHref(category.slug, subcategory.slug)),
             changeFrequency: 'weekly' as const,
             priority: 0.8,
@@ -26,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 ? [subcategory.assetUrl || category.assetUrl!]
                 : undefined,
         })),
+    ],
     );
     const productPages: MetadataRoute.Sitemap = [...products.values()].map(product => ({
         url: absoluteUrl(`/product/${product.slug}`),
