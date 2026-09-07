@@ -1,21 +1,24 @@
 import Link from 'next/link';
 
-const catalogLinks = [
-    { label: 'Пельмени', href: '/pelmeni' },
-    { label: 'Вареники', href: '/vareniki' },
-    { label: 'Манты', href: '/manty' },
-    { label: 'Хинкали', href: '/hinkali' },
-    { label: 'Наборы для дома', href: '/pelmeni#bundles' },
-];
+import type { Category } from '@/lib/api/catalog';
+import { categoryHref } from '@/lib/catalog-routes';
 
-const customerLinks = [
-    { label: 'Доставка и оплата', href: '/pelmeni#delivery' },
-    { label: 'Мои заказы', href: '/account/orders' },
-    { label: 'Документы', href: '/docs' },
-    { label: 'Как мы готовим', href: '/pelmeni#how-we-cook' },
-];
+export function DesktopFooter({ categories }: { categories: Category[] }) {
+    const catalogRoot = categories[0] ? categoryHref(categories[0].slug) : '/';
+    const catalogLinks = [
+        ...categories.slice(0, 4).map(category => ({
+            label: category.name,
+            href: categoryHref(category.slug),
+        })),
+        { label: 'Наборы для дома', href: `${catalogRoot}#bundles` },
+    ];
+    const customerLinks = [
+        { label: 'Доставка и оплата', href: `${catalogRoot}#delivery` },
+        { label: 'Мои заказы', href: '/account/orders' },
+        { label: 'Документы', href: '/docs' },
+        { label: 'Как мы готовим', href: `${catalogRoot}#how-we-cook` },
+    ];
 
-export function DesktopFooter() {
     return (
         <footer className="hidden bg-[linear-gradient(180deg,var(--color-bg)_0%,color-mix(in_srgb,var(--color-surface)_80%,var(--color-bg))_100%)] lg:block">
             <div className="mx-auto grid max-w-[1280px] grid-cols-[1.4fr_1fr_1fr] gap-16 px-8 pb-10 pt-14">

@@ -58,7 +58,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <body className="min-h-full">
                 <PaletteShell>
                     <main className="flex-1 pb-16 lg:pb-0 lg:pt-[72px]">{children}</main>
-                    <DesktopFooter />
+                    <DesktopFooter categories={categories} />
                     <BottomNav
                         cartQuantity={cart?.totalQuantity ?? 0}
                         accountPhone={account?.phoneDisplay ?? null}
