@@ -43,9 +43,12 @@ export async function CatalogPageContent({
         getCollectionProducts(subcategory?.slug ?? category.slug),
         getBundles(BUNDLES.map(bundle => bundle.slug)),
     ]);
-    const pagePath = subcategory
-        ? subcategoryHref(category.slug, subcategory.slug)
-        : `/${category.slug}`;
+    const isCatalogRoot = !categorySlug && !subcategoryUrlSegment;
+    const pagePath = isCatalogRoot
+        ? '/'
+        : subcategory
+            ? subcategoryHref(category.slug, subcategory.slug)
+            : `/${category.slug}`;
     const pageName = subcategory
         ? `${category.name}: ${subcategory.name}`
         : category.name;
@@ -60,12 +63,14 @@ export async function CatalogPageContent({
                     name: 'Скаска',
                     item: absoluteUrl('/'),
                 },
-                {
-                    '@type': 'ListItem',
-                    position: 2,
-                    name: pageName,
-                    item: absoluteUrl(pagePath),
-                },
+                ...(!isCatalogRoot
+                    ? [{
+                        '@type': 'ListItem',
+                        position: 2,
+                        name: pageName,
+                        item: absoluteUrl(pagePath),
+                    }]
+                    : []),
             ],
         },
         {

@@ -4,7 +4,7 @@ import type { Category } from '@/lib/api/catalog';
 import { categoryHref } from '@/lib/catalog-routes';
 
 export function DesktopFooter({ categories }: { categories: Category[] }) {
-    const catalogRoot = categories[0] ? categoryHref(categories[0].slug) : '/';
+    const catalogRoot = '/';
     const catalogLinks = [
         ...categories.slice(0, 4).map(category => ({
             label: category.name,

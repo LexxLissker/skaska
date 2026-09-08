@@ -1,16 +1,13 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 
 import { CatalogPageContent } from '@/components/catalog/catalog-page-content';
-import { getCategories } from '@/lib/api/catalog';
-import { categoryLandingHref } from '@/lib/catalog-routes';
 
-/**
- * У каталога нет дублирующей «безымянной» категории на `/`: главная ведёт на
- * первую самостоятельную страницу коллекции, например `/pelmeni`.
- */
-export default async function CatalogPage() {
-    const categories = await getCategories();
-    if (!categories.length) return <CatalogPageContent />;
+export const metadata: Metadata = {
+    alternates: { canonical: '/' },
+    robots: { index: true, follow: true },
+};
 
-    redirect(categoryLandingHref(categories[0]));
+/** Главная остаётся на чистом домене и открывает первую категорию каталога. */
+export default function CatalogPage() {
+    return <CatalogPageContent />;
 }

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { categoryHref } from '@/lib/catalog-routes';
 import { AccountSheet } from './account-sheet';
 import { ContactPopover } from './contact-popover';
 import { SearchPanel } from './search-panel';
@@ -30,8 +29,8 @@ export function BottomNav({
     const pathname = usePathname();
     const firstPathSegment = pathname.split('/')[1] ?? '';
     const isCatalogPage =
-        pathname.startsWith('/palette/') || catalogSlugs.includes(firstPathSegment);
-    const catalogHome = categoryHref(catalogSlugs[0] ?? 'pelmeni');
+        pathname === '/' || pathname.startsWith('/palette/') || catalogSlugs.includes(firstPathSegment);
+    const catalogHome = '/';
     const [panel, setPanel] = useState<'search' | 'contact' | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState<DesktopSection | null>(
