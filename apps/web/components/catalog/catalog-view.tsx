@@ -161,7 +161,7 @@ export function CatalogView({
                 id="catalog"
                 onTouchStart={onCatalogTouchStart}
                 onTouchEnd={onCatalogTouchEnd}
-                className="scroll-mt-24 lg:mx-auto lg:max-w-[1280px]"
+                className="scroll-mt-24 lg:mx-auto lg:mt-4 lg:max-w-[1280px]"
             >
                 {/* Навигация на телефоне наезжает на герой, на ПК закрепляется под шапкой. */}
                 <div
@@ -179,7 +179,7 @@ export function CatalogView({
 
                 {/* ── Контекстный баннер категории/подкатегории: всегда видим ── */}
                 <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden
-                    lg:mx-8 lg:mb-6 lg:mt-6 lg:h-[340px] lg:w-auto lg:rounded-[20px]
+                    lg:mx-8 lg:mb-6 lg:mt-3 lg:h-[340px] lg:w-auto lg:rounded-[20px]
                     lg:border lg:border-divider">
                     <ImagePlaceholder
                         src={contextAssetUrl}
