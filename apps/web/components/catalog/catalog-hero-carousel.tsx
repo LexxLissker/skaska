@@ -128,18 +128,11 @@ export function CatalogHeroCarousel({ slides }: { slides: CatalogHeroSlide[] }) 
                             onClick={() => setActiveIndex(index)}
                             aria-label={`Показать слайд «${slide.controlTitle}»`}
                             aria-current={active ? 'true' : undefined}
-                            className={`relative min-w-0 rounded-md px-2 pb-1 pt-3 text-left
-                                transition-[color,background-color,transform,box-shadow] duration-300
-                                ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none
+                            className={`relative min-w-0 cursor-pointer px-2 pb-1 pt-3 text-left transition-colors
                                 before:absolute before:-top-px before:left-0 before:h-[3px] before:rounded-full
-                                before:bg-accent before:transition-[width,opacity] before:duration-500
+                                before:bg-accent before:transition-[width,opacity] before:duration-300
                                 lg:px-3 lg:pb-2 lg:pt-4
-                                ${active
-                                    ? 'bg-white/[0.025] text-text before:w-full before:opacity-100'
-                                    : `text-text/55 before:w-0 before:opacity-0
-                                        hover:-translate-y-0.5 hover:bg-white/[0.055] hover:text-text
-                                        hover:shadow-[0_8px_24px_rgba(0,0,0,0.18)]
-                                        hover:before:w-1/3 hover:before:opacity-70`}`}
+                                ${active ? 'text-text before:w-full before:opacity-100' : 'text-text/55 before:w-0 before:opacity-0 hover:text-text/80'}`}
                         >
                             <span className="block truncate font-heading text-[11px] font-medium lg:text-[15px]">
                                 {slide.controlTitle}
