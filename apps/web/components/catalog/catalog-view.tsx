@@ -179,7 +179,7 @@ export function CatalogView({
 
                 {/* ── Контекстный баннер категории/подкатегории: всегда видим ── */}
                 <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden
-                    lg:mx-8 lg:mb-6 lg:mt-3 lg:h-[340px] lg:w-auto lg:rounded-[20px]
+                    lg:mx-8 lg:mb-6 lg:mt-1 lg:h-[340px] lg:w-auto lg:rounded-[20px]
                     lg:border lg:border-divider">
                     <ImagePlaceholder
                         src={contextAssetUrl}
