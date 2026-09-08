@@ -194,7 +194,8 @@ export function CatalogView({
                             lg:[background:linear-gradient(to_right,color-mix(in_srgb,var(--color-bg)_88%,transparent)_0%,color-mix(in_srgb,var(--color-bg)_62%,transparent)_48%,color-mix(in_srgb,var(--color-bg)_20%,transparent)_100%)]"
                     />
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-5
-                        lg:bottom-1/2 lg:w-[62%] lg:translate-y-1/2 lg:px-9 lg:pb-0">
+                        lg:bottom-auto lg:top-[128px] lg:w-[62%] lg:translate-y-0
+                        lg:px-9 lg:pb-0 lg:pt-0">
                         <h1 className="mb-2 text-[19px] text-[#eef6ff] text-pretty lg:text-[28px]">
                             {contextTitle}
                         </h1>
