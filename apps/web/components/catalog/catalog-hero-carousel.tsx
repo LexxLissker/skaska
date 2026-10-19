@@ -68,7 +68,7 @@ export function CatalogHeroCarousel({ slides }: { slides: CatalogHeroSlide[] }) 
             }}
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
-            className="relative h-[680px] w-full overflow-hidden [touch-action:pan-y]
+            className="relative h-[580px] w-full overflow-hidden [touch-action:pan-y]
                 lg:mx-auto lg:mt-6 lg:h-[620px] lg:w-[calc(100%_-_64px)] lg:max-w-[1216px]
                 lg:rounded-[24px] lg:border lg:border-divider"
         >
