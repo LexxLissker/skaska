@@ -79,8 +79,8 @@ export function CatalogView({
 
     return (
         <>
-            {/* ── Герой категории: 580px с затемнением к низу ────────────────── */}
-            <header className="relative h-[580px] w-full">
+            {/* ── Герой категории: 680px с затемнением к низу ────────────────── */}
+            <header className="relative h-[680px] w-full">
                 <ImagePlaceholder
                     src={category.assetUrl}
                     alt={category.name}
