@@ -15,11 +15,11 @@ export function BundleRail({ offers }: { offers: BundleOffer[] }) {
     if (!offers.length) return null;
 
     return (
-        <section id="bundles" className="scroll-mt-24 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-12">
+        <section id="bundles" className="scroll-mt-24 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-section">
             <h2 className="mb-3 px-4 font-heading text-[22px] font-medium lg:mb-5 lg:px-0 lg:text-[30px]">
                 Наборы для дома
             </h2>
-            <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:px-0">
+            <div className="noscroll flex gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:px-0 lg:pb-0">
                 {BUNDLES.map(bundle => {
                     const offer = offers.find(o => o.slug === bundle.slug);
                     if (!offer) return null;

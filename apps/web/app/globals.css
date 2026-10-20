@@ -12,6 +12,8 @@
 /* Токены продублированы в @theme, чтобы Tailwind сгенерировал утилиты
    bg-surface, text-accent и прочие. Значения те же, что в nocturne.css. */
 @theme {
+  --spacing-section: 3rem;
+
   --color-bg: #090d16;
   --color-surface: #111827;
   --color-surface-2: #1a2336;

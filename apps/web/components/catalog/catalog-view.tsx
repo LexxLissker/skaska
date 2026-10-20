@@ -163,14 +163,14 @@ export function CatalogView({
                 id="catalog"
                 onTouchStart={onCatalogTouchStart}
                 onTouchEnd={onCatalogTouchEnd}
-                className="scroll-mt-24 lg:mx-auto lg:mt-4 lg:max-w-[1280px]"
+                className="scroll-mt-24 lg:mx-auto lg:mt-section lg:max-w-[1280px]"
             >
                 {/* Навигация на телефоне наезжает на герой, на ПК закрепляется под шапкой. */}
                 <div
                     className="relative z-[2] -mt-4 pt-14
                         [background:linear-gradient(to_bottom,transparent_0,var(--color-bg)_50px,var(--color-bg)_100%)]
                         lg:sticky lg:top-[72px] lg:z-30 lg:mt-0
-                        lg:bg-[color-mix(in_srgb,var(--color-bg)_94%,transparent)] lg:px-4 lg:pb-1 lg:pt-4 lg:backdrop-blur-xl"
+                        lg:bg-[color-mix(in_srgb,var(--color-bg)_94%,transparent)] lg:px-4 lg:pb-1 lg:pt-0 lg:backdrop-blur-xl"
                 >
                     <CatalogNav
                         categories={categories}
@@ -209,7 +209,7 @@ export function CatalogView({
                 </section>
 
                 {/* ── Сетка товаров ──────────────────────────────────────────── */}
-                <section className="px-4 lg:px-8 lg:pb-4">
+                <section className="px-4 lg:px-8">
                     {products.length === 0 ? (
                         <p className="py-10 text-center text-[13px] text-text/45">
                             В этой подкатегории пока нет товаров
@@ -251,9 +251,9 @@ export function CatalogView({
             <ReviewRail reviews={reviews} />
 
             {/* ── Почему выбирают нас ───────────────────────────────────────── */}
-            <section id="delivery" className="scroll-mt-24 px-4 pb-1 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-12">
+            <section id="delivery" className="scroll-mt-24 px-4 pb-1 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pb-0 lg:pt-section">
                 <h2 className="mb-3 text-[22px] font-medium lg:mb-5 lg:text-[30px]">Почему выбирают нас</h2>
-                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5 lg:grid lg:grid-cols-2 lg:overflow-visible">
+                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5 lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0">
                     {OFFERS.map(offer => (
                         <article
                             key={offer.title}
@@ -274,9 +274,9 @@ export function CatalogView({
             </section>
 
             {/* ── Как мы готовим ────────────────────────────────────────────── */}
-            <section id="how-we-cook" className="scroll-mt-24 px-4 pb-1 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pt-12">
+            <section id="how-we-cook" className="scroll-mt-24 px-4 pb-1 pt-[22px] lg:mx-auto lg:max-w-[1280px] lg:px-8 lg:pb-0 lg:pt-section">
                 <h2 className="mb-3 text-[22px] font-medium lg:mb-5 lg:text-[30px]">Как мы готовим</h2>
-                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5 lg:grid lg:grid-cols-4 lg:overflow-visible">
+                <div className="noscroll flex gap-[14px] overflow-x-auto pb-1.5 lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
                     {STEPS.map(step => (
                         <article
                             key={step.num}
@@ -303,7 +303,7 @@ export function CatalogView({
             </section>
 
             {/* ── Вопросы и ответы ──────────────────────────────────────────── */}
-            <section className="px-4 pb-10 pt-8 lg:mx-auto lg:max-w-[900px] lg:px-8 lg:pb-20 lg:pt-16">
+            <section className="px-4 pb-10 pt-8 lg:mx-auto lg:max-w-[900px] lg:px-8 lg:pb-20 lg:pt-section">
                 <h2 className="mb-3 text-[22px] font-medium lg:mb-5 lg:text-center lg:text-[30px]">Вопросы и ответы</h2>
                 <FaqAccordion items={FAQS} />
             </section>
