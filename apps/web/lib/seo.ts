@@ -102,8 +102,7 @@ export function catalogMetadata(category: Category, subcategory?: Subcategory): 
     };
 }
 
-export function productMetadata(product: ProductDetail): Metadata {
-    const path = `/product/${product.slug}`;
+export function productMetadata(product: ProductDetail, path: string): Metadata {
     const productName = plainText(product.name);
     const sourceDescription = plainText(product.description);
     const description = sourceDescription

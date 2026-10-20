@@ -1,15 +1,10 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
-import { ProductView } from '@/components/product/product-view';
-import { getConfigurator, getProduct } from '@/lib/api/catalog';
-import {
-    absoluteUrl,
-    plainText,
-    productMetadata,
-    serializeJsonLd,
-    SITE_NAME,
-} from '@/lib/seo';
+import { ProductPageContent } from '@/components/product/product-page-content';
+import { getProduct } from '@/lib/api/catalog';
+import { getProductRoute } from '@/lib/product-routes.server';
+import { productMetadata } from '@/lib/seo';
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -17,45 +12,32 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const product = await getProduct(slug);
+    const [product, route] = await Promise.all([
+        getProduct(slug),
+        getProductRoute(slug),
+    ]);
 
     if (!product) return { robots: { index: false, follow: false } };
-    return productMetadata(product);
+    if (route) {
+        return {
+            alternates: { canonical: route.href },
+            robots: { index: false, follow: true },
+        };
+    }
+    return productMetadata(product, `/product/${product.slug}`);
 }
 
 export default async function ProductPage({ params }: PageProps) {
     const { slug } = await params;
-    const product = await getProduct(slug);
+    const [product, route] = await Promise.all([
+        getProduct(slug),
+        getProductRoute(slug),
+    ]);
 
     if (!product) notFound();
+    if (route) permanentRedirect(route.href);
 
-    const configurator = await getConfigurator(product.id);
-    const productUrl = absoluteUrl(`/product/${product.slug}`);
-    const structuredData = {
-        '@context': 'https://schema.org',
-        '@type': 'Product',
-        name: plainText(product.name),
-        description: plainText(product.description),
-        image: product.assetUrl ? [product.assetUrl] : undefined,
-        brand: { '@type': 'Brand', name: SITE_NAME },
-        offers: product.variants.map(variant => ({
-            '@type': 'Offer',
-            name: variant.name,
-            url: productUrl,
-            priceCurrency: 'RUB',
-            price: (variant.price / 100).toFixed(2),
-            availability: 'https://schema.org/InStock',
-            itemCondition: 'https://schema.org/NewCondition',
-        })),
-    };
-
-    return (
-        <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
-            />
-            <ProductView product={product} configurator={configurator} />
-        </>
-    );
+    // Запасной вариант для товара, который ещё не включён ни в одну
+    // подкатегорию: страница остаётся доступной, но в sitemap не продвигается.
+    return <ProductPageContent product={product} path={`/product/${product.slug}`} />;
 }

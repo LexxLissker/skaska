@@ -16,7 +16,7 @@ import { WeightToggle } from './weight-toggle';
  * с ценой. Товар кладётся в корзину прямо из сетки, без захода в карточку —
  * с настройками по умолчанию.
  */
-export function ProductCard({ product }: { product: ProductCardType }) {
+export function ProductCard({ product, href }: { product: ProductCardType; href: string }) {
     const router = useRouter();
     const [weight, setWeight] = useState<'500' | '1000'>('500');
     const [pending, startTransition] = useTransition();
@@ -47,7 +47,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                     />
                 </button>
             ) : (
-                <Link href={`/product/${product.slug}`} className="block">
+                <Link href={href} className="block">
                     <ImagePlaceholder
                         src={product.assetUrl}
                         alt={product.name}
@@ -64,7 +64,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                         </h3>
                     </button>
                 ) : (
-                    <Link href={`/product/${product.slug}`}>
+                    <Link href={href}>
                         <h3 className="min-h-[34px] text-[13px] font-normal leading-[1.3] text-text lg:min-h-[42px] lg:text-[16px]">
                             {product.name}
                         </h3>

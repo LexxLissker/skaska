@@ -28,6 +28,7 @@ interface Props {
     activeCategorySlug: string;
     activeSubSlug: string | null;
     products: ProductCardType[];
+    productHrefs: Record<string, string>;
     bundles: BundleOffer[];
 }
 
@@ -36,6 +37,7 @@ export function CatalogView({
     activeCategorySlug,
     activeSubSlug,
     products,
+    productHrefs,
     bundles,
 }: Props) {
     const router = useRouter();
@@ -216,7 +218,11 @@ export function CatalogView({
                         <>
                             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
                                 {visible.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        href={productHrefs[product.slug] ?? `/product/${product.slug}`}
+                                    />
                                 ))}
                             </div>
 

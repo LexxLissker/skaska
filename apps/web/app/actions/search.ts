@@ -2,10 +2,12 @@
 
 import { shopApi } from '@/lib/vendure';
 import { demoSearch, isDemoStorefront } from '@/lib/demo-catalog';
+import { getProductRouteIndex } from '@/lib/product-routes.server';
 
 export interface SearchHit {
     name: string;
     slug: string;
+    href: string;
     /** Минимальная цена товара, копейки. */
     price: number;
 }
@@ -30,24 +32,37 @@ const SEARCH_QUERY = /* GraphQL */ `
 `;
 
 export async function searchProducts(term: string): Promise<SearchHit[]> {
-    if (isDemoStorefront) return demoSearch(term);
-    try {
-        const data = await shopApi<{
-        search: {
-            items: Array<{
-                productName: string;
-                slug: string;
-                priceWithTax: { min?: number; value?: number };
-            }>;
-        };
-    }>(SEARCH_QUERY, { term }, { revalidate: 30 });
+    let hits: Array<Omit<SearchHit, 'href'>>;
 
-        return data.search.items.map(item => ({
-        name: item.productName,
-        slug: item.slug,
-        price: item.priceWithTax.min ?? item.priceWithTax.value ?? 0,
-        }));
-    } catch {
-        return demoSearch(term);
+    if (isDemoStorefront) {
+        hits = demoSearch(term);
+    } else {
+        try {
+            const data = await shopApi<{
+                search: {
+                    items: Array<{
+                        productName: string;
+                        slug: string;
+                        priceWithTax: { min?: number; value?: number };
+                    }>;
+                };
+            }>(SEARCH_QUERY, { term }, { revalidate: 30 });
+
+            hits = data.search.items.map(item => ({
+                name: item.productName,
+                slug: item.slug,
+                price: item.priceWithTax.min ?? item.priceWithTax.value ?? 0,
+            }));
+        } catch {
+            hits = demoSearch(term);
+        }
     }
+
+    if (hits.length === 0) return [];
+
+    const routes = await getProductRouteIndex();
+    return hits.map(hit => ({
+        ...hit,
+        href: routes.get(hit.slug)?.href ?? `/product/${hit.slug}`,
+    }));
 }

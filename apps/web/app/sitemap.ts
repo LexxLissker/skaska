@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 
 import { getCategories, getCollectionProducts } from '@/lib/api/catalog';
 import { categoryHref, subcategoryHref } from '@/lib/catalog-routes';
+import { getProductRouteIndex } from '@/lib/product-routes.server';
 import { absoluteUrl } from '@/lib/seo';
 
 // Во время Docker-сборки Vendure ещё недоступен. Генерируем sitemap по запросу,
@@ -10,9 +11,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const categories = await getCategories();
-    const productGroups = await Promise.all(
-        categories.map(category => getCollectionProducts(category.slug)),
-    );
+    const [productGroups, productRouteIndex] = await Promise.all([
+        Promise.all(categories.map(category => getCollectionProducts(category.slug))),
+        getProductRouteIndex(),
+    ]);
     const products = new Map(
         productGroups.flat().map(product => [product.slug, product] as const),
     );
@@ -35,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ],
     );
     const productPages: MetadataRoute.Sitemap = [...products.values()].map(product => ({
-        url: absoluteUrl(`/product/${product.slug}`),
+        url: absoluteUrl(productRouteIndex.get(product.slug)?.href ?? `/product/${product.slug}`),
         changeFrequency: 'weekly' as const,
         priority: 0.7,
         images: product.assetUrl ? [product.assetUrl] : undefined,

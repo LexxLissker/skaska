@@ -74,7 +74,7 @@ export function SearchPanel({ onClose }: { onClose: () => void }) {
                         {hits.map(hit => (
                             <li key={hit.slug}>
                                 <Link
-                                    href={`/product/${hit.slug}`}
+                                    href={hit.href}
                                     onClick={onClose}
                                     className="flex items-center justify-between gap-3 rounded-md
                                         px-2 py-2 hover:bg-surface-2"

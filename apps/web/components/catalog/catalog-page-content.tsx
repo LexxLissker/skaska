@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getBundles, getCategories, getCollectionProducts } from '@/lib/api/catalog';
 import { findSubcategory, subcategoryHref } from '@/lib/catalog-routes';
 import { BUNDLES } from '@/lib/content';
+import { getProductRouteIndex } from '@/lib/product-routes.server';
 import { absoluteUrl, serializeJsonLd } from '@/lib/seo';
 import { CatalogView } from './catalog-view';
 
@@ -39,10 +40,17 @@ export async function CatalogPageContent({
 
     if (subcategoryUrlSegment && !subcategory) notFound();
 
-    const [products, bundles] = await Promise.all([
+    const [products, bundles, productRouteIndex] = await Promise.all([
         getCollectionProducts(subcategory?.slug ?? category.slug),
         getBundles(BUNDLES.map(bundle => bundle.slug)),
+        getProductRouteIndex(),
     ]);
+    const productHrefs = Object.fromEntries(
+        products.map(product => [
+            product.slug,
+            productRouteIndex.get(product.slug)?.href ?? `/product/${product.slug}`,
+        ]),
+    );
     const isCatalogRoot = !categorySlug && !subcategoryUrlSegment;
     const pagePath = isCatalogRoot
         ? '/'
@@ -86,7 +94,7 @@ export async function CatalogPageContent({
                     '@type': 'ListItem',
                     position: index + 1,
                     name: product.name,
-                    url: absoluteUrl(`/product/${product.slug}`),
+                    url: absoluteUrl(productHrefs[product.slug]),
                 })),
             },
         },
@@ -103,6 +111,7 @@ export async function CatalogPageContent({
                 activeCategorySlug={category.slug}
                 activeSubSlug={subcategory?.slug ?? null}
                 products={products}
+                productHrefs={productHrefs}
                 bundles={bundles}
             />
         </>

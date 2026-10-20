@@ -24,6 +24,15 @@ export function subcategoryHref(
     return `/${categorySlug}/${subcategorySegment(categorySlug, subcategorySlug)}`;
 }
 
+/** Канонический адрес товара внутри его категории и подкатегории. */
+export function productHref(
+    categorySlug: string,
+    subcategorySlug: string,
+    productSlug: string,
+): string {
+    return `${subcategoryHref(categorySlug, subcategorySlug)}/${productSlug}`;
+}
+
 /** Главная вкладка открывает общую страницу категории без выбранного фильтра. */
 export function categoryLandingHref(category: Category): string {
     return categoryHref(category.slug);
