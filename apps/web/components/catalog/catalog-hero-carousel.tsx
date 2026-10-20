@@ -132,7 +132,7 @@ export function CatalogHeroCarousel({ slides }: { slides: CatalogHeroSlide[] }) 
                                 before:absolute before:-top-px before:left-0 before:h-[3px] before:rounded-full
                                 before:bg-accent before:transition-[width,opacity] before:duration-300
                                 lg:px-3 lg:pb-2 lg:pt-4
-                                ${active ? 'text-text before:w-full before:opacity-100' : 'text-text/55 before:w-0 before:opacity-0 hover:text-text/80'}`}
+                                ${active ? 'text-[#eef6ff] before:w-full before:opacity-100' : 'text-[#eef6ff] before:w-0 before:opacity-0'}`}
                         >
                             <span className="block truncate font-heading text-[11px] font-medium lg:text-[15px]">
                                 {slide.controlTitle}

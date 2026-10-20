@@ -25,7 +25,8 @@ export function CatalogNav({
     return (
         <>
             <nav
-                className="noscroll flex gap-2 overflow-x-auto px-4 pb-2 lg:justify-center lg:gap-3"
+                className="noscroll flex gap-2 overflow-x-auto px-4 pb-4
+                    lg:justify-center lg:gap-3 lg:pb-2"
                 aria-label="Категории"
             >
                 {categories.map(item => {
@@ -41,7 +42,7 @@ export function CatalogNav({
                                 ${
                                     active
                                         ? 'border-accent bg-surface-2 text-accent shadow-[0_0_12px_rgba(229,184,75,0.18)]'
-                                        : 'border-divider bg-transparent text-[#a5b8de]'
+                                        : 'border-divider bg-transparent text-[#eef6ff]'
                                 }`}
                         >
                             {item.name}
@@ -52,7 +53,8 @@ export function CatalogNav({
 
             {category.children.length > 0 && (
                 <nav
-                    className="noscroll flex gap-4 overflow-x-auto px-4 pb-3 lg:justify-center lg:gap-7 lg:pt-1"
+                    className="noscroll flex gap-4 overflow-x-auto px-4 pb-2
+                        lg:justify-center lg:gap-7 lg:pb-3 lg:pt-1"
                     aria-label="Подкатегории"
                 >
                     {category.children.map(sub => {
@@ -68,7 +70,7 @@ export function CatalogNav({
                                     ${
                                         active
                                             ? 'border-accent text-accent'
-                                            : 'border-transparent text-text/55'
+                                            : 'border-transparent text-[#eef6ff]'
                                     }`}
                             >
                                 {sub.name}

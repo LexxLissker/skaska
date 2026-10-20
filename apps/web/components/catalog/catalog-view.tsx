@@ -167,7 +167,7 @@ export function CatalogView({
             >
                 {/* Навигация на телефоне наезжает на герой, на ПК закрепляется под шапкой. */}
                 <div
-                    className="relative z-[2] -mt-4 pt-10
+                    className="relative z-[2] -mt-4 pt-14
                         [background:linear-gradient(to_bottom,transparent_0,var(--color-bg)_50px,var(--color-bg)_100%)]
                         lg:sticky lg:top-[72px] lg:z-30 lg:mt-0
                         lg:bg-[color-mix(in_srgb,var(--color-bg)_94%,transparent)] lg:px-4 lg:pb-1 lg:pt-4 lg:backdrop-blur-xl"
@@ -180,7 +180,7 @@ export function CatalogView({
                 </div>
 
                 {/* ── Контекстный баннер категории/подкатегории: всегда видим ── */}
-                <section className="relative mb-1 mt-[14px] h-[414px] w-full overflow-hidden
+                <section className="relative mb-1 mt-2 h-[414px] w-full overflow-hidden
                     lg:mx-8 lg:mb-6 lg:mt-1 lg:h-[340px] lg:w-auto lg:rounded-[20px]
                     lg:border lg:border-divider">
                     <ImagePlaceholder
