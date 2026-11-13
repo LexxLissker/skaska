@@ -56,3 +56,8 @@
 nehalennia.ru {
 	reverse_proxy 139.100.237.248:8081
 }
+
+# Основной домен питомника; Caddy управляет HTTPS-сертификатом автоматически.
+veronabulls.ru {
+	reverse_proxy 139.100.237.248:8081
+}
